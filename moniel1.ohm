@@ -1,0 +1,48 @@
+Moniel{
+    Network
+        = Definition*
+    Definition
+        = (BlockDefinition | ConnectionDefinition)
+    ConnectionDefinition
+        = NonemptyListOf<(LayerList | Layer), connectionSymbol>
+    LayerList
+        = "[" NonemptyListOf<Layer,","> "]"
+    Layer
+        = LayerDefinition | identifier
+    LayerDefinition (layer instance)
+        = LayerIdentifier layerName LayerParameters
+    BlockDefinition
+        = layerName "{" Definition* "}"
+    LayerParameters
+        = ("(" NonemptyListOf<Parameter,","> ")")?
+    Parameter (parameter)
+        =  ParameterDefinition (HyperparameterValue | ParameterValue)
+    ParameterDefinition
+        = (parameterName "=")?
+    ParameterValue
+        = Dimension | number | layerName
+    
+    LayerIdentifier
+        = (identifier ":")?
+        
+    layerName (layer name)
+        = upper letter*
+    identifier (identifier)
+        = lower alnum*
+    parameterName
+        = letter+
+    HyperparameterValue
+        = "<" ListOf<ParameterValue,";"> ">"
+    number
+        = digit+
+    Dimension
+        = ListOf<number, "x">
+    connectionSymbol (->)
+        = "->"
+    space
+        += comment
+
+    comment
+        = "//" (~"\n" any)* "\n"  -- singleLine
+        | "/*" (~"*/" any)* "*/"  -- multiLine
+}

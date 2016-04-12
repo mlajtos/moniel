@@ -1,0 +1,66 @@
+
+resnet: RN
+
+// ResNet block is just a ResNetBlock repeated N times
+ResNet{
+    Input -> Repeater(block=ResNetBlock, count=<100;500;1000>) -> Output
+}
+
+ResNet{
+    block: RNB(<2x2,3x3>, 4)
+    Input -> Repeater(b=block, c=<100,500,1000>) -> Output
+}
+
+// ResNetBlock implements a basic unit of residual learning
+ResNetBlock{
+    Block{
+        Input ->
+            Convolution(kS=3x3, strideSize=2x2) ->
+            BatchNormalization(alpha=0.3) ->
+            RectifiedLinearUnit ->
+            Convolution(kS=3x3, strideSize=2x2) ->
+            BatchNormalization(alpha=0.3) ->
+        Output
+    }
+    
+    a:b:Block(kS=2x2)
+    
+    In -> [Identity, a, b] -> Summation -> Out
+}
+
+
+
+
+
+
+
+resnet: RN
+
+// ResNet block is just a chain of ResNetBlocks of length N
+ResNet{
+    In -> Chain(b=RNB, n=100) -> Out
+}
+
+// ResNetBlock implements a basic unit of residual learning
+ResNetBlock{
+    Block{ In -> Conv(kS=3x3, sS=2x2) -> BN -> ReLU -> Conv -> BN -> Out }
+    a: Block
+    In -> [Id, a] -> Sum -> Out
+}
+
+
+
+
+// ako vyjadriť hyper parametre?
+
+Layer(parameter){
+    In -> Meh(parameter) -> Out
+}
+
+a:Layer(param = <3, 4, 5>)
+
+a:Layer(p = <2x2, 3x3>)
+
+// ako definovať horizontálne opakovanie bloku? chain
+// ako definovať vertikálne opakovanie bloku? stack
+// siamese?

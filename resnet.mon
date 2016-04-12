@@ -1,0 +1,11 @@
+ResNet{
+	In -> Repeat(layer=ResNetBlock, size=100) -> Out
+	
+    ResNetBlock{
+		In -> [Identity, a] -> Summation -> Out
+
+        Block{
+    	    Conv -> BatchNorm -> ReLU -> Conv -> BatchNorm
+        }
+    }
+}

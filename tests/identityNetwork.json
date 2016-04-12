@@ -1,0 +1,27 @@
+{
+  "type": "network",
+  "definition": [
+    {
+      "type": "connection",
+      "from": {
+        "type": "layer",
+        "value": "In"
+      },
+      "to": {
+        "type": "connection",
+        "from": {
+          "type": "layer",
+          "value": "Identity",
+          "id": {
+          	"type": "identifier",
+          	"value": "id"
+          }
+        },
+        "to": {
+          "type": "Layer",
+          "value": "Out"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "type": "network",
+  "definition": [
+    {
+      "type": "connection",
+      "from": {
+        "type": "identifier",
+        "value": "m"
+      },
+      "to": {
+        "type": "connection",
+        "from": {
+          "type": "identifier",
+          "value": "a"
+        },
+        "to": {
+          "type": "identifier",
+          "value": "b"
+        }
+      }
+    }
+  ]
+}

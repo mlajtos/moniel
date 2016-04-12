@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Moniel/JS</title>
+	<script type="text/javascript" src="ohm.js"></script>
+	<script type="text/ohm-js" src="moniel1.ohm"></script>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<script src="./ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+
+<div class="panel">
+	<div id="networkDefinition">
+resnet: RN
+
+ResNet{
+    In -> Repeat(ResNetBlock, 100) -> Out
+}
+
+ResNetBlock{
+    Block{Conv -> BatchNorm -> ReLU -> Conv -> BatchNorm}
+    In -> [Identity, a:Block] -> Summation -> Out
+}
+	</div>
+	<pre id="parsingMessage" class="message"></pre>
+</div>
+
+<div class="panel">
+	<div id="grammarSemantics">
+
+var g = ohm.grammarFromScriptElement();
+var semantics = g.semantics().addOperation('eval', {
+	Network: function(definitions) {
+		return {
+			type: "network",
+			code: definitions.eval()
+		};
+	},
+	BlockDefinition: function(layerName, _, definition, _) {
+		return {
+			type: "block",
+			name: layerName.interval.contents,
+			code: definition.eval()
+		};
+	},
+	ConnectionDefinition: function(from, _, meh) {
+		return {
+		    type: "connection",
+		    from: from.eval(),
+		    to: meh.eval()
+		};
+	},
+	LayerDefinition: function(id, _, layerName, _) {
+	    return {
+	        type: "layer",
+	        layer: layerName.eval(),
+	        id: id.eval()[0]
+	    };
+	},
+	Meh: function(_,_,_,_,_) {
+	    return this.interval.contents
+	},
+	identifier: function(_, _) {
+	    return this.interval.contents;
+	},
+	layerName: function(_, _) {
+	    return {
+	        type: "layer",
+	        value: this.interval.contents
+	    }
+	}
+});
+	</div>
+	<pre id="grammarMessage" class="message"></pre>
+</div>
+
+<div class="panel">
+	<div id="parsedNetworkDefinition" readonly></div>
+</div>
+
+<script>
+    var networkDefinition = ace.edit("networkDefinition");
+    networkDefinition.setTheme("ace/theme/monokai");
+    networkDefinition.getSession().setMode("ace/mode/text");
+    networkDefinition.on("change", update);
+    networkDefinition.$blockScrolling = Infinity;
+
+    var grammarSemantics = ace.edit("grammarSemantics");
+    grammarSemantics.setTheme("ace/theme/monokai");
+    grammarSemantics.getSession().setMode("ace/mode/javascript");
+    grammarSemantics.on("change", update);
+    grammarSemantics.$blockScrolling = Infinity;
+
+    var parsedNetworkDefinition = ace.edit("parsedNetworkDefinition");
+    parsedNetworkDefinition.setTheme("ace/theme/monokai");
+    parsedNetworkDefinition.getSession().setMode("ace/mode/json");
+    parsedNetworkDefinition.setOptions({
+    	readOnly: true
+	});
+	parsedNetworkDefinition.$blockScrolling = Infinity;
+
+
+
+function getNetworkSpecification() {
+	return networkDefinition.getValue();
+}
+
+function getSemantics() {
+	return grammarSemantics.getValue();
+}
+
+function setParsingResult(value) {
+	parsedNetworkDefinition.setValue(value);
+}
+
+
+function update(){
+	var parsingMessageEl = document.getElementById("parsingMessage");
+	var grammarMessageEl = document.getElementById("grammarMessage");
+
+	try{
+		grammarMessageEl.textContent = "OK";
+	  	grammarMessageEl.dataset.error = false;
+
+		eval(getSemantics());
+	} catch (error) {
+		grammarMessageEl.textContent = error;
+	  	grammarMessageEl.dataset.error = true;
+	  	return;
+	}
+
+	var result;
+	var networkDefinition = getNetworkSpecification();
+
+	var m = g.match(networkDefinition);
+
+	if (m.succeeded()) {
+		try {
+			var evalResult = semantics(m).eval();
+		} catch (error) {
+			grammarMessageEl.textContent = error;
+		  	grammarMessageEl.dataset.error = true;
+		  	return;
+		}
+		result = JSON.stringify(evalResult, null, 2);
+		setParsingResult(result);
+
+		parsingMessageEl.textContent = "OK";
+		parsingMessageEl.dataset.error = false;
+	} else {
+	  	parsingMessageEl.textContent = m.message;
+	  	parsingMessageEl.dataset.error = true;
+	}
+}
+
+update();
+</script>
+
+</body>
+</html>

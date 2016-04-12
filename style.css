@@ -1,0 +1,51 @@
+body{
+	display: flex;
+	margin: 0;
+    height: 100vh;
+    width: 100vw;
+
+    background-color: white;
+    color: black;
+
+    font-size: 16px;
+}
+
+textarea{
+	resize: none;
+    flex: 1;
+    font-family: "Monaco", monospace;
+    transition: all 0.2s ease-in-out;
+    padding: 1em;
+    background-color: transparent;
+    border: 1px solid gray;
+	outline: none;
+}
+textarea:focus{
+	background-color: rgba(255, 255, 255, 0.07);
+}
+.panel{
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+textarea[disabled] {
+    opacity: 0.3;
+}
+
+.message{
+    margin: 0;
+    padding: 1em;
+    white-space: pre-wrap;
+}
+
+.message[data-error="true"]{
+	background-color: hsl(4, 100%, 40%);
+}
+
+.message[data-error="false"]{
+	display: none;
+}
+
+.ace_editor{
+    height: 100vh;
+}
