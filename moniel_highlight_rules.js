@@ -13,28 +13,85 @@ var MonielHighlightRules = function() {
             {
                 token : "comment",
                 regex : /\/\/.*$/
+            },
+            
+            {
+                regex : "{",
+                token : "lparen",
+                next  : "start"
             }, {
-                regex : "([A-Z][a-zA-Z]*)({)",
-                token : ["storage.type", "lparen"],
-            },{
-                regex : "([A-Z][a-zA-Z]*)(\\()?",
-                token : ["entity.name.function", "lparen"]
-            }, {
-                regex : "([a-z][a-zA-Z]*)(=)",
-                token : ["variable.parameter", "keyword.operator"]
-            }, {
+                regex : "}",
+                token : "rparen",
+                next  : "start"
+            },
+            
+            {
+                regex : "\"[^\"]*\"",
+                token : "comment"
+            },
+            
+            /* Block Definition*/
+            
+            { // parametrized block definition
+                regex : "([A-Z][a-zA-Z]*)(\\s*)(\\[)",
+                token : ["storage.type", "text", "lparen"],
+                next  : "blockParameters"
+            }, { // non-parametrized block definition
+                regex : "([A-Z][a-zA-Z]*)(\\s*)({)",
+                token : ["storage.type", "text", "lparen"],
+                next  : "start"
+            },
+            
+            
+            /* Block Instance*/
+            
+            { // parametrized block instance
+                regex : "([A-Z][a-zA-Z]*)(\\s*)(\\()",
+                token : ["entity.name.function", "text", "lparen"],
+                next  : "blockParameters"
+            }, { // non-parametrized block instance
+                regex : "[A-Z][a-zA-Z]*",
+                token : "entity.name.function"
+            },
+            
+            {
                 token : "keyword.operator",
                 regex : "(->)|(\\|\\|)(x)"
             }, {
-                token : ["variable.language", "text"],
+                token : "support.other",
                 regex : "([a-z][a-zA-Z]*)"
-            }, {
-                regex : "([1-9]+)(x([1-9]+))*",
-                token : "constant.numeric"
-            }, {
-                regex : "([0-9]+)(\\.[0-9]+)?",
-                token : "constant.numeric"
             }
+        ],
+    "blockParameters": [
+            {
+                regex : "\\)",
+                token : "rparen",
+                next  : "start"
+            }, {
+                regex : "([a-z][a-zA-Z]*)",
+                token : "variable.parameter",
+            }, {
+                regex : "=",
+                token : "keyword.operator",
+                next  : "blockParameter"
+            }
+        ],
+    "blockParameter": [
+            {
+                regex : ",",
+                token : "text",
+                next  : "blockParameters"
+            }, {
+                regex : "\\)|\\]",
+                token : "rparen",
+                next  : "start"
+            }, {
+                regex : "[0-9](x[0-9]*)",
+                token : "constant.numeric"
+            }, {
+                regex : "[0-9]+",
+                token : "constant.numeric"
+            } 
         ]
    };
 };
