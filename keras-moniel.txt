@@ -1,0 +1,19 @@
+model = Sequential()
+
+model.add(Dense(64, input_dim=20, init='uniform', activation='relu'))
+model.add(Dropout(0.5))
+
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.5))
+
+model.add(Dense(1, activation='sigmoid'))
+
+
+# model.compile(loss='binary_crossentropy', optimizer='rmsprop')
+
+model: Net
+Network{ In(20) -> B -> B -> Dens(1) -> Sigm -> Out}
+Block{In -> Dense(64, 'uni') -> ReLU -> Drop(0.5) –> Out}
+
+
+No konečne. :)

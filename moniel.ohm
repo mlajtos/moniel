@@ -3,24 +3,33 @@ Moniel{
         = Definition*
     Definition
         = (BlockDefinition | ConnectionDefinition)
+
     ConnectionDefinition
         = NonemptyListOf<(BlockList | Block), connectionSymbol>
+
     BlockList (block list)
-        = "{" NonemptyListOf<Block, ","> "}"
-    Block (block)
+        = "[" ListOf<Block, ","> "]"
+
+    Block
         = BlockInstance | identifier
-    BlockInstance (block instance)
+
+    BlockInstance (block)
         = LayerIdentifier blockName BlockInstanceParameters
     BlockInstanceParameters
         = ("(" Parameters ")")?
+
     BlockDefinition
-        = blockName BlockDefinitionParameters "{" Definition* "}"
+        = "+" blockName BlockDefinitionParameters BlockDefinitionBody
     BlockDefinitionParameters
-        = ("[" Parameters "]")?
+        = ("(" Parameters ")")?
+    BlockDefinitionBody
+        = ("{" Definition* "}")?
+
     Parameters
-        = NonemptyListOf<Parameter, ",">
+        = ListOf<Parameter, ",">
     Parameter (parameter)
         =  parameterName "=" (ValueList | Value)
+
     ValueList
         = "<" ListOf<Value, ";"> ">"
     Value

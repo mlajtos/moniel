@@ -3,157 +3,307 @@
 <head>
 	<title>Moniel/JS</title>
 	<script type="text/javascript" src="ohm.js"></script>
-	<script type="text/ohm-js" src="moniel1.ohm"></script>
 	<link rel="stylesheet" type="text/css" href="style.css" />
-	<script src="./ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="./ace-builds/src/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="./ace-builds/src/ext-language_tools.js"></script>
+	<script src="jquery-2.2.3.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="bower_components/d3/d3.min.js"></script>
+	<script src="bower_components/lodash/lodash.js"></script>
+	<script src="bower_components/graphlib/dist/graphlib.core.js"></script>
+	<script src="bower_components/dagre/dist/dagre.core.js"></script>
+	<script src="bower_components/dagre-d3/dist/dagre-d3.core.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+
+	<script type="text/javascript" src="core.js"></script>
 </head>
 <body>
 
-<div class="panel">
-	<div id="networkDefinition">
-resnet: RN
 
-ResNet{
-    In -> Repeat(ResNetBlock, 100) -> Out
-}
-
-ResNetBlock{
-    Block{Conv -> BatchNorm -> ReLU -> Conv -> BatchNorm}
-    In -> [Identity, a:Block] -> Summation -> Out
-}
+<div class="panel" data-hidden="true">
+	<div class="header">
+		<div class="left"></div>
+		<div class="center">Grammar</div>
+		<div class="right">
+		</div>
 	</div>
-	<pre id="parsingMessage" class="message"></pre>
+	<div id="grammar" class="file" data-file="moniel1.ohm" data-mode="ace/mode/text"></div>
+	<pre id="grammarMessage" class="message" data-error="false"></pre>
+</div>
+
+<div class="panel" data-hidden="true">
+	<div class="header">
+		<div class="left"></div>
+		<div class="center">Semantics</div>
+		<div class="right">
+		</div>
+	</div>
+	<div id="semantics" class="file" data-file="moniel1.js" data-mode="ace/mode/javascript"></div>
+	<pre id="semanticsMessage" class="message" data-error="false"></pre>
 </div>
 
 <div class="panel">
-	<div id="grammarSemantics">
-
-var g = ohm.grammarFromScriptElement();
-var semantics = g.semantics().addOperation('eval', {
-	Network: function(definitions) {
-		return {
-			type: "network",
-			code: definitions.eval()
-		};
-	},
-	BlockDefinition: function(layerName, _, definition, _) {
-		return {
-			type: "block",
-			name: layerName.interval.contents,
-			code: definition.eval()
-		};
-	},
-	ConnectionDefinition: function(from, _, meh) {
-		return {
-		    type: "connection",
-		    from: from.eval(),
-		    to: meh.eval()
-		};
-	},
-	LayerDefinition: function(id, _, layerName, _) {
-	    return {
-	        type: "layer",
-	        layer: layerName.eval(),
-	        id: id.eval()[0]
-	    };
-	},
-	Meh: function(_,_,_,_,_) {
-	    return this.interval.contents
-	},
-	identifier: function(_, _) {
-	    return this.interval.contents;
-	},
-	layerName: function(_, _) {
-	    return {
-	        type: "layer",
-	        value: this.interval.contents
-	    }
-	}
-});
+	<div class="header">
+		<div class="left"></div>
+		<div class="center">Net</div>
+		<div class="right">
+		</div>
 	</div>
-	<pre id="grammarMessage" class="message"></pre>
+	<div id="network" class="file" data-file="resnet.mon" data-mode="ace/mode/moniel"></div>
+	<pre id="networkMessage" class="message" data-error="false"></pre>
 </div>
 
-<div class="panel">
-	<div id="parsedNetworkDefinition" readonly></div>
+<div class="panel">	
+	<div class="header">
+		<div class="left"></div>
+		<div class="center">AST</div>
+		<div class="right">
+		</div>
+	</div>
+	<div id="ast" class="file" data-readonly="true" data-mode="ace/mode/json"></div>
+</div>
+
+<div class="panel">	
+	<div class="header">
+		<div class="left"></div>
+		<div class="center">Meh</div>
+		<div class="right">
+		</div>
+	</div>
+	<div id="process" class="file" data-file="moniel1_process.js" data-mode="ace/mode/javascript"></div>
+	<pre id="processMessage" class="message" data-error="false"></pre>
+</div>
+
+<div class="panel" data-hidden="false">	
+	<div class="header">
+		<div class="center">Objects</div>
+	</div>
+	<div id="objects" class="file" data-readonly="true" data-mode="ace/mode/json"></div>
+</div>
+
+<div class="panel" data-full="true">	
+	<div class="header">
+		<div class="center">Viz</div>
+	</div>
+	<svg id="viz"><g id="group"></g></svg>
 </div>
 
 <script>
-    var networkDefinition = ace.edit("networkDefinition");
-    networkDefinition.setTheme("ace/theme/monokai");
-    networkDefinition.getSession().setMode("ace/mode/text");
-    networkDefinition.on("change", update);
-    networkDefinition.$blockScrolling = Infinity;
 
-    var grammarSemantics = ace.edit("grammarSemantics");
-    grammarSemantics.setTheme("ace/theme/monokai");
-    grammarSemantics.getSession().setMode("ace/mode/javascript");
-    grammarSemantics.on("change", update);
-    grammarSemantics.$blockScrolling = Infinity;
+$(".panel .header").on("dblclick", function(event) {
+	var panel = this.parentNode;
+	var mini = panel.getAttribute("data-mini");
+	var newValue = (mini === "true") ? "" : "true";
+	panel.setAttribute("data-mini", newValue);
 
-    var parsedNetworkDefinition = ace.edit("parsedNetworkDefinition");
-    parsedNetworkDefinition.setTheme("ace/theme/monokai");
-    parsedNetworkDefinition.getSession().setMode("ace/mode/json");
-    parsedNetworkDefinition.setOptions({
-    	readOnly: true
+	setTimeout(function(){
+		window.dispatchEvent(new Event('resize'));	
+	}, 300);
+});
+
+$(".file").each(function() {
+	var editor = ace.edit(this.id);
+	editor.$blockScrolling = Infinity;
+
+	var saved = localStorage.getItem(editor.container.id);
+	if (saved !== null) {
+		editor.setValue(saved, -1);
+	} else {
+		if (this.dataset.file) {
+			$.ajax({
+			  url: this.dataset.file,
+			  dataType: "text",
+			  success: function(content) {
+			  	editor.setValue(content, -1);
+			  },
+			  error: function(meh, a, b) {
+			  	console.warn(meh, a, b)
+			  }
+			});
+		}
+	}
+
+	if (this.dataset.mode) {
+		editor.getSession().setMode(this.dataset.mode);
+	} else {
+		editor.getSession().setMode("ace/mode/text");
+	}
+
+	if (this.dataset.theme) {
+		editor.setTheme(this.dataset.theme);
+	} else {
+		editor.setTheme("ace/theme/monokai");
+	}
+
+	if (this.dataset.readonly) {
+		editor.setOption("readOnly", true);
+	}
+
+	if (!this.dataset.readonly) {
+		editor.on("change", function(value) {
+			localStorage.setItem(editor.container.id, editor.getValue());
+		});
+
+		editor.on("change", delayedUpdate);
+	}
+
+	editor.setOptions({
+	    enableBasicAutocompletion: true,
+	    wrap: true,
+	    autoScrollEditorIntoView: true,
+	    //maxLines: 47,
+	    //minLines: 3
 	});
-	parsedNetworkDefinition.$blockScrolling = Infinity;
 
+	editor.on("change", function(_, editor) {
+		setTimeout(function() {
+			editor.resize();
+		}, 250)
+	});
 
+	editor.on("focus", function(event, editor) {
+		editor.container.parentNode.classList.add("focused")
+	});
+
+	editor.on("blur", function(event, editor) {
+		editor.container.parentNode.classList.remove("focused")
+	});
+})
 
 function getNetworkSpecification() {
-	return networkDefinition.getValue();
+	return ace.edit("network").getValue();
+}
+
+function getGrammar() {
+	return ace.edit("grammar").getValue();
 }
 
 function getSemantics() {
-	return grammarSemantics.getValue();
+	return ace.edit("semantics").getValue();
 }
 
 function setParsingResult(value) {
-	parsedNetworkDefinition.setValue(value);
+	ace.edit("ast").setValue(value, -1);
+}
+
+function getAST() {
+	return ace.edit("ast").getValue();	
+}
+
+function getProcess() {
+	return ace.edit("process").getValue();
+}
+
+function setObjects() {
+	if (state.objects){
+		ace.edit("objects").setValue(JSON.stringify(state.objects, null, 2), -1);
+	}
+}
+
+var state = {
+	lock: null,
+	grammar: null,
+	semantics: null,
+	ast: null,
+	process: null,
+	objects: null
+}
+
+function delayedUpdate() {
+	if (state.lock) {
+		clearTimeout(state.lock);
+	}
+	state.lock = setTimeout(function() {
+		update();
+	}, 10)
 }
 
 
 function update(){
-	var parsingMessageEl = document.getElementById("parsingMessage");
+	console.log("update!");
+
+	var networkMessageEl = document.getElementById("networkMessage");
 	var grammarMessageEl = document.getElementById("grammarMessage");
+	var semanticsMessageEl = document.getElementById("semanticsMessage");
+	var processMessageEl = document.getElementById("processMessage");
+
+	var networkDefinitionEditor = ace.edit("network");
 
 	try{
 		grammarMessageEl.textContent = "OK";
 	  	grammarMessageEl.dataset.error = false;
-
-		eval(getSemantics());
+		var g = ohm.grammar(getGrammar());
+		state.grammar = g;
 	} catch (error) {
+		console.log(error.interval);
 		grammarMessageEl.textContent = error;
 	  	grammarMessageEl.dataset.error = true;
+	}
+
+	try{
+		semanticsMessageEl.textContent = "OK";
+	  	semanticsMessageEl.dataset.error = false;
+	  	
+		eval(getSemantics());
+		state.semantics = semantics;
+	} catch (error) {
+		semanticsMessageEl.textContent = error;
+	  	semanticsMessageEl.dataset.error = true;
 	  	return;
 	}
 
-	var result;
-	var networkDefinition = getNetworkSpecification();
-
-	var m = g.match(networkDefinition);
+	try {
+		var result;
+		var networkDefinition = getNetworkSpecification();
+		var m = g.match(networkDefinition);
+	} catch (error) {
+		console.log(error);
+	}
 
 	if (m.succeeded()) {
 		try {
 			var evalResult = semantics(m).eval();
+			state.ast = evalResult;
 		} catch (error) {
-			grammarMessageEl.textContent = error;
-		  	grammarMessageEl.dataset.error = true;
+			semanticsMessageEl.textContent = error;
+		  	semanticsMessageEl.dataset.error = true;
 		  	return;
 		}
 		result = JSON.stringify(evalResult, null, 2);
 		setParsingResult(result);
 
-		parsingMessageEl.textContent = "OK";
-		parsingMessageEl.dataset.error = false;
+		networkDefinitionEditor.session.clearAnnotations();
+		networkDefinitionEditor.execCommand("goToNextError");
 	} else {
-	  	parsingMessageEl.textContent = m.message;
-	  	parsingMessageEl.dataset.error = true;
+	  	var position = networkDefinitionEditor.session.doc.indexToPosition(m.getRightmostFailurePosition())
+	  	var message = "Expected " + m.getExpectedText()
+
+	  	networkDefinitionEditor.session.setAnnotations([{
+  			row: position.row,
+  			column: position.column,
+  			text: message,
+  			type: "error" // also warning and information
+		}]);
+		networkDefinitionEditor.execCommand("goToNextError");
+	}
+
+	if (state.ast) {
+		processMessageEl.textContent = "OK";
+	  	processMessageEl.dataset.error = false;
+
+		state.process = getProcess();
+		// console.log(state.process)
+
+		try{
+			eval(state.process);
+		} catch(error) {
+			processMessageEl.textContent = error;
+	  		processMessageEl.dataset.error = true;
+			console.warn(error);
+		}
+		setObjects();
 	}
 }
 
-update();
 </script>
 
 </body>

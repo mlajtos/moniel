@@ -1,3 +1,57 @@
+REGISTER_OP("ZeroOut")
+    .Attr("T: {float, int32}")
+    .Input("to_zero: T")
+    .Output("zeroed: T");
+
+ZeroOut(T: [float, int32]) {
+    toZero:T -> zeroed:T
+}
+
+
+
+–––––––
+
+meh:FutureTeller{
+    image <- MNIST.random
+    hint <- Gauss{
+        shape <- Nx10
+        mean <- 0
+        variance <- 0
+    }
+}
+
+meh.prediction -> ReLU -> Dropout -> ReLU
+
+FutureTeller{
+    image[28x28] -> Reshape(shape=786) -> reshapedImage
+    hint[10]
+
+    (reshapedImage && hint) -> input[796]
+        -> ResNet(length=100) ->
+    (reconstructedImage[28x28] && prediction[10])
+}
+
+-------
+
+-> Image -1x28x28-> Reshape(shape=1x786) -1x786-> image
+-> Hint -1x10-> Gauss(mean=0, variance=2) -1x10-> blindHint
+
+<- ReconstructedImage <-1x28x28- reconstrucedImage
+<- Prediction <-1x10- prediction
+
+image && blindHint
+    -1x796->
+ResidualNetwork(l=100)
+    -1x796->
+reconstructedImage && prediction
+
+
+
+
+
+
+
+
 
 resnet: RN
 
@@ -27,11 +81,6 @@ ResNetBlock{
     
     In -> [Identity, a, b] -> Summation -> Out
 }
-
-
-
-
-
 
 
 resnet: RN
