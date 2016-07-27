@@ -2,7 +2,7 @@ Moniel{
     Network
         = Definition*
     Definition
-        = (BlockDefinition | ConnectionDefinition)
+        = (BlockDefinition | Scope | ConnectionDefinition)
 
     ConnectionDefinition
         = NonemptyListOf<(BlockList | Block), connectionSymbol>
@@ -11,18 +11,26 @@ Moniel{
         = "[" ListOf<Block, ","> "]"
 
     Block
-        = BlockInstance | identifier
+        = BlockInstance | blockIdentifier
 
     BlockInstance (block)
-        = LayerIdentifier blockName BlockInstanceParameters
+        = BlockName blockType BlockInstanceParameters
     BlockInstanceParameters
         = ("(" Parameters ")")?
 
+    BlockName
+        = (blockName ":")?
+
     BlockDefinition
-        = "+" blockName BlockDefinitionParameters BlockDefinitionBody
+        = "+" blockType BlockDefinitionParameters BlockDefinitionBody
     BlockDefinitionParameters
         = ("(" Parameters ")")?
     BlockDefinitionBody
+        = ("{" Definition* "}")?
+
+    Scope
+        = "/" scopeName ScopeBody
+    ScopeBody
         = ("{" Definition* "}")?
 
     Parameters
@@ -33,21 +41,24 @@ Moniel{
     ValueList
         = "<" ListOf<Value, ";"> ">"
     Value
-        = blockName | Dimension
+        = blockType | float | Shape | integer
 
-    LayerIdentifier
-        = (identifier ":")?
-        
-    blockName (block name)
-        = upper letter*
-    identifier (identifier)
-        = lower alnum*
+    scopeName
+        = lower (alnum | "_")*
+    blockType (block name)
+        = upper (alnum | "_")*
+    blockName
+        = lower (alnum | "_")*
+    blockIdentifier (identifier)
+        = "./"? lower (alnum | "_" | "/")*
     parameterName
         = letter+
-    number
+    integer
         = digit+
-    Dimension
-        = ListOf<number, "x">
+    float
+        = digit* "." digit+
+    Shape
+        = ListOf<integer, "x">
     connectionSymbol (->)
         = "->"
     space

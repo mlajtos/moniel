@@ -1,4 +1,5 @@
 function extractDefinitionsFromAST(node, definitionAccumulator) {
+    return;
     if (!node) {
         return;
     }
@@ -38,14 +39,12 @@ function compileToAST(grammar, semantics, source) {
     }
 }
 
-
 function isMultiPrefix(name, target) {
     if (name.length !== target.length) { return false; }
     var i = 0;
     while(i < name.length && target[i].startsWith(name[i])) { i += 1; }
     return (i === name.length); // got to the end?
 }
-
 
 function nameResolution(partial, list) {
     partialArray = partial.split(/(?=[A-Z])/);

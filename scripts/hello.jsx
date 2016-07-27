@@ -8,10 +8,15 @@ class Hello extends React.Component{
 			"networkDefinition": "",
 			"ast": null,
 			"annotations": null,
-			"definitions": []
+			"definitions": [],
+			"highlightRange": {
+				startIdx: 0,
+				endIdx: 0
+			}
 		};
 		this.updateNetworkDefinition = this.updateNetworkDefinition.bind(this);
 		this.delayedUpdateNetworkDefinition = this.delayedUpdateNetworkDefinition.bind(this);
+		this.onHighlight = this.onHighlight.bind(this);
 		this.lock = null;
 	}
 
@@ -44,6 +49,12 @@ class Hello extends React.Component{
 		}
 	}
 
+	onHighlight(range) {
+		this.setState({
+			highlightRange: range
+		})
+	}
+
 	render() {
 		var style = {
 	  		position: "absolute",
@@ -63,11 +74,12 @@ class Hello extends React.Component{
     				annotations={this.state.annotations}
     				onChange={this.delayedUpdateNetworkDefinition}
     				defaultValue="In -> conv1:C -> ReLU -> C -> [ReLU,Id] -> [C,C,C] -> out:Out  conv1 -> ReLU -> C -> [ReLU,Id] -> [C,C,C] -> out:Out"
+    				highlightRange={this.state.highlightRange}
     			/>
     		</Panel>
     		
     		<Panel title="Schema">
-    			<Graph ast={this.state.ast} />
+    			<Graph ast={this.state.ast} onHighlight={this.onHighlight} />
     		</Panel>
 
     		{/*

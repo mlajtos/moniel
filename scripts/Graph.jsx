@@ -4,30 +4,17 @@ class Graph extends React.Component{
         console.log("constructor");
         super(props);
 
-        this.graph = new dagreD3.graphlib.Graph()
-            .setGraph({})
-            .setDefaultEdgeLabel(function() { return {}; });
-
         this.dagreRenderer = new dagreD3.render();
 
         this.walkAst = this.walkAst.bind(this);
-        var customHash = function(str) {
-            var hash = 0;
-            for(var i = 0; i < str.length; i++) {
-                hash += str.charCodeAt(i) % 47;
-            }
-            return hash;
-        };
-
-        var customHash = function(str) {
-            var hash = 11;
-            for (var i = 0; i < str.length; i++) {
-                hash = hash * 47 + str.charCodeAt(i) % 32;
-            }
-            return hash
+        this.defaultEdge = {
+            arrowhead: "vee",
+            lineInterpolate: "basis"
         }
-        this.colorHash = new ColorHash({saturation: [0.9], lightness: [0.45], hash: customHash});
-        this.lineInterpolate = "basis";
+    }
+
+    getDefaultEdge() {
+        return JSON.parse(JSON.stringify(this.defaultEdge));
     }
 
     componentDidMount() {
@@ -50,14 +37,44 @@ class Graph extends React.Component{
 
     generateGraph(ast) {
         // console.log("generateGraph")
-        var graph = new dagreD3.graphlib.Graph()
+        var graph = new dagreD3.graphlib.Graph({compound:true})
             .setGraph({})
             .setDefaultEdgeLabel(function() { return {}; });
 
         this.nodeCounter = {};
         this.previousItem = null;
 
-        this.blockDefinitions = ["Input", "KatarinaLajtosova", "Output", "Convolution", "BatchNormalization", "Identity", "RectifiedLinearUnit", "Summation", "Dropout"];
+        this.scopeStack = [];
+
+        this.blockDefinitions = [
+            "Add",
+            "Input",
+            "Output",
+            "Placeholder",
+            "Variable",
+            "Constant",
+            "Multiply",
+            "Convolution",
+            "Dense",
+            "MaxPooling",
+            "BatchNormalization",
+            "Identity",
+            "RectifiedLinearUnit",
+            "Sigmoid",
+            "ExponentialLinearUnit",
+            "Tanh",
+            "Absolute",
+            "Summation",
+            "Dropout",
+            "MatrixMultiply",
+            "BiasAdd",
+            "Reshape",
+            "Concat",
+            "Flatten",
+            "Tensor",
+            "Softmax",
+            "CrossEntropy"
+        ];
         extractDefinitionsFromAST(this.ast, this.blockDefinitions)
 
         this.walkAst(this.ast, graph);
@@ -65,22 +82,43 @@ class Graph extends React.Component{
         return graph;
     }
 
-    generateIdentifier(blockName) {
-        if (this.nodeCounter.hasOwnProperty(blockName)) {
-            this.nodeCounter[blockName] += 1;
+    generateIdentifier(scopeStack, node, type) {
+        var scope = scopeStack.join("/");
+        var id = scope + "/" + type;
+
+        if (node.type === "BlockInstance") {
+            if (!node.alias) {
+                if (this.nodeCounter.hasOwnProperty(id)) {
+                    this.nodeCounter[id] += 1;
+                } else {
+                    this.nodeCounter[id] = 1;
+                }
+                id = scope + "/" + type + this.nodeCounter[id];
+            } else {
+                id = scope + "/" + node.alias.value;
+            }
+        } else if (node.type === "Identifier") {
+            id = scope + "/" + node.value;
+        } else if (node.type === "Scope") {
+            id = scope;
         } else {
-            this.nodeCounter[blockName] = 1;
+            console.warn("uf!", node);
         }
-        return blockName + this.nodeCounter[blockName];
+
+        //console.log("nove ID:", id);
+
+        return id;
     }
 
     walkAst(node, graph) {
+        // console.log(node.type);
         if (!node) {
             return;
         }
         switch (node.type) {
             case "Network":
-                // node.definitions.map(definition => console.log(definition, graph));
+                this.scopeStack.push(".");
+                graph.setNode(this.scopeStack.join("/"), {class: "Network"});
                 node.definitions.forEach(function(definition) {
                     this.walkAst(definition, graph);
                 }, this);
@@ -94,48 +132,59 @@ class Graph extends React.Component{
                 break;
             case "BlockInstance":
                 var block = nameResolution(node.name, this.blockDefinitions);
-                var type, label, shape;
+                var type, label, shape, color, id;
 
                 if (block.length === 0) {
                     type = "undefined";
                     label = node.name;
                     shape = "rect";
-                    // annotate source -> unrecognized block type
+                    console.log("Unknown block type");
                 } else if (block.length === 1) {
                     type = block[0];
                     label = block[0];
                     shape = "rect";
+                    color = colorHash.hex(label);
                 } else {
                     type = "ambiguous"
                     label = node.name
                     shape = "diamond";
-                    // annotate source -> ambiguous block name, show possible matches
+                    console.log("ambiguous block type; possible matches:", block);
                 }
+
+                var id = this.generateIdentifier(this.scopeStack, node, type);
 
                 if (!node.alias) {
                     node.alias = {
                         "type": "Identifier",
-                        "value": this.generateIdentifier(label),
+                        "value": id,
                         "autogenerated": true
                     }
+                } else {
+                    node.alias.value = id;
+                    label = node.alias.value;
                 }
 
-                var color = this.colorHash.hex(label);
-
-                graph.setNode(node.alias.value, {label: label, rx: 5, ry: 5, class: type, shape: shape, labelStyle: "fill: white", style: "fill: " + color});
+                graph.setNode(node.alias.value, {
+                    label: label,
+                    class: type,
+                    shape: shape,
+                    style: "fill: " + color,
+                    _interval: node._interval
+                });
+                graph.setParent(node.alias.value, this.scopeStack.join("/"));
                 
                 if (this.previousItem) {
                     
                     if (this.previousItem.type === "Identifier") {
-                        graph.setEdge(this.previousItem.value, node.alias.value, {lineInterpolate: this.lineInterpolate});
+                        graph.setEdge(this.previousItem.value, node.alias.value, this.getDefaultEdge());
                     } else if (this.previousItem.type === "BlockInstance") {
-                        graph.setEdge(this.previousItem.alias.value, node.alias.value, {lineInterpolate: this.lineInterpolate});   
+                        graph.setEdge(this.previousItem.alias.value, node.alias.value, this.getDefaultEdge());   
                     } else if (this.previousItem.type === "BlockList") {
                         this.previousItem.list.forEach(function(item) {
                             if (item.type === "BlockInstance") {
-                                graph.setEdge(item.alias.value, node.alias.value, {lineInterpolate: this.lineInterpolate});
+                                graph.setEdge(item.alias.value, node.alias.value, this.getDefaultEdge());
                             } else if (item.type === "Identifier") {
-                                graph.setEdge(item.value, node.alias.value, {lineInterpolate: this.lineInterpolate});
+                                graph.setEdge(item.value, node.alias.value, this.getDefaultEdge());
                             }
                         }, this);
                     }
@@ -147,27 +196,33 @@ class Graph extends React.Component{
                 }, this);
                 break;
             case "Identifier":
-                // 
+                var id = this.generateIdentifier(this.scopeStack, node, null);
+                if (!graph.hasNode(id)) {
+                    console.warn("Unresolved identifier - ", id, node);
+                    node.value = id;
 
-                if (!graph.hasNode(node.value)) {
-                    console.warn("Unresolved identifier - ", node.value);
-                    var color = this.colorHash.hex(node.value);
-
-                   graph.setNode(node.value, {label: node.value, class: "type-identifier", style: "fill: " + color}); 
+                    graph.setNode(id, {
+                        label: node.value,
+                        rx: 5, ry: 5,
+                        class: "undefined"
+                    });
+                    graph.setParent(node.value, this.scopeStack.join("/"));
+                } else {
+                    node.value = id;
                 }
 
                 if (this.previousItem) {
 
                     if (this.previousItem.type === "Identifier") {
-                        graph.setEdge(this.previousItem.value, node.value, {lineInterpolate: this.lineInterpolate});
+                        graph.setEdge(this.previousItem.value, node.value, this.getDefaultEdge());
                     } else if (this.previousItem.type === "BlockInstance") {
-                        graph.setEdge(this.previousItem.alias.value, node.value, {lineInterpolate: this.lineInterpolate});
+                        graph.setEdge(this.previousItem.alias.value, node.value, this.getDefaultEdge());
                     } else if (this.previousItem.type === "BlockList") {
                         this.previousItem.list.forEach(function(item) {
                             if (item.type === "BlockInstance") {
-                                graph.setEdge(item.alias.value, node.value, {lineInterpolate: this.lineInterpolate});
+                                graph.setEdge(item.alias.value, node.value, this.getDefaultEdge());
                             } else if (item.type === "Identifier") {
-                                graph.setEdge(item.value, node.value, {lineInterpolate: this.lineInterpolate});
+                                graph.setEdge(item.value, node.value, this.getDefaultEdge());
                             }
                         }, this);
                     }
@@ -175,11 +230,42 @@ class Graph extends React.Component{
 
                 break;
             case "BlockDefinition":
-                console.log(node);
                 if (!this.blockDefinitions.includes(node.name)) {
                     this.blockDefinitions.push(node.name);
                 }
                 break;
+            case "Scope":
+                console.log(node.type, node);
+
+                var previousScopeId = this.generateIdentifier(this.scopeStack, node, null);
+                this.scopeStack.push(node.name);
+                var scopeId = this.generateIdentifier(this.scopeStack, node, null);
+
+                graph.setNode(scopeId, {
+                    label: node.name,
+                    clusterLabelPos: 'top',
+                    class: "Scope"
+                });
+                graph.setParent(scopeId, previousScopeId);
+
+                if (node.body) {
+                    this.walkAst(node.body, graph);
+                }
+
+                this.scopeStack.pop();
+                break;
+            case "ScopeBody":
+                console.log(node.type, node);
+                if (node.definitions) {
+                    node.definitions.forEach(function(definition) {
+                        this.walkAst(definition, graph);
+                    }, this);
+                } else {
+                    console.info("Empty scope.");
+                }
+                break;
+            default:
+                console.warn("Unrecognized Block", node);
         }
     }
 
@@ -191,19 +277,34 @@ class Graph extends React.Component{
             var group = d3.select(this.svgGroup)
 
             graph.graph().transition = function(selection) {
-                return selection.transition().duration(500);
+                return selection.transition().duration(250);
             };
+
+            graph.setGraph({
+                rankdir: 'BT',
+                edgesep: 20,
+                ranksep: 40,
+                nodeSep: 20,
+                marginx: 20,
+                marginy: 20
+            })
+            dagre.layout(graph);
 
             this.dagreRenderer(d3.select(this.svgGroup), graph);
 
-            group.selectAll("g.node")
-                .on("mouseover", function(d) {
-                    console.log(d);
+            var nodes = group.selectAll("g.node");
+
+            nodes.on("click", function(d) {
+                var node = graph.node(d);
+                this.props.onHighlight({
+                    startIdx: node._interval.startIdx,
+                    endIdx: node._interval.endIdx
                 });
+            }.bind(this));
 
 
-            var graphWidth = graph.graph().width + 20;
-            var graphHeight = graph.graph().height + 20;
+            var graphWidth = graph.graph().width;
+            var graphHeight = graph.graph().height;
             var width = this.svg.getBoundingClientRect().width
             var height = this.svg.getBoundingClientRect().height
             var zoomScale = Math.min(width / graphWidth, height / graphHeight);
@@ -216,7 +317,7 @@ class Graph extends React.Component{
             d3.select(this.svgGroup).transition().duration(250).attr("transform", "translate(" + translate + ")scale(" + zoomScale + ")");
         }
 
-        var style = {flex: 1, margin: "1em"}
+        var style = {flex: 1}
 
         return <svg id="vizualization" style={style} ref={(ref) => this.svg = ref}>
             <g id="group" ref={(ref) => this.svgGroup = ref}></g>

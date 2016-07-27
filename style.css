@@ -12,6 +12,7 @@ body{
     flex-direction: column;
     align-content: stretch;
     flex-wrap: wrap;
+    font: 300 16px 'Helvetica Neue', Helvetica;
 }
 .panel{
     flex-grow: 1;
@@ -29,43 +30,7 @@ body{
     /*max-height: 600px;*/
     box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.75);
 }
-.panel.focused {
-    /* border-width: 2px; */
-    border-color: orange;
-    outline: none;
-    /* margin: 1px; */
-    /* flex-basis: 40em; */
-}
-.panel.focused > .header {
-    background-color: rgba(140, 73, 49, 0.38);
-}
 
-/* minimized */
-.panel[data-mini="true"] {
-    flex-basis: 0;
-    flex-grow: 0;
-}
-.panel[data-mini="true"] > .file {
-    opacity: 0;
-    flex: 0 0 0;
-}
-
-.panel[data-hidden="true"] {
-    display: none;
-}
-
-.panel[data-full="true"] {
-    flex-basis: 100%;
-}
-
-.file {
-    opacity: 1;
-    transition: opacity ease-out 0.25s;
-}
-
-.panel[data-fullscreen="true"] {
-    flex-basis: 100%;
-}
 .header {
     border-bottom: 1px solid #4e4e4e;
     color: orange;
@@ -79,88 +44,120 @@ body{
     border-bottom-right-radius: 0;
 }
 
-.header > .center{
-    flex: 1;
-    text-align: center;
-}
-
-.message{
-    margin: 0;
-    padding: 0.5em;
-    white-space: pre-wrap;
-    flex: 0 1 6.5em;
-    display: flex;
-    overflow: scroll;
-}
-.message[data-error="true"]{
-	background-color: hsl(4, 100%, 40%);
-}
-.message[data-error="false"]{
-	display: none;
-}
-
 .ace_editor{
     flex: 1 1 20em;
 }
 
-/* Unknown */
-g.undefined {
-    opacity: 0.5 !important;
+.error_widget {
+    border: solid 2px;
+    border-radius: 5px;
+    margin: 5px 0.5em;
+    padding: 0.5em 1em;
+    white-space: pre-wrap;
+    font-size: 9px;
+    background-color: #ff2222;
+    box-shadow: inset 0px 0px 10px #ff5a5a;
 }
-g.undefined > rect {
+
+.error_widget.ace_error, .error_widget_arrow.ace_error {
+    border-color: #ff5a5a;
+}
+
+.highlight{
+    position: absolute;
+    z-index: 2;
+    background-color: white;
+    opacity: 0.3;
+}
+
+g.node rect{
+    rx: 10;
+    ry: 10;
+    stroke: rgba(0, 0, 0, 0.3);
+}
+
+g.node:hover rect, g.node:hover polygon{
+    stroke: white !important;
+    stroke-width: 2px !important;
+    opacity: 1 !important;
+    stroke-dasharray: initial !important;
+    cursor: pointer;
+}
+
+/* Unknown */
+g.node.undefined > rect {
     fill: #afafaf !important;
     stroke: white;
     stroke-width: 3px;
     stroke-dasharray: 5,5;
     opacity: 0.2;
 }
-g.undefined > .label {
+g.node.undefined > .label {
     fill: yellow;
 }
 
 /* Ambiguous */
-g.ambiguous {
-    opacity: 0.5 !important;
-}
-g.ambiguous > polygon {
+g.node.ambiguous > polygon {
     fill: #afafaf !important;
     stroke: white;
     stroke-width: 3px;
     stroke-dasharray: 5,5;
     opacity: 0.2;
 }
-g.ambiguous > .label {
+g.node.ambiguous > .label {
     fill: yellow;
+}
+
+g.node.Network > rect{
+    fill: rgba(255,255,255,0.3);
+    stroke: #fff;
+    stroke-width: 2px;
+    opacity: 0.5;
+    rx: 5;
+    ry: 5;
 }
 
 g > text{
     text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    font-weight: bold;
+    fill: white;
 }
 
 .edgePath path {
     stroke-dasharray: 10,3;
-    animation: dash 64s linear reverse infinite;
+    animation: dash 13s linear reverse infinite;
 }
 
 @keyframes dash {
-  to {
-    stroke-dashoffset: 1000;
-  }
-}
-
-
-/* DAGRE DEMO */
-body {
-  font: 300 14px 'Helvetica Neue', Helvetica;
-}
-
-.node rect {
-  stroke: #333;
-  fill: #fff;
+    0% {
+        stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dashoffset: 130;
+    }
 }
 
 .edgePath path {
-  stroke: #fff;
-  fill: #fff;
-  stroke-width: 1.5px;
+    stroke: #fff;
+    fill: #fff;
+    stroke-width: 1.5px;
+}
+
+g.node.Scope rect, .clusters rect {
+    fill: rgba(255,255,255,0.3);
+    stroke: #fff;
+    stroke-width: 2px;
+    opacity: 0.5;
+    rx: 5;
+    ry: 5;
+}
+
+g.node.Scope text, .cluster .label text{
+    fill: white;
+    opacity: 0.5;
+    font-weight: normal;
+    font-size: small;
 }

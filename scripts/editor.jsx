@@ -1,7 +1,8 @@
 class Editor extends React.Component{
     constructor(props) {
         super(props);
-        this.onChange = this.onChange.bind(this)
+        this.onChange = this.onChange.bind(this);
+        this.marker = null;
     }
 
     onChange() {
@@ -22,8 +23,13 @@ class Editor extends React.Component{
         this.editor.setShowPrintMargin(false);
         this.editor.setOptions({
             enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: false,
             wrap: true,
-            autoScrollEditorIntoView: true
+            autoScrollEditorIntoView: true,
+            fontFamily: "Fira  Code",
+            //showLineNumbers: false,
+            //showGutter: false
         });
         this.editor.$blockScrolling = Infinity;
         this.editor.on("change", this.onChange);
@@ -53,6 +59,17 @@ class Editor extends React.Component{
 
         if (nextProps.value) {
             this.editor.setValue(nextProps.value, -1);
+        }
+
+        if (nextProps.highlightRange) {
+            this.editor.getSession().removeMarker(this.marker);
+            //console.log("highlightRange", nextProps.highlightRange);
+            var Range = require('ace/range').Range;
+            var start = this.editor.session.doc.indexToPosition(nextProps.highlightRange.startIdx);
+            var end = this.editor.session.doc.indexToPosition(nextProps.highlightRange.endIdx);
+            var range = new Range(start.row, start.column, end.row, end.column);
+            //console.log(range);
+            this.marker = this.editor.getSession().addMarker(range, "highlight", "text");
         }
     }
 

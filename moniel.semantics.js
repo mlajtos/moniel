@@ -6,11 +6,24 @@ var semantics = grammar.semantics().addOperation('eval', {
 			definitions: definitions.eval()
 		};
 	},
-	BlockDefinition: function(_, layerName, params, definition) {
+	BlockDefinition: function(_, layerName, params, body) {
 		return {
 			type: "BlockDefinition",
 			name: layerName.interval.contents,
-			definitions: definition.eval()
+			body: body.eval()
+		};
+	},
+	Scope: function(_, name, body) {
+		return {
+			type: "Scope",
+			name: name.interval.contents,
+			body: body.eval()
+		};
+	},
+	ScopeBody: function(_, list, _) {
+		return {
+			type: "ScopeBody",
+			definitions: list.eval()[0]
 		};
 	},
 	ConnectionDefinition: function(list) {
@@ -24,10 +37,11 @@ var semantics = grammar.semantics().addOperation('eval', {
 	        type: "BlockInstance",
 	        name: layerName.eval(),
 	        alias: id.eval()[0],
-	        parameters: params.eval()
+	        parameters: params.eval(),
+	        _interval: this.interval
 	    };
 	},
-	LayerIdentifier: function(id, _) {
+	BlockName: function(id, _) {
 	    return id.eval();
 	},
 	BlockList: function(_, list, _) {
@@ -37,10 +51,14 @@ var semantics = grammar.semantics().addOperation('eval', {
 	    };
 	},
 	BlockDefinitionParameters: function(_, list, _) {
+		console.log(list)
 	    return list.eval();
 	},
 	BlockDefinitionBody: function(_, list, _) {
-	    return list.eval();
+		return {
+			type: "BlockDefinitionBody",
+			definitions: list.eval()[0]
+		};
 	},
 	BlockInstanceParameters: function(_, list, _) {
 	    return list.eval();
@@ -67,7 +85,7 @@ var semantics = grammar.semantics().addOperation('eval', {
 	EmptyListOf: function() {
         return [];
 	},
-	identifier: function(first, rest) {
+	blockIdentifier: function(_, _, _) {
 	    return {
 	        type: "Identifier",
 	        value: this.interval.contents
@@ -76,7 +94,13 @@ var semantics = grammar.semantics().addOperation('eval', {
 	parameterName: function(a) {
 	    return a.interval.contents;  
 	},
-	blockName: function(_, _) {
+	blockType: function(_, _) {
 	    return this.interval.contents;
+	},
+	blockName: function(_, _) {
+		return {
+	        type: "Identifier",
+	        value: this.interval.contents
+	    };
 	}
 });
