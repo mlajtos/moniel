@@ -65,6 +65,34 @@ class Hello extends React.Component{
 	    	left: 0,
 	    	right: 0
 	  	}
+
+	  	var model = `/conv1{
+    in:Input(shape=28x28)
+    
+    filters:Tensor(shape=10x3x3)
+    biases:Tensor(shape=10x1)
+    
+    [in,filters] -> conv:Convolution
+    [conv, biases] -> BiasAdd -> ReLU -> out
+    
+    out:Output
+}
+
+/conv2{
+    in:Input(shape=28x28)
+    
+    filters:Tensor(shape=10x3x3)
+    biases:Tensor(shape=10x1)
+    
+    [in,filters] -> conv:Convolution
+    [conv, biases] -> BiasAdd -> ReLU -> out
+    
+    out:Output
+}
+
+image:Input -> conv1/in
+conv1/out -> conv2/in
+conv2/out -> Out`;
     	return <div style={style}>
     		<Panel title="Definition">
     			<Editor
@@ -73,7 +101,8 @@ class Hello extends React.Component{
     				theme="monokai"
     				annotations={this.state.annotations}
     				onChange={this.delayedUpdateNetworkDefinition}
-    				defaultValue="In -> conv1:C -> ReLU -> C -> [ReLU,Id] -> [C,C,C] -> out:Out  conv1 -> ReLU -> C -> [ReLU,Id] -> [C,C,C] -> out:Out"
+    				/*defaultValue="In -> conv1:C -> ReLU -> C -> [ReLU,Id] -> [C,C,C] -> out:Out  conv1 -> ReLU -> C -> [ReLU,Id] -> [C,C,C] -> out:Out"*/
+    				defaultValue={model}
     				highlightRange={this.state.highlightRange}
     			/>
     		</Panel>
