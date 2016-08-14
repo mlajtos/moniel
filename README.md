@@ -1,5 +1,15 @@
 # Moniel
-*Definícia modelov neurónových sietí pre smrteľníkov.*
+*Deep learning model defintions for people.*
+
+### A foreword about representations
+Deep learning is all about learning representations. Hierarchical representations that help us peek into the  structure of important data. Good representations are crucial to solving tasks that were thought to be impossible to solve. For example, the whole generative modeling movement is a true test for learning good representations. As Feynman said, ```"What I cannot create, I do not understand."```. Let's see where this path will lead us.
+
+## Computational graph
+
+Computational graph is a way to organize many small computations in an ordered and efficient manner. In deep learning communtity it is so far the best approach to tackle the problem of training massive models. How it helps? In contrast to computing everything right away, we construct a lightway *representation* of all these computations that needs to be done. This representation is called computational graph. Boxes and arrows. And juice! Every box represents a unit computation; arrows connect boxes to boxes; and juice is the thing that flows through the whole thing and makes us happy. This representation as a graph is really good for neural nets because sometimes we need to derive another computational graph from it. We won't go into that – Christopher Olah wrote beautifully about [Calculus on Computational Graphs](https://colah.github.io/posts/2015-08-Backprop/), so go read it.
+
+We started at a weird starting point – computational graphs are almost the middle point of the software-hardware stack that we need to run a neural net. Down are depths of ones and zeroes and at the top are UI/UX heights. I prefer to be high.
+## Formulas
 
 Súčasné frameworky pre neurónové siete využívajú na definíciu modelov imperatívne rozhranie. Inak povedané, architektúra modelu je zadefinovaná priamo v kóde spolu s učiacou sa slučkou a  preprocesingom dát. Ako illustračný príklad nám poslúži framework Torch v programovacom jazyku Lua:
 ```lua
