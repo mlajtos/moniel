@@ -2,7 +2,7 @@
 *Deep learning model defintions for people.*
 
 You can view [first public demo](https://www.youtube.com/watch?v=zVZqHHNQ50c). Following text is brief introduction of implemented ideas.
-
+------------------
 ### A Foreword about Representations
 Deep Learning is all about learning representations. Deep hierarchical representations that help us solve problems that were thought to be impossible to crack. Ironically, represenatations of deep learning models themselves suck. This is a stab at creating notation for deep learning models.
 
@@ -31,7 +31,9 @@ f(x) = max(plus(times(x,w),b),0)
 ```
 As we can clearly see, this isn't better. Actually it is harder to read and understand. What if we skipped the step of translating formulas into graphs? What if we adopted our graph thinking for the direct definition of computational graphs?
 ## Composition
-In mathematics, we have functions that can be composed. For example, we can rewrite `h(g(f(x)))` into `(h.g.f)(x)`. This is called *function composition* (notice the order of execution). As you can see, this is directly related to stacking layers on top of each other in deep learning practice. But how we think about it is slightly different. We rather talk about *chain of transformations*. As an example, we can look at a definition of a simple MLP in high-level Python framework [Keras](https://keras.io/):
+In mathematics, we have functions that can be composed. For example, we can rewrite `h(g(f(x)))` into `(h.g.f)(x)`. This is called *function composition* (notice the order of execution). As you can see, this is directly related to stacking layers on top of each other in deep learning practice. But how we think about it is slightly different. We rather talk about *chain of transformations*, so instead of using prefix notation, we should switch to postfix notation.
+
+As an example, we can look at a definition of a simple MLP in high-level Python framework [Keras](https://keras.io/):
 ```python
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
@@ -47,7 +49,7 @@ model.add(Dense(10, init='uniform'))
 model.add(Activation('softmax'))
 ```
 In this example, every layer (Dense, Activation, Dropout) takes in the output of the layer before it. However, this information is infered and not directly stated by the notation. Using the [functional API](https://keras.io/getting-started/functional-api-guide/) this information can be explicitly stated:
-```
+```python
 from keras.layers import Input, Dense
 from keras.models import Model
 
@@ -59,25 +61,19 @@ predictions = Dense(10, activation='softmax')(x)
 
 model = Model(input=inputs, output=predictions)
 ```
-Even though that this notation is intended to be more functional, the composition is still quite different  than functional composition. But more important is fact that the overall model architecture (computational graph) is still hidden. Wouldn't it be nice to see things more clearly?
+Even though that this notation is intended to be more functional, the feeling from it is quite different than from notation for functional composition. But more important is fact that the overall model architecture (computational graph) is still lurking in the imperative code. Wouldn't it be nice to see things more clearly?
+## Chinese Room
+In the famous Chinese Room argument, Searle proposed a thought experiment – man locked in the room is recieving messages written in Chinese and his task is to reply with messages written in Chinese. Twist is that the man cannot speak a bit of Chinese, but has a rule book that specify how to get from input message to the output message. Will Chinese person be convinced that man in the room can speak Chinese language? It is basically a Turing's final version of Imitation game.
 
-## Chinnese Room
+Answer to the question is unimportant. Also the implications of any answer to that question are unimportant. The important part is a *black box* approach with clearly defined *input-output interface*. This goes hand in hand with proper composition. If we can use high-level block of computation, we don't have to worry how it works while it works. Our notation should embrace black box encapsulation.
+## Notation
+The single most important thing was assumed without any consideration. Why creating a textual notation rather than say [visual programming interface](https://www.youtube.com/watch?v=JsyKf_RlWLo)? Most of visual programming languages are graph-based, so it makes sense that this kind of UI would be approachable by most people, right? No. Definitely not. [Noooope](https://www.youtube.com/watch?v=mJXYMDu6dpY). Sadly, visual programming is really constraining and inflexible for beginners and naturally also for experts. So, let's not create various visual deep learning tools([1](https://www.youtube.com/watch?v=qS8qhzXRQWE), [2](http://dianne.intec.ugent.be/), [exception](http://lstm.seas.harvard.edu/)), instead let's focus on notation. Or you might say [programming language for neural networks](https://twitter.com/karpathy/status/469958608260579328) if you want to. I prefer notation.
+## Richer Representation
+Modifying graph structure only by manipulating visual representation is tedious. Seeing only code and imagining the rest is a nightmare. Having textual notation coupled with visualization is better. User has a much richer representation of what is going on and can jump between the two. 
 
+## 
 
-Súčasné frameworky pre neurónové siete využívajú na definíciu modelov imperatívne rozhranie. Inak povedané, architektúra modelu je zadefinovaná priamo v kóde spolu s učiacou sa slučkou a  preprocesingom dát. Ako illustračný príklad nám poslúži framework Torch v programovacom jazyku Lua:
-```lua
-mlp = nn.Sequential()
-mlp:add(nn.Linear(784,2000))
-mlp:add(nn.ReLU())
-mlp:add(nn.Linear(2000,1000))
-mlp:add(nn.ReLU())
-mlp:add(nn.Linear(1000,10))
-mlp:add(nn.SoftMax())
-```
-Kompozíciou preddefinovaných blokov vytvárame komplexné modely, ktoré potom učíme pomocou učiaceho sa algoritmu podľa vhodného výberu. Každý blok má predpis, vzorec, či rovnicu ktorá definuje čo robí – ako transformuje vstupné dáta na výstupné dáta. Napr. notorický známy blok ReLU označuje funkciu, ktorú vieme vyjadriť ako ```y = max(x,0)``` Ak vieme napísať, čo robí jeden blok, vieme napísať aj rovnicu pre celý tento zložený model. Tá rovnica bude samozrejme nečitateľná... Ale presne na to máme koncept funkcií, či blokov – aby sme zabaľovali funkcionalitu jednotlivých modulov do čiernych skriniek, ktoré potom spájame do seba. Inými slovami, schovávame nepodstatné implementačné detaily a sústreďujeme sa na úroveň opisu, ktorá je vhodnejšia pre tvorbu komplexných modelov.
-
-
-Čo keby sme preskočili reprezentáciu výpočtu danú vzorcami a išli rovno do grafovej reprezentácie? Notácia by sa nám podstatne zjednodušila. 
+[Pure mess](https://github.com/ajtulloch/dnngraph)
 
 Na tento typ úlohy je turing-complete programovací jazyk overkill z nasledujúcich dôvodov:
 
