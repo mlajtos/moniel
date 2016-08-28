@@ -41,7 +41,7 @@ Moniel{
     ValueList
         = "<" ListOf<Value, ";"> ">"
     Value
-        = blockType | float | Shape | integer
+        = parameterName | blockType | float | Shape | integer
 
     scopeName
         = lower (alnum | "_")*
