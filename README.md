@@ -108,4 +108,5 @@ If scopes are almost identical, we can create a reusable block and use it as a n
 RL(s=784x1000) -> RL(s=1000x10)
 ```
 Of course, with syntax highlighting it is much better:
+
 ![Syntax highlightning helps](images/ReusableLayer.png)
