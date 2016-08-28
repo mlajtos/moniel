@@ -3,9 +3,9 @@
 ## Why?
 Deep Learning is all about learning representations. Deep hierarchical representations that help us solve problems that were thought to be impossible to crack. Ironically, representations of models themselves suck – we describe them in programming languages that were designed for other purpose in another era; effectively burying the beauty of the model under years of legacy ideas.
 ## How?
-Deep learning community shifted its thinking about the computations that are at the core of every learning model. We don't execute everything right away, instead we construct a lightweight intermediate representation of all these computations – a computational graph. Coincidentally, illustrations in form of boxes and arrows are used as the best tool to convey an understanding about neural nets. Funny.
+Deep learning community shifted its thinking about the computations that are at the core of every learning model. We don't execute everything right away, instead we construct a lightweight intermediate representation of all these computations – [a computational graph](https://colah.github.io/posts/2015-08-Backprop/). Coincidentally, illustrations in form of boxes and arrows are used as the best tool to convey an understanding about neural nets. Funny.
 ## What?
-Moniel is an attempt at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define our model as a declarative dataflow graph. It is not a programming language, just a convenient notation that can be executed.
+Moniel is an attempt at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define our model as a declarative dataflow graph. It is [not a programming language](https://twitter.com/karpathy/status/469958608260579328), just a convenient notation that can be executed.
 
 ----------
 
@@ -94,7 +94,7 @@ Creating one giant graph without proper structuring is a suicide. Scopes can shi
 
 layer1/out -> layer2/in // connect scopes together
 ```
-When scopes have defined Inputs and Outputs, one can connect them as normal nodes:
+When scopes have defined Inputs and Outputs, they can be connected directly:
 ```
 layer1 -> layer2
 ```
@@ -107,6 +107,6 @@ If scopes are almost identical, we can create a reusable block and use it as a n
 
 RL(s=784x1000) -> RL(s=1000x10)
 ```
-Of course, with syntax highlighting it is much better:
+Of course, editor with proper syntax highlighting can really help:
 
 ![Syntax highlightning helps](images/ReusableLayer.png)
