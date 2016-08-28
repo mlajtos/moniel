@@ -1,10 +1,22 @@
-class Graph extends React.Component{
+class VisualGraph extends React.Component{
 
     constructor(props) {
         console.log("constructor");
         super(props);
         this.dagreRenderer = new dagreD3.render();
         this.moniel = new Moniel();
+
+        this.colorHash = new ColorHash({
+            saturation: [0.9],
+            lightness: [0.45],
+            hash: function(str) {
+                var hash = 11;
+                for (var i = 0; i < str.length; i++) {
+                    hash = hash * 47 + str.charCodeAt(i) % 32;
+                }
+                return hash
+            }
+        });
     }
 
     componentDidMount() {
@@ -20,13 +32,8 @@ class Graph extends React.Component{
         */
     }
 
-    componentWillReceiveProps(nextProps) {
-        // console.log("componentWillReceiveProps");
-        this.ast = nextProps.ast;
-    }
-
     generateGraph(ast) {
-        this.moniel.walkAst(this.ast);
+        this.moniel.walkAst(ast);
         return this.moniel.getComputationalGraph();
     }
 
@@ -48,7 +55,7 @@ class Graph extends React.Component{
                 marginx: 20,
                 marginy: 20
             })
-            dagre.layout(graph);
+            // dagre.layout(graph);
 
             this.dagreRenderer(d3.select(this.svgGroup), graph);
 
@@ -78,6 +85,8 @@ class Graph extends React.Component{
         }
 
         var style = {flex: 1}
+
+        console.timeEnd("dataflow");
 
         return <svg id="vizualization" style={style} ref={(ref) => this.svg = ref}>
             <g id="group" ref={(ref) => this.svgGroup = ref}></g>

@@ -32,7 +32,8 @@ class Hello extends React.Component{
 
 	updateNetworkDefinition(value){
 		console.log("update")
-		var result = compileToAST(this.state.grammar, this.state.semantics, value);
+		console.time("dataflow");
+		var result = this.compileToAST(this.state.grammar, this.state.semantics, value);
 		if (result.ast) {
 			this.setState({
 				ast: result.ast,
@@ -53,6 +54,24 @@ class Hello extends React.Component{
 		this.setState({
 			highlightRange: range
 		})
+	}
+
+	compileToAST(grammar, semantics, source) {
+	    var result = grammar.match(source);
+
+	    if (result.succeeded()) {
+	        var ast = semantics(result).eval();
+	        return {
+	            "ast": ast
+	        }
+	    } else {
+	        var expected = result.getExpectedText();
+	        var position = result.getRightmostFailurePosition();
+	        return {
+	            "expected": expected,
+	            "position": position
+	        }
+	    }
 	}
 
 	render() {
@@ -108,7 +127,7 @@ conv2/out -> Out`;
     		</Panel>
     		
     		<Panel title="Schema">
-    			<Graph ast={this.state.ast} onHighlight={this.onHighlight} />
+    			<VisualGraph ast={this.state.ast} onHighlight={this.onHighlight} />
     		</Panel>
 
     		{/*

@@ -80,7 +80,7 @@ class Moniel{
         } else if (possibleTypes.length === 1) {
 			type = possibleTypes[0];
 			label = type;
-			color = colorHash.hex(label);
+			color = colorHash.hex(label); // this should be handled in VisualGraph
 		} else {
 			type = "ambiguous"
             label = instance.name
@@ -122,7 +122,6 @@ class Moniel{
 	}
 
 	getComputationalGraph() {
-		console.log(this.graph.getGraph());
 		return this.graph.getGraph();
 	}
 
