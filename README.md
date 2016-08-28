@@ -1,39 +1,37 @@
 # Moniel
 *Notation for deep learning models.* [Demo](https://www.youtube.com/watch?v=zVZqHHNQ50c)
 ## Why?
-Deep Learning is all about learning representations. Deep hierarchical representations that help us solve problems that were thought to be impossible to crack. Ironically, representations of models themselves suck – we describe them in programming languages that were designed long time ago for other purpose; effectively burying the beauty of the model under years of legacy ideas.
+Deep Learning is all about learning representations. Deep hierarchical representations that help us solve problems that were thought to be impossible to crack. Ironically, representations of models themselves suck – we describe them in programming languages that were designed for other purpose in another era; effectively burying the beauty of the model under years of legacy ideas.
 ## How?
-Deep learning community shifted its thinking about the computations that are at the core of every learning model. We don't execute everything right away, instead we construct a lightweight representation of all these computations – a computational graph. Coincidentally, illustrations in form of boxes and arrows are used as the best tool to convey an understanding about neural nets. Funny.
+Deep learning community shifted its thinking about the computations that are at the core of every learning model. We don't execute everything right away, instead we construct a lightweight intermediate representation of all these computations – a computational graph. Coincidentally, illustrations in form of boxes and arrows are used as the best tool to convey an understanding about neural nets. Funny.
 ## What?
 Moniel is an attempt at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define our model as a declarative dataflow graph. It is not a programming language, just a convenient notation that can be executed.
 
 ----------
 
-## Introduction
-*These examples are sometimes weird and without any sense. They are only for introducing the notation, not to be real-world examples.*
+## Quick Introduction
+*These examples are sometimes weird and without any sense. They are not real-world examples and serve only for introducing the notation.*
 
 Let's start with nothing, i.e. comments:
 ```
-// This is line comment
+// This is line comment.
 
 /*
-	This
-	is
-	block
-	comment
+	This is block
+	comment.
 */
 ```
 Node can be created by stating its type:
 ```
-Sigmoid // First node, yay!
+Sigmoid
 ```
-You don't have to write full names. Use acronyms that fit you – these are all equivalent:
+You don't have to write full name of a type. Use acronym that fits you! These are all equivalent:
 ```
 LocalResponseNormalization // canonical, but too long
-LocRespNorm // weird, but if you like that
-LRN // cryptic for beginners
+LocRespNorm // weird, but why not?
+LRN // cryptic for beginners, enough for others
 ```
-Nodes can be connected with an arrow:
+Nodes connect with other nodes with an arrow:
 ```
 Sigmoid -> MaxPooling
 ```
@@ -52,10 +50,10 @@ conv:Convolution
 ```
 Identifiers let's you refer to nodes that are used more than once:
 ```
-/* Inefficient definition of matrix-matrix multiplication. */
+// inefficient definition of matrix-matrix multiplication
 matrix1:Tensor
 matrix2:Tensor
-mm:MatrixMultiply
+mm:MatrixMultiplication
 
 matrix1 -> mm
 matrix2 -> mm
@@ -67,12 +65,12 @@ However, this can be rewritten without identifiers using list:
 Lists let's you easily define multi-connection:
 ```
 // Maximum of 5 random numbers
-[Rand,Rand,Rand,Rand,Rand] -> Max
+[Random,Random,Random,Random,Random] -> Maximum
 ```
 List-to-list connections are sometimes really handy:
 ```
-// Range of 5 random numbers
-[Rand,Rand,Rand,Rand,Rand] -> [Max,Min]
+// Range of 3 random numbers
+[Rand,Rand,Rand] -> [Max,Min] -> Sub -> Abs
 ```
 Some nodes can take named attributes that modify their behavior:
 ```
@@ -86,26 +84,28 @@ Creating one giant graph without proper structuring is a suicide. Scopes can shi
 ```
 /layer1{ // slash denotes scope
 	RandomNormal(shape=784x1000) -> weights:Variable
-	[in:Input,weigths] -> dp:DotProduct -> ReLU -> out:Output
+	[in:Input,weigths] -> DotProduct -> ReLU -> out:Output
 }
 
-/layer2{ // in, weights, dp, out are not shared because scope name is different
+/layer2{
 	RandomNormal(shape=1000x10) -> weights:Variable
-	[in:Input,weigths] -> dp:DotProduct -> ReLU -> out:Output
-}
+	[in:Input,weigths] -> DotProduct -> ReLU -> out:Output
+} // 'in', 'weights', and 'out' are not shared because scope name is different
 
 layer1/out -> layer2/in // connect scopes together
 ```
-However, when scopes have defined Inputs and Outputs, one can connect them as normal nodes:
+When scopes have defined Inputs and Outputs, one can connect them as normal nodes:
 ```
 layer1 -> layer2
 ```
-If scopes are almost identical, we can create a reusable block and use it as normal node:
+If scopes are almost identical, we can create a reusable block and use it as a normal node:
 ```
 +ReusableLayer(shape = 1x1){
-	RandomNormal(shape = shape) -> weights:Variable
-	[in:Input,weigths] -> dp:DotProduct -> ReLU -> out:Output
+	RandN(shape = shape) -> w:Var
+	[in:In,w] -> DP -> ReLU -> out:Out
 }
 
-RL(784x1000) -> RL(1000x10)
+RL(s=784x1000) -> RL(s=1000x10)
 ```
+Of course, with syntax highlighting it is much better:
+![Syntax highlightning helps](images/ReusableLayer.png)
