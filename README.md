@@ -1,4 +1,4 @@
-# Moniel: Notation for Deep Learning Models
+# Moniel: *Notation for Deep Learning Models*
 [Demo](https://www.youtube.com/watch?v=zVZqHHNQ50c)
 ## Why?
 Deep Learning is all about learning representations. Deep hierarchical representations that help us solve problems that were thought to be impossible to crack. Ironically, representations of models themselves suck – we describe them in programming languages that were designed for other purpose in another era; effectively burying the beauty of the model under years of legacy ideas.
