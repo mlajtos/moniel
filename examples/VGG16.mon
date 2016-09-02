@@ -1,0 +1,33 @@
++VGG16{
+    +ConvolutionLayer(kernelSize = 1x1x1){
+        In ->
+            ZeroPadding(padding = 1x1) ->
+            Convolution(kernelSize = kernelSize) ->
+            ReLU ->
+        Out
+    }
+    
+    +MaxPoolingLayer{
+        In -> MaxPooling(poolSize = 2x2, strides = 2x2) -> Out    
+    }
+    
+    +Dense_Layer{
+        In -> Dense(size = 4096) -> ReLU -> Dropout(ratio = 0.5) -> Out    
+    }
+    
+    In ->
+        ConvL(kS = 64x3x3)  -> ConvL(kS = 64x3x3)  ->
+        MaxPoolL ->
+        ConvL(kS = 128x3x3) -> ConvL(kS = 128x3x3) ->
+        MaxPoolL ->
+        ConvL(kS = 256x3x3) -> ConvL(kS = 256x3x3) -> ConvL(kS = 256x3x3) ->
+        MaxPoolL ->
+        ConvL(kS = 512x3x3) -> ConvL(kS = 512x3x3) -> ConvL(kS = 512x3x3) ->
+        MaxPoolL ->
+        ConvL(kS = 512x3x3) -> ConvL(kS = 512x3x3) -> ConvL(kS = 512x3x3) ->
+        MaxPoolL ->
+        Flatten -> DenseL -> DenseL -> Dense(size = 1000) -> Softmax ->
+    Out
+}
+
+In -> vgg:VGG16 -> Out
