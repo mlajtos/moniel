@@ -1,5 +1,5 @@
 # Moniel: *Notation for Deep Learning Models*
-**Moniel** is human-friendly notation for declarative data flow graphs which can be compiled for TensorFlow runtime. [Demo](https://www.youtube.com/watch?v=zVZqHHNQ50c)
+Moniel is human-friendly notation for declarative data flow graphs which can be compiled for TensorFlow runtime.
 
 ![VGG16 written in Moniel](images/VGG16.png)
 ## Motivation
@@ -114,17 +114,17 @@ If scopes are almost identical, we can create a **reusable block** and use it as
 
 RL(s=784x1000) -> RL(s=1000x10)
 ```
-Of course, editor with proper syntax highlighting can really help:
+Of course, [editor](https://www.youtube.com/watch?v=zVZqHHNQ50c) with proper syntax highlighting and interactive feedback really helps:
 
 ![Syntax highlightning helps](images/ReusableLayer.png)
 
 ----------
 
 ## Similar projects
-
-[TensorBuilder](https://cgarciae.github.io/tensorbuilder/) – "a functional fluent immutable API based on the Builder Pattern"
-[Keras](https://keras.io/) – "minimalist, highly modular neural networks library"
-[PrettyTensor](https://github.com/google/prettytensor) – "a high level builder API"
-[TF-Slim](https://github.com/tensorflow/models/blob/master/inception/inception/slim/README.md) – "a lightweight library for defining, training and evaluating models"
-[TFLearn](http://tflearn.org/) – "modular and transparent deep learning library"
-[Caffe](https://github.com/BVLC/caffe) – "deep learning framework made with expression, speed, and modularity in mind"
+- [DNNGraph](https://github.com/ajtulloch/dnngraph) – "a deep neural network model generation DSL in Haskell"
+- [TensorBuilder](https://cgarciae.github.io/tensorbuilder/) – "a functional fluent immutable API based on the Builder Pattern"
+- [Keras](https://keras.io/) – "minimalist, highly modular neural networks library"
+- [PrettyTensor](https://github.com/google/prettytensor) – "a high level builder API"
+- [TF-Slim](https://github.com/tensorflow/models/blob/master/inception/inception/slim/README.md) – "a lightweight library for defining, training and evaluating models"
+- [TFLearn](http://tflearn.org/) – "modular and transparent deep learning library"
+- [Caffe](https://github.com/BVLC/caffe) – "deep learning framework made with expression, speed, and modularity in mind"
