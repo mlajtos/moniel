@@ -120,7 +120,6 @@ conv2/out -> Out`;
     				theme="monokai"
     				annotations={this.state.annotations}
     				onChange={this.delayedUpdateNetworkDefinition}
-    				/*defaultValue="In -> conv1:C -> ReLU -> C -> [ReLU,Id] -> [C,C,C] -> out:Out  conv1 -> ReLU -> C -> [ReLU,Id] -> [C,C,C] -> out:Out"*/
     				defaultValue={model}
     				highlightRange={this.state.highlightRange}
     			/>
