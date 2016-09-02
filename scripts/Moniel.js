@@ -89,7 +89,7 @@ class Moniel{
 		}
 
 		if (!instance.alias) {
-			id = this.graph.generateInstanceId(this.graph.scopeStack, type);
+			id = this.graph.generateInstanceId(type);
 		} else {
 			id = [...this.graph.scopeStack.current(), instance.alias.value].join("/");
 		}

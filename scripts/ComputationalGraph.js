@@ -41,16 +41,17 @@ class ComputationalGraph{
 		this.scopeStack.pop();
 	}
 
-	generateInstanceId(scope, type) {
-		let typedId = [...scope, type].join("/");
-
-		if (!this.nodeCounter.hasOwnProperty(typedId)) {
-			this.nodeCounter[typedId] = 0;
+	generateInstanceId(type) {
+		if (!this.nodeCounter.hasOwnProperty(type)) {
+			this.nodeCounter[type] = 0;
 		}
-		
-		this.nodeCounter[typedId] += 1;
+		this.nodeCounter[type] += 1;
 
-		return [...scope, type].join("/") + this.nodeCounter[typedId];
+		this.scopeStack.push(type + this.nodeCounter[type]);
+		var id = this.scopeStack.currentScopeIdentifier();
+		this.scopeStack.pop();
+
+		return id;
 	}
 
 	addMain() {
@@ -67,6 +68,7 @@ class ComputationalGraph{
 	}
 
 	setNode(id, node) {
+		console.info(`Creating node with id "${id}".`);
 		this.touchNode(id);
 		this.setParent(id, this.scopeStack.currentScopeIdentifier());
 		return this.graph.setNode(id, node);
