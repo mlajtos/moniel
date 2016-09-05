@@ -2,6 +2,7 @@
 Moniel is human-friendly notation for declarative data flow graphs which can be compiled for TensorFlow runtime.
 
 Definition of VGG16:
+
 ![VGG16 written in Moniel](docs/images/VGG16.png)
 ## Motivation
 ### Why?
