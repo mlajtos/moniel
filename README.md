@@ -2,7 +2,7 @@
 Moniel is human-friendly notation for declarative data flow graphs which can be compiled for TensorFlow runtime.
 
 Definition of VGG16:
-![VGG16 written in Moniel](images/VGG16.png)
+![VGG16 written in Moniel](docs/images/VGG16.png)
 ## Motivation
 ### Why?
 Deep Learning is all about learning representations. Deep hierarchical representations that help us solve problems that were thought to be impossible to crack. Ironically, representations of models themselves suck – we describe them in programming languages that were designed for other purpose in another era; effectively burying the beauty of the model under years of legacy ideas.
@@ -117,7 +117,7 @@ RL(s = 784x1000) -> RL(s = 1000x10)
 ```
 Of course, [editor](https://www.youtube.com/watch?v=zVZqHHNQ50c) with proper syntax highlighting and interactive feedback really helps:
 
-![Syntax highlightning helps](images/ReusableLayer.png)
+![Syntax highlightning helps](docs/images/ReusableLayer.png)
 
 ----------
 
