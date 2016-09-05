@@ -1,0 +1,27 @@
+/conv1{
+    in:Input(shape=28x28)
+    
+    filters:Tensor(shape=10x3x3)
+    biases:Tensor(shape=10x1)
+    
+    [in,filters] -> conv:Convolution
+    [conv, biases] -> BiasAdd -> ReLU -> out
+    
+    out:Output
+}
+
+/conv2{
+    in:Input(shape=28x28)
+    
+    filters:Tensor(shape=10x3x3)
+    biases:Tensor(shape=10x1)
+    
+    [in,filters] -> conv:Convolution
+    [conv, biases] -> BiasAdd -> ReLU -> out
+    
+    out:Output
+}
+
+image:Input -> conv1/in
+conv1/out -> conv2/in
+conv2/out -> Out

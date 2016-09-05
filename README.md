@@ -1,6 +1,7 @@
 # Moniel: *Notation for Deep Learning Models*
 Moniel is human-friendly notation for declarative data flow graphs which can be compiled for TensorFlow runtime.
 
+Definition of VGG16:
 ![VGG16 written in Moniel](images/VGG16.png)
 ## Motivation
 ### Why?
@@ -15,7 +16,7 @@ Moniel is an attempt at creating a notation for deep learning models leveraging 
 ## Quick Introduction
 *These examples are contrived. They are not real-world examples and serve only for introducing the notation.*
 
-Let's start with nothing, i.e. comments:
+Let's start with nothing, i.e. **comments**:
 ```
 // This is line comment.
 
@@ -40,7 +41,7 @@ Sigmoid -> MaxPooling
 ```
 There can be **chains** of any length:
 ```
-LRN -> Sigm -> BathNorm -> ReLU -> Tanh -> MP -> Conv -> BN -> ELU
+LRN -> Sigm -> BatchNorm -> ReLU -> Tanh -> MP -> Conv -> BN -> ELU
 ```
 Also, there can be many chains:
 ```
@@ -77,7 +78,7 @@ Lists let's you easily define **multi-connection**:
 ```
 Some nodes can take **named attributes** that modify their behavior:
 ```
-Constant(shape = 10x10x10, value = 1.0)
+Fill(shape = 10x10x10, value = 1.0)
 ```
 Attribute names can also be shortened:
 ```
@@ -109,10 +110,10 @@ If scopes are almost identical, we can create a **reusable block** and use it as
 ```
 +ReusableLayer(shape = 1x1){
 	RandN(shape = shape) -> w:Var
-	[in:In,w] -> DP -> ReLU -> out:Out
+	[in:In,w] -> DP -> RLU -> out:Out
 }
 
-RL(s=784x1000) -> RL(s=1000x10)
+RL(s = 784x1000) -> RL(s = 1000x10)
 ```
 Of course, [editor](https://www.youtube.com/watch?v=zVZqHHNQ50c) with proper syntax highlighting and interactive feedback really helps:
 
