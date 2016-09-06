@@ -13,22 +13,23 @@ var semantics = grammar.semantics().addOperation('eval', {
 			body: body.eval()
 		};
 	},
-	Scope: function(_, name, body) {
+	ScopeDefinition: function(_, name, body) {
 		return {
-			type: "Scope",
+			type: "ScopeDefinition",
 			name: name.interval.contents,
 			body: body.eval()
 		};
 	},
-	ScopeBody: function(_, list, _) {
+	ScopeDefinitionBody: function(_, list, _) {
+		var definitions = list.eval()[0]; 
 		return {
-			type: "ScopeBody",
-			definitions: list.eval()[0]
+			type: "ScopeDefinitionBody",
+			definitions: definitions ? definitions : []
 		};
 	},
 	ConnectionDefinition: function(list) {
 		return {
-		    type: "Connection",
+		    type: "ConnectionDefinition",
 		    list: list.eval()
 		};
 	},
@@ -88,7 +89,8 @@ var semantics = grammar.semantics().addOperation('eval', {
 	blockIdentifier: function(_, _, _) {
 	    return {
 	        type: "Identifier",
-	        value: this.interval.contents
+	        value: this.interval.contents,
+	        _interval: this.interval
 	    };
 	},
 	parameterName: function(a) {

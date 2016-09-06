@@ -2,17 +2,20 @@ class Moniel{
 	constructor() {
 		this.definitions = [];
 		this.graph = new ComputationalGraph();
+		this.logger = new Logger();
 		this.initialize();
 	}
 
 	initialize() {
-		this.definitions = [];
 		this.graph.initialize();
+		this.logger.clear();
+
+		this.definitions = [];
 		this.addDefaultDefinitions();
 	}
 
 	addDefaultDefinitions() {
-		console.info(`Adding default definitions.`);
+		// console.info(`Adding default definitions.`);
 		const defaultDefinitions = ["Add", "Input", "Output", "Placeholder", "Variable", "Constant", "Multiply", "Convolution", "Dense", "MaxPooling", "BatchNormalization", "Identity", "RectifiedLinearUnit", "Sigmoid", "ExponentialLinearUnit", "Tanh", "Absolute", "Summation", "Dropout", "MatrixMultiply", "BiasAdd", "Reshape", "Concat", "Flatten", "Tensor", "Softmax", "CrossEntropy"];
 		defaultDefinitions.forEach(definition => this.addDefinition(definition));
 	}
@@ -21,27 +24,18 @@ class Moniel{
 		this.definitions.push(definition);
 	}
 
-	generateBlockIdentifier(identifier) {
-		return [...this.graph.scopeStack.current(), identifier].join("/");
-	}
-
 	handleScopeDefinition(scope) {
 		this.graph.enterScope(scope.name);
-		if (scope.body) { this.walkAst(scope.body); }
+		this.walkAst(scope.body);
 		this.graph.exitScope();
 	}
 
-	handleScopeBody(scopeBody) {
-		if (scopeBody.definitions) {
-			scopeBody.definitions.forEach(definition => this.walkAst(definition));
-		} else {
-			const scopeId = this.graph.scopeStack.generateCurrentScopeIdentifier();
-			console.warn(`Scope "${scopeId}" has no definitions, i.e. empty scope.`);
-		}
+	handleScopeDefinitionBody(scopeBody) {
+		scopeBody.definitions.forEach(definition => this.walkAst(definition));
 	}
 
 	handleBlockDefinition(blockDefinition) {
-		console.info(`Adding "${blockDefinition.name}" to available definitions.`);
+		// console.info(`Adding "${blockDefinition.name}" to available definitions.`);
 		this.addDefinition(blockDefinition.name);
 	}
 
@@ -51,7 +45,6 @@ class Moniel{
 
 	handleNetworkDefinition(network) {
 		this.initialize();
-		this.graph.addMain();
 		network.definitions.forEach(definition => this.walkAst(definition));
 	}
 
@@ -63,6 +56,7 @@ class Moniel{
 		});
 	}
 
+	// this is doing too much – break into "not recognized", "success" and "ambiguous"
 	handleBlockInstance(instance) {
 		var id = undefined;
 		var label = "undeclared";
@@ -76,7 +70,11 @@ class Moniel{
             type = "undefined";
             label = instance.name;
             shape = "rect";
-            console.warn(`Unrecognized type of block instance. No possible matches found.`);
+            this.addIssue({
+            	message: `Unrecognized type of block instance "${instance.name}". No possible matches found.`,
+            	position: instance._interval.startIdx,
+            	type: "error"
+            });
         } else if (possibleTypes.length === 1) {
 			type = possibleTypes[0];
 			label = type;
@@ -85,16 +83,20 @@ class Moniel{
 			type = "ambiguous"
             label = instance.name
             shape = "diamond";
-			console.warn(`Unrecognized type of block instance. Possible matches: ${possibleTypes.join(", ")}.`);
+			this.addIssue({
+				message: `Unrecognized type of block instance. Possible matches: ${possibleTypes.join(", ")}.`,
+				position: instance._interval.startIdx,
+				type: "warning"
+			});
 		}
 
 		if (!instance.alias) {
 			id = this.graph.generateInstanceId(type);
 		} else {
-			id = [...this.graph.scopeStack.current(), instance.alias.value].join("/");
+			id = instance.alias.value;
 		}
 
-		this.graph.setNode(id, {
+		this.graph.createNode(id, {
 			label: label,
             class: type,
             shape: shape,
@@ -107,27 +109,24 @@ class Moniel{
 	}
 
 	handleIdentifier(identifier) {
-		let id = this.generateBlockIdentifier(identifier.value);
+		this.graph.referenceNode(identifier.value);
+	}
 
-		if (!this.graph.hasNode(id)) {
-			console.warn(`Forward use of undeclared instance "${identifier.value}"`);
-
-			this.graph.setNode(id, {
-				label: identifier.value,
-				class: "undefined"
-			});
-		} else {
-			this.graph.touchNode(id);
-		}
+	getTypeOfInstance(instance) {
+		// console.info(`Trying to match "${instance.name}" against block definitions.`);
+		return Moniel.nameResolution(instance.name, this.definitions);
 	}
 
 	getComputationalGraph() {
 		return this.graph.getGraph();
 	}
 
-	getTypeOfInstance(instance) {
-		console.info(`Trying to match "${instance.name}" against block definitions.`);
-		return Moniel.nameResolution(instance.name, this.definitions);
+	getIssues() {
+		return this.logger.getIssues();
+	}
+
+	addIssue(issue) {
+		this.logger.addIssue(issue);
 	}
 
 	static nameResolution(partial, list) {
@@ -150,13 +149,13 @@ class Moniel{
 
 		switch (node.type) {
 			case "Network": this.handleNetworkDefinition(node); break;
-			case "Connection": this.handleConnectionDefinition(node); break;
-			case "BlockInstance": this.handleBlockInstance(node); break;
 			case "BlockDefinition": this.handleBlockDefinition(node); break;
+			case "ScopeDefinition": this.handleScopeDefinition(node); break;
+			case "ScopeDefinitionBody": this.handleScopeDefinitionBody(node); break;
+			case "ConnectionDefinition": this.handleConnectionDefinition(node); break;
+			case "BlockInstance": this.handleBlockInstance(node); break;
 			case "BlockList": this.handleBlockList(node); break;
 			case "Identifier": this.handleIdentifier(node); break;
-			case "Scope": this.handleScopeDefinition(node); break;
-			case "ScopeBody": this.handleScopeBody(node); break;
 			default: this.handleUnrecognizedNode(node);
 		}
 	}

@@ -8,13 +8,13 @@ class ScopeStack{
 	}
 
 	push(scope) {
-		console.info(`Scope "${scope}" pushed to scope stack.`);
+		// console.info(`Scope "${scope}" pushed to scope stack.`);
 		this.scopeStack.push(scope);
 	}
 
 	pop() {
 		const scope = this.scopeStack.pop();
-		console.info(`Scope "${scope}" popped from scope stack.`);
+		// console.info(`Scope "${scope}" popped from scope stack.`);
 		return scope;
 	}
 
@@ -24,26 +24,15 @@ class ScopeStack{
 
 	initialize() {
 		this.clear();
-		this.push(".");
 	}
 
 	currentScopeIdentifier() {
 		return this.scopeStack.join("/");
 	}
 
-	toString() {
-		return this.scopeStack.join("/");	
-	}
-
-	generateCurrentScopeIdentifier() {
-		return this.scopeStack.join("/");
-	}
-
-	current() {
-		return Array.from(this.scopeStack);
-	}
-
-	toString() {
-		return this.scopeStack.join("/");
+	previousScopeIdentifier() {
+		let copy = Array.from(this.scopeStack);
+		copy.pop();
+		return copy.join("/");
 	}
 }

@@ -1,14 +1,16 @@
-class Hello extends React.Component{
+class IDE extends React.Component{
 
 	constructor(props) {
 		super(props);
+
+		this.moniel = new Moniel();
+
 		this.state = {
 			"grammar": grammar,
 			"semantics": semantics,
 			"networkDefinition": "",
 			"ast": null,
-			"annotations": null,
-			"definitions": [],
+			"issues": null,
 			"highlightRange": {
 				startIdx: 0,
 				endIdx: 0
@@ -21,31 +23,36 @@ class Hello extends React.Component{
 	}
 
 	componentDidMount() {
+		this.loadExample("VGG16");
 	}
 
 	delayedUpdateNetworkDefinition(value) {
-		if (this.lock) {
-			clearTimeout(this.lock);
-		}
+		if (this.lock) { clearTimeout(this.lock); }
 		this.lock = setTimeout(() => { this.updateNetworkDefinition(value); }, 250);
 	}
 
 	updateNetworkDefinition(value){
-		console.log("update")
 		console.time("dataflow");
 		var result = this.compileToAST(this.state.grammar, this.state.semantics, value);
 		if (result.ast) {
+			this.moniel.walkAst(result.ast);
+			var graph = this.moniel.getComputationalGraph();
 			this.setState({
+				networkDefinition: value,
 				ast: result.ast,
-				annotations: null
+				graph: graph,
+				issues: this.moniel.getIssues()
 			});
 		} else {
 			this.setState({
+				networkDefinition: value,
 				ast: null,
-				annotations: {
+				graph: null,
+				issues: [{
 					position: result.position,
-					message: "Expected " + result.expected + "."
-				}
+					message: "Expected " + result.expected + ".",
+					type: "error"
+				}]
 			});
 		}
 	}
@@ -56,7 +63,25 @@ class Hello extends React.Component{
 		})
 	}
 
+	loadExample(id) {
+		var callback = function(value) {
+			this.editor.setValue(value);
+			this.setState({
+				networkDefinition: value
+			});
+		};
+
+		$.ajax({
+			url: `/examples/${id}.mon`,
+			data: null,
+			success: callback.bind(this),
+			dataType: "text"
+		});
+	}
+
+	// into Moniel? or Parser
 	compileToAST(grammar, semantics, source) {
+		console.log("compileToAST");
 	    var result = grammar.match(source);
 
 	    if (result.succeeded()) {
@@ -75,64 +100,27 @@ class Hello extends React.Component{
 	}
 
 	render() {
-		var style = {
-	  		position: "absolute",
-	  		display: "flex",
-	  		flexDirection: "row",
-	  		bottom: 0,
-	    	top: 0,
-	    	left: 0,
-	    	right: 0
-	  	}
-
-	  	var model = `/conv1{
-    in:Input(shape=28x28)
-    
-    filters:Tensor(shape=10x3x3)
-    biases:Tensor(shape=10x1)
-    
-    [in,filters] -> conv:Convolution
-    [conv, biases] -> BiasAdd -> ReLU -> out
-    
-    out:Output
-}
-
-/conv2{
-    in:Input(shape=28x28)
-    
-    filters:Tensor(shape=10x3x3)
-    biases:Tensor(shape=10x1)
-    
-    [in,filters] -> conv:Convolution
-    [conv, biases] -> BiasAdd -> ReLU -> out
-    
-    out:Output
-}
-
-image:Input -> conv1/in
-conv1/out -> conv2/in
-conv2/out -> Out`;
-    	return <div style={style}>
+		console.log("IDE.render");
+    	return <div id="container">
     		<Panel title="Definition">
     			<Editor
-    				name="network"
+    				ref={(ref) => this.editor = ref}
     				mode="moniel"
     				theme="monokai"
-    				annotations={this.state.annotations}
+    				issues={this.state.issues}
     				onChange={this.delayedUpdateNetworkDefinition}
-    				defaultValue={model}
+    				defaultValue={this.state.networkDefinition}
     				highlightRange={this.state.highlightRange}
     			/>
     		</Panel>
     		
-    		<Panel title="Schema">
-    			<VisualGraph ast={this.state.ast} onHighlight={this.onHighlight} />
+    		<Panel title="Visualization">
+    			<VisualGraph graph={this.state.graph} onHighlight={this.onHighlight} />
     		</Panel>
 
     		{/*
     		<Panel title="AST">
     			<Editor
-    				name="ast"
     				mode="json"
     				theme="monokai"
     				value={JSON.stringify(this.state.ast, null, 2)}

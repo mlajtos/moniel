@@ -14,6 +14,15 @@ body{
     flex-wrap: wrap;
     font: 300 16px 'Helvetica Neue', Helvetica;
 }
+#container{
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+}
 .panel{
     flex-grow: 1;
     flex-shrink: 1;
@@ -68,6 +77,10 @@ body{
     z-index: 2;
     background-color: white;
     opacity: 0.3;
+}
+
+svg#visualization{
+    flex: 1;
 }
 
 g.node rect{

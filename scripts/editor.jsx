@@ -16,6 +16,10 @@ class Editor extends React.Component{
         this.container = element;
     }
 
+    setValue(value) {
+        this.editor.setValue(value, -1);
+    }
+
     componentDidMount() {
         this.editor = ace.edit(this.container);
         this.editor.getSession().setMode("ace/mode/" + this.props.mode);
@@ -28,29 +32,31 @@ class Editor extends React.Component{
             wrap: true,
             autoScrollEditorIntoView: true,
             fontFamily: "Fira  Code",
-            //showLineNumbers: false,
-            //showGutter: false
+            showLineNumbers: true,
+            showGutter: true
         });
         this.editor.$blockScrolling = Infinity;
-        this.editor.on("change", this.onChange);
+
         if (this.props.defaultValue){
             this.editor.setValue(this.props.defaultValue, -1);
         }
+
+        this.editor.on("change", this.onChange);
     }
 
     componentWillReceiveProps(nextProps) {
-        var anno = nextProps.annotations;
+        if (nextProps.issues) {
+            var annotations = nextProps.issues.map(issue => {
+                let position = this.editor.session.doc.indexToPosition(issue.position);
+                return {
+                    row: position.row,
+                    column: position.column,
+                    text: issue.message,
+                    type: issue.type
+                }
+            })
 
-        if (nextProps.annotations) {
-            var position = this.editor.session.doc.indexToPosition(anno.position);
-            var message = anno.message
-
-            this.editor.session.setAnnotations([{
-                row: position.row,
-                column: position.column,
-                text: message,
-                type: "error" // also warning and information
-            }]);
+            this.editor.session.setAnnotations(annotations);
             this.editor.execCommand("goToNextError");
         } else {
             this.editor.session.clearAnnotations();
@@ -74,10 +80,6 @@ class Editor extends React.Component{
     }
 
     render() {
-        return <div
-            id={this.props.name}
-            ref={ (element) => this.init(element) }
-        >
-        </div>;
+        return <div ref={ (element) => this.init(element) }></div>;
     }
 }

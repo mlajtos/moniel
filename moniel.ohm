@@ -2,7 +2,7 @@ Moniel{
     Network
         = Definition*
     Definition
-        = (BlockDefinition | Scope | ConnectionDefinition)
+        = (BlockDefinition | ScopeDefinition | ConnectionDefinition)
 
     ConnectionDefinition
         = NonemptyListOf<(BlockList | Block), connectionSymbol>
@@ -28,9 +28,9 @@ Moniel{
     BlockDefinitionBody
         = ("{" Definition* "}")?
 
-    Scope
-        = "/" scopeName ScopeBody
-    ScopeBody
+    ScopeDefinition
+        = "/" scopeName ScopeDefinitionBody
+    ScopeDefinitionBody
         = ("{" Definition* "}")?
 
     Parameters

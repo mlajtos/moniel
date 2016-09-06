@@ -21,10 +21,11 @@ class ComputationalGraph{
             arrowhead: "vee",
             lineInterpolate: "basis"
         }
+
+        this.addMain();
 	}
 
 	enterScope(name) {
-		let previousScopeId = this.scopeStack.currentScopeIdentifier();
 		this.scopeStack.push(name);
 		let currentScopeId = this.scopeStack.currentScopeIdentifier();
 
@@ -34,6 +35,7 @@ class ComputationalGraph{
             class: "Scope"
 		});
 
+		let previousScopeId = this.scopeStack.previousScopeIdentifier();
 		this.graph.setParent(currentScopeId, previousScopeId);
 	}
 
@@ -46,15 +48,12 @@ class ComputationalGraph{
 			this.nodeCounter[type] = 0;
 		}
 		this.nodeCounter[type] += 1;
-
-		this.scopeStack.push(type + this.nodeCounter[type]);
-		var id = this.scopeStack.currentScopeIdentifier();
-		this.scopeStack.pop();
-
+		let id = type + this.nodeCounter[type];
 		return id;
 	}
 
 	addMain() {
+		this.scopeStack.push(".");
 		let id = this.scopeStack.currentScopeIdentifier();
 
 		this.graph.setNode(id, {
@@ -62,16 +61,48 @@ class ComputationalGraph{
 		});
 	}
 
-	touchNode(id) {
-		this.nodeStack.push(id);
-		this.previousNodeStack.forEach(from => this.setEdge(from, id));
+	touchNode(nodePath) {
+		if (this.graph.hasNode(nodePath)) {
+			this.nodeStack.push(nodePath);
+			this.previousNodeStack.forEach(fromPath => this.setEdge(fromPath, nodePath));
+		} else {
+			console.warn(`Trying to touch non-existant node "${nodePath}"`);
+		}
 	}
 
-	setNode(id, node) {
-		console.info(`Creating node with id "${id}".`);
-		this.touchNode(id);
-		this.setParent(id, this.scopeStack.currentScopeIdentifier());
-		return this.graph.setNode(id, node);
+	referenceNode(id) {
+		this.scopeStack.push(id);
+		let nodePath = this.scopeStack.currentScopeIdentifier();
+		let scope = this.scopeStack.previousScopeIdentifier();
+
+		if (!this.graph.hasNode(nodePath)) {
+			this.graph.setNode(nodePath, {
+				label: id,
+				class: "undefined"
+			});
+			this.setParent(nodePath, scope);
+		}
+
+		this.touchNode(nodePath);
+		this.scopeStack.pop();
+	}
+
+	createNode(id, node) {
+		this.scopeStack.push(id);
+		let nodePath = this.scopeStack.currentScopeIdentifier();
+		let scope = this.scopeStack.previousScopeIdentifier();
+
+		if (!this.graph.hasNode(nodePath)) {
+			this.graph.setNode(nodePath, node);
+			this.setParent(nodePath, scope);
+		} else {
+			console.warn(`Redifining node "${id}"`);
+			this.graph.setNode(nodePath, node);
+			this.setParent(nodePath, scope);
+		}
+		
+		this.touchNode(nodePath);
+		this.scopeStack.pop();
 	}
 
 	clearNodeStack() {
@@ -80,29 +111,25 @@ class ComputationalGraph{
 	}
 
 	freezeNodeStack() {
-		console.log(`Freezing node stack. Content: ${JSON.stringify(this.nodeStack)}`);
+		// console.log(`Freezing node stack. Content: ${JSON.stringify(this.nodeStack)}`);
 		this.previousNodeStack = [...this.nodeStack];
 		this.nodeStack = [];
 	}
 
-	setParent(node1, node2) {
-		return this.graph.setParent(node1, node2);
+	setParent(childPath, parentPath) {
+		return this.graph.setParent(childPath, parentPath);
 	}
 
-	setEdge(from, to) {
-		console.log(`Creating edge from "${from}" to "${to}".`)
-		this.graph.setEdge(from, to, {...this.defaultEdge});
+	setEdge(fromPath, toPath) {
+		// console.info(`Creating edge from "${fromPath}" to "${toPath}".`)
+		this.graph.setEdge(fromPath, toPath, {...this.defaultEdge});
 	}
 
-	hasNode(id) {
-		return this.graph.hasNode(id);
+	hasNode(nodePath) {
+		return this.graph.hasNode(nodePath);
 	}
 
 	getGraph() {
-		return this.graph;
-	}
-
-	graph() {
 		return this.graph;
 	}
 }
