@@ -126,6 +126,7 @@ Of course, [editor](https://www.youtube.com/watch?v=zVZqHHNQ50c) with proper syn
 - [DNNGraph](https://github.com/ajtulloch/dnngraph) – "a deep neural network model generation DSL in Haskell"
 - [TensorBuilder](https://cgarciae.github.io/tensorbuilder/) – "a functional fluent immutable API based on the Builder Pattern"
 - [Keras](https://keras.io/) – "minimalist, highly modular neural networks library"
+- [KeraFlow](https://github.com/ipod825/keraflow) – simplified Keras(?)
 - [PrettyTensor](https://github.com/google/prettytensor) – "a high level builder API"
 - [TF-Slim](https://github.com/tensorflow/models/blob/master/inception/inception/slim/README.md) – "a lightweight library for defining, training and evaluating models"
 - [TFLearn](http://tflearn.org/) – "modular and transparent deep learning library"
