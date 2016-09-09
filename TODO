@@ -1,8 +1,0 @@
-Syntax
-	* Tensor Dimension
-		* should be NxNxN, i.e. not as [N,N,N]
-	* Hyperparameters
-		* Layer(param=<1,2,3,4>)
-
-Visualization
-	* level of detail?
