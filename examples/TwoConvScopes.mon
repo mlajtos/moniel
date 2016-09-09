@@ -22,6 +22,4 @@
     out:Output
 }
 
-image:Input -> conv1/in
-conv1/out -> conv2/in
-conv2/out -> Out
+image:Input -> conv1 -> conv2 -> Out

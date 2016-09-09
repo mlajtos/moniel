@@ -1,6 +1,7 @@
 class ComputationalGraph{
-	constructor() {
+	constructor(parent) {
 		this.initialize();
+		this.moniel = parent;
 	}
 
 	initialize() {
@@ -25,14 +26,15 @@ class ComputationalGraph{
         this.addMain();
 	}
 
-	enterScope(name) {
-		this.scopeStack.push(name);
+	enterScope(scope) {
+		this.scopeStack.push(scope.name);
 		let currentScopeId = this.scopeStack.currentScopeIdentifier();
 
 		this.graph.setNode(currentScopeId, {
-			label: name,
+			label: scope.name,
 			clusterLabelPos: "top",
-            class: "Scope"
+            class: "Scope",
+            _parserInfo: scope._interval
 		});
 
 		let previousScopeId = this.scopeStack.previousScopeIdentifier();
@@ -64,7 +66,9 @@ class ComputationalGraph{
 	touchNode(nodePath) {
 		if (this.graph.hasNode(nodePath)) {
 			this.nodeStack.push(nodePath);
-			this.previousNodeStack.forEach(fromPath => this.setEdge(fromPath, nodePath));
+			this.previousNodeStack.forEach(fromPath => {
+				this.setEdge(fromPath, nodePath)	
+			});
 		} else {
 			console.warn(`Trying to touch non-existant node "${nodePath}"`);
 		}
@@ -120,9 +124,76 @@ class ComputationalGraph{
 		return this.graph.setParent(childPath, parentPath);
 	}
 
+	isInput(nodePath) {
+		return this.graph.node(nodePath).class === "Input";
+	}
+
+	isOutput(nodePath) {
+		return this.graph.node(nodePath).class === "Output";
+	}
+
+	isScope(nodePath) {
+		return this.graph.node(nodePath).class === "Scope";	
+	}
+
+	getScopeOutput(scopePath) {
+		let scope = this.graph.node(scopePath);
+		let outs = this.graph.children(scopePath).filter(node => { return this.isOutput(node) });
+		if (outs.length === 1) {
+			return outs[0];	
+		} else  if (outs.length === 0) {
+			this.moniel.logger.addIssue({
+				message: `Scope "${scope.label}" doesn't have any Output node.`,
+				type: "error",
+				position: scope._parserInfo.startIdx
+			});
+			return null;
+		} else {
+			this.moniel.logger.addIssue({
+				message: `Scope "${scope.label}" has more than one Output node.`,
+				type: "error",
+				position: scope._parserInfo.startIdx
+			});
+			return null;
+		}
+	}
+
+	getScopeInput(scopePath) {
+		let scope = this.graph.node(scopePath);
+		let ins = this.graph.children(scopePath).filter(node => { return this.isInput(node) });
+		if (ins.length === 1) {
+			return ins[0];	
+		} else  if (ins.length === 0) {
+			this.moniel.logger.addIssue({
+				message: `Scope "${scope.label}" doesn't have any Input node.`,
+				type: "error",
+				position: scope._parserInfo.startIdx
+			});
+			return null;
+		} else {
+			this.moniel.logger.addIssue({
+				message: `Scope "${scope.label}" has more than one Input node.`,
+				type: "error",
+				position: scope._parserInfo.startIdx
+			});
+			return null;
+		}	
+	}
+
 	setEdge(fromPath, toPath) {
 		// console.info(`Creating edge from "${fromPath}" to "${toPath}".`)
-		this.graph.setEdge(fromPath, toPath, {...this.defaultEdge});
+
+		if (this.isScope(fromPath)) {
+			fromPath = this.getScopeOutput(fromPath);
+		}
+
+		if (this.isScope(toPath)) {
+			toPath = this.getScopeInput(toPath);
+		}
+		
+		if (fromPath && toPath) {
+			this.graph.setEdge(fromPath, toPath, {...this.defaultEdge});	
+		}
 	}
 
 	hasNode(nodePath) {

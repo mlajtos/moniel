@@ -1,7 +1,7 @@
 class Moniel{
 	constructor() {
 		this.definitions = [];
-		this.graph = new ComputationalGraph();
+		this.graph = new ComputationalGraph(this);
 		this.logger = new Logger();
 		this.initialize();
 	}
@@ -25,7 +25,7 @@ class Moniel{
 	}
 
 	handleScopeDefinition(scope) {
-		this.graph.enterScope(scope.name);
+		this.graph.enterScope(scope);
 		this.walkAst(scope.body);
 		this.graph.exitScope();
 	}
@@ -101,6 +101,7 @@ class Moniel{
             class: type,
             shape: shape,
             style: "fill: " + color,
+            _parserInfo: instance
         });
 	}
 

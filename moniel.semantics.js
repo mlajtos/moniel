@@ -17,7 +17,8 @@ var semantics = grammar.semantics().addOperation('eval', {
 		return {
 			type: "ScopeDefinition",
 			name: name.interval.contents,
-			body: body.eval()
+			body: body.eval(),
+			_interval: this.interval
 		};
 	},
 	ScopeDefinitionBody: function(_, list, _) {

@@ -1,0 +1,51 @@
+// AlexNet – scope-based, canonical, incomplete
+
++TruncatedNormalDistribution
+
+/conv1{
+    images:Input
+    TruncatedNormalDistribution(shape = 11x11x3x64) -> kernels:Variable
+    [images,kernels] -> conv:Convolution(strides = 1x4x4x1)
+    Constant(shape = 1x64, value = 0.0) -> biases:Variable
+    [conv,biases] -> BiasAdd -> ReLU -> Output
+}
+
+/pool1{ Input -> MaxPooling(poolShape = 1x3x3x1, strides = 1x2x2x1) -> Output }
+
+/conv2{
+    images:Input
+    TruncatedNormalDistribution(shape = 5x5x64x192) -> kernels:Variable
+    [images,kernels] -> conv:Convolution(strides = 1x1x1x1)
+    Constant(shape = 1x192, value = 0.0) -> biases:Variable
+    [conv,biases] -> BiasAdd -> ReLU -> Output
+}
+
+/pool2{ Input -> MaxPooling(poolShape = 1x3x3x1, strides = 1x2x2x1) -> Output }
+
+/conv3{
+    images:Input
+    TruncatedNormalDistribution(shape = 3x3x192x384) -> kernels:Variable
+    [images,kernels] -> conv:Convolution(strides = 1x1x1x1)
+    Constant(shape = 1x384, value = 0.0) -> biases:Variable
+    [conv,biases] -> BiasAdd -> ReLU -> Output
+}
+
+/conv4{
+    images:Input
+    TruncatedNormalDistribution(shape = 3x3x384x256) -> kernels:Variable
+    [images,kernels] -> conv:Convolution(strides = 1x1x1x1)
+    Constant(shape = 1x256, value = 0.0) -> biases:Variable
+    [conv,biases] -> BiasAdd -> ReLU -> Output
+}
+
+/conv5{
+    images:Input
+    TruncatedNormalDistribution(shape = 3x3x256x256) -> kernels:Variable
+    [images,kernels] -> conv:Convolution(strides = 1x1x1x1)
+    Constant(shape = 1x256, value = 0.0) -> biases:Variable
+    [conv,biases] -> BiasAdd -> ReLU -> Output
+}
+
+/pool5{ Input -> MaxPooling(poolShape = 1x3x3x1, strides = 1x2x2x1) -> Output }
+
+Input -> conv1 -> pool1 -> conv2 -> pool2 -> conv3 -> conv4 -> conv5 -> pool5 -> Output
