@@ -84,9 +84,10 @@ svg#visualization{
 }
 
 g.node rect{
-    rx: 10;
-    ry: 10;
-    stroke: rgba(0, 0, 0, 0.3);
+    rx: 20;
+    ry: 20;
+    stroke: white;
+    stroke-width: 2px;
 }
 
 g.node:hover rect, g.node:hover polygon{
@@ -135,13 +136,15 @@ g > text{
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
-    font-weight: bold;
+    font-weight: normal;
     fill: white;
 }
 
 .edgePath path {
+    /*
     stroke-dasharray: 10,3;
     animation: dash 13s linear reverse infinite;
+    */
 }
 
 @keyframes dash {
@@ -164,8 +167,8 @@ g.node.Scope rect, .clusters rect {
     stroke: #fff;
     stroke-width: 2px;
     opacity: 0.5;
-    rx: 5;
-    ry: 5;
+    rx: 20;
+    ry: 20;
 }
 
 g.node.Scope text, .cluster .label text{
