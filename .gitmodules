@@ -1,0 +1,6 @@
+[submodule "lib/FiraCode"]
+	path = lib/FiraCode
+	url = https://github.com/tonsky/FiraCode.git
+[submodule "lib/ohm"]
+	path = lib/ohm
+	url = https://github.com/cdglabs/ohm.git
