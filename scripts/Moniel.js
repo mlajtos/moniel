@@ -72,7 +72,7 @@ class Moniel{
             shape = "rect";
             this.addIssue({
             	message: `Unrecognized type of block instance "${instance.name}". No possible matches found.`,
-            	position: instance._interval.startIdx,
+            	position: instance._source.startIdx,
             	type: "error"
             });
         } else if (possibleTypes.length === 1) {
@@ -85,7 +85,7 @@ class Moniel{
             shape = "diamond";
 			this.addIssue({
 				message: `Unrecognized type of block instance. Possible matches: ${possibleTypes.join(", ")}.`,
-				position: instance._interval.startIdx,
+				position: instance._source.startIdx,
 				type: "warning"
 			});
 		}
@@ -101,7 +101,7 @@ class Moniel{
             class: type,
             shape: shape,
             style: "fill: " + color,
-            _parserInfo: instance
+            _source: instance
         });
 	}
 

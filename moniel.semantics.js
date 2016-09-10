@@ -1,5 +1,5 @@
 var grammar = ohm.grammarFromScriptElement();
-var semantics = grammar.semantics().addOperation('eval', {
+var semantics = grammar.createSemantics().addOperation('eval', {
 	Network: function(definitions) {
 		return {
 			type: "Network",
@@ -9,16 +9,16 @@ var semantics = grammar.semantics().addOperation('eval', {
 	BlockDefinition: function(_, layerName, params, body) {
 		return {
 			type: "BlockDefinition",
-			name: layerName.interval.contents,
+			name: layerName.source.contents,
 			body: body.eval()
 		};
 	},
 	ScopeDefinition: function(_, name, body) {
 		return {
 			type: "ScopeDefinition",
-			name: name.interval.contents,
+			name: name.source.contents,
 			body: body.eval(),
-			_interval: this.interval
+			_source: this.source
 		};
 	},
 	ScopeDefinitionBody: function(_, list, _) {
@@ -40,7 +40,7 @@ var semantics = grammar.semantics().addOperation('eval', {
 	        name: layerName.eval(),
 	        alias: id.eval()[0],
 	        parameters: params.eval(),
-	        _interval: this.interval
+	        _source: this.source
 	    };
 	},
 	BlockName: function(id, _) {
@@ -75,7 +75,7 @@ var semantics = grammar.semantics().addOperation('eval', {
 	Value: function(val) {
 	    return {
 	        type: "Value",
-	        value: val.interval.contents
+	        value: val.source.contents
 	    };
 	},
 	ValueList: function(_, list, _) {
@@ -90,20 +90,20 @@ var semantics = grammar.semantics().addOperation('eval', {
 	blockIdentifier: function(_, _, _) {
 	    return {
 	        type: "Identifier",
-	        value: this.interval.contents,
-	        _interval: this.interval
+	        value: this.source.contents,
+	        _source: this.source
 	    };
 	},
 	parameterName: function(a) {
-	    return a.interval.contents;  
+	    return a.source.contents;  
 	},
 	blockType: function(_, _) {
-	    return this.interval.contents;
+	    return this.source.contents;
 	},
 	blockName: function(_, _) {
 		return {
 	        type: "Identifier",
-	        value: this.interval.contents
+	        value: this.source.contents
 	    };
 	}
 });

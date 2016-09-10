@@ -34,7 +34,7 @@ class ComputationalGraph{
 			label: scope.name,
 			clusterLabelPos: "top",
             class: "Scope",
-            _parserInfo: scope._interval
+            _source: scope._source
 		});
 
 		let previousScopeId = this.scopeStack.previousScopeIdentifier();
@@ -145,14 +145,14 @@ class ComputationalGraph{
 			this.moniel.logger.addIssue({
 				message: `Scope "${scope.label}" doesn't have any Output node.`,
 				type: "error",
-				position: scope._parserInfo.startIdx
+				position: scope._source.startIdx
 			});
 			return null;
 		} else {
 			this.moniel.logger.addIssue({
 				message: `Scope "${scope.label}" has more than one Output node.`,
 				type: "error",
-				position: scope._parserInfo.startIdx
+				position: scope._source.startIdx
 			});
 			return null;
 		}
@@ -167,14 +167,14 @@ class ComputationalGraph{
 			this.moniel.logger.addIssue({
 				message: `Scope "${scope.label}" doesn't have any Input node.`,
 				type: "error",
-				position: scope._parserInfo.startIdx
+				position: scope._source.startIdx
 			});
 			return null;
 		} else {
 			this.moniel.logger.addIssue({
 				message: `Scope "${scope.label}" has more than one Input node.`,
 				type: "error",
-				position: scope._parserInfo.startIdx
+				position: scope._source.startIdx
 			});
 			return null;
 		}	
