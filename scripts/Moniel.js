@@ -1,8 +1,10 @@
 class Moniel{
+	logger = new Logger();
+	graph = new ComputationalGraph(this);
+
+	definitions = [];
+
 	constructor() {
-		this.definitions = [];
-		this.graph = new ComputationalGraph(this);
-		this.logger = new Logger();
 		this.initialize();
 	}
 

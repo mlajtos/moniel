@@ -1,7 +1,5 @@
 class Logger{
-	constructor() {
-		this.issues = [];
-	}
+	issues = []
 
 	clear() {
 		this.issues = [];

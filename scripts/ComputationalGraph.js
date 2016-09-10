@@ -1,27 +1,26 @@
 class ComputationalGraph{
+	graph = new dagreD3.graphlib.Graph({
+		compound:true
+	});
+
+	defaultEdge = {
+        arrowhead: "vee",
+        lineInterpolate: "basis"
+    }
+
+	nodeCounter = {}
+	nodeStack = []
+	previousNodeStack = []
+	scopeStack = new ScopeStack()
+
 	constructor(parent) {
 		this.initialize();
 		this.moniel = parent;
 	}
 
 	initialize() {
-		this.graph = new dagreD3.graphlib.Graph({
-			compound:true
-		});
         this.graph.setGraph({});
-
-		this.nodeCounter = {};
-
-		this.nodeStack = [];
-		this.previousNodeStack = [];
-
-		this.scopeStack = new ScopeStack();
 		this.scopeStack.initialize();
-
-		this.defaultEdge = {
-            arrowhead: "vee",
-            lineInterpolate: "basis"
-        }
 
         this.addMain();
 	}

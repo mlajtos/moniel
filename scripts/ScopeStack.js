@@ -1,4 +1,6 @@
 class ScopeStack{
+	scopeStack = []
+
 	constructor(scope = []) {
 		if (Array.isArray(scope)) {
 			this.scopeStack = scope;
@@ -7,23 +9,20 @@ class ScopeStack{
 		}
 	}
 
+	initialize() {
+		this.clear();
+	}
+
 	push(scope) {
-		// console.info(`Scope "${scope}" pushed to scope stack.`);
 		this.scopeStack.push(scope);
 	}
 
 	pop() {
-		const scope = this.scopeStack.pop();
-		// console.info(`Scope "${scope}" popped from scope stack.`);
-		return scope;
+		return this.scopeStack.pop();
 	}
 
 	clear() {
 		this.scopeStack = [];
-	}
-
-	initialize() {
-		this.clear();
 	}
 
 	currentScopeIdentifier() {
