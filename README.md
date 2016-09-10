@@ -89,9 +89,25 @@ Ones(s=10x10x10)
 ```
 Dropout(ratio = <0.3, 0.5, 0.7>)
 ```
-Defining large graphs without proper structuring is unmanageable. **Scopes** shield computations by Input-Output boundary:
+Defining large graphs without proper structuring is unmanageable. **Scopes** can help:
 ```
+// really bad example of how to use scopes
+
 /layer1{ // slash denotes scope
+	RandomNormal(shape=784x1000) -> weights:Variable
+	weigths -> dp:DotProduct -> act:ReLU
+}
+
+/layer2{
+	RandomNormal(shape=1000x10) -> weights:Variable
+	weigths -> dp:DotProduct -> act:ReLU
+} // 'dp', 'weights', and 'act' are not shared because scope is different
+
+layer1/relu1 -> layer2/dp // connect nodes from different scopes
+```
+Scopes are more powerful when they define proper **Input-Output boundary**:
+```
+/layer1{
 	RandomNormal(shape=784x1000) -> weights:Variable
 	[in:Input,weigths] -> DotProduct -> ReLU -> out:Output
 }
@@ -99,15 +115,11 @@ Defining large graphs without proper structuring is unmanageable. **Scopes** shi
 /layer2{
 	RandomNormal(shape=1000x10) -> weights:Variable
 	[in:Input,weigths] -> DotProduct -> ReLU -> out:Output
-} // 'in', 'weights', and 'out' are not shared because scope name is different
+}
 
-layer1/out -> layer2/in // connect scopes together
+layer1 -> layer2 // connect scopes directly
 ```
-When scopes have defined Inputs and Outputs, they can be connected directly:
-```
-layer1 -> layer2
-```
-If scopes are almost identical, we can create a **reusable block** and use it as a normal node:
+If scopes have identical structure, we can create a **reusable block** and use it as a normal node:
 ```
 +ReusableLayer(shape = 1x1){
 	RandN(shape = shape) -> w:Var
@@ -122,8 +134,9 @@ Of course, [editor](https://www.youtube.com/watch?v=zVZqHHNQ50c) with proper syn
 
 ----------
 
-## Similar projects
+## Similar projects and Inspiration
 - [DNNGraph](https://github.com/ajtulloch/dnngraph) – "a deep neural network model generation DSL in Haskell"
+- [NNVM](https://github.com/dmlc/nnvm) – "Intermediate Computational Graph Representation for Deep Learning Systems"
 - [TensorBuilder](https://cgarciae.github.io/tensorbuilder/) – "a functional fluent immutable API based on the Builder Pattern"
 - [Keras](https://keras.io/) – "minimalist, highly modular neural networks library"
 - [KeraFlow](https://github.com/ipod825/keraflow) – simplified Keras(?)

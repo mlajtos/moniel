@@ -3,14 +3,11 @@
 ![Transformation pipeline](images/pipeline.png)
 
 ### Moniel
-#### PEG
-Moniel notation is a [PEG](https://en.wikipedia.org/wiki/Parsing_expression_grammar) language described by the [grammar](../moniel.ohm) and [semantics](../moniel.semantics.js) in [Ohm/JS](https://github.com/cdglabs/ohm).
+#### Parser
+Moniel notation is defined as a [Parsing Expression Grammar](https://en.wikipedia.org/wiki/Parsing_expression_grammar). The language consists of a [grammar](../moniel.ohm) and [semantics](../moniel.semantics.js) that are interpreted by [Ohm/JS](https://github.com/cdglabs/ohm). Result is a Abstract Syntax Tree that is further processed by Moniel Runtime.
 
-#### AST
-Ohm/JS creates abstract syntax tree that is processed by Moniel runtime which constructs the intermediate representation of computational graph.
-
-#### JSON, Protocol Buffers
-TensorFlow uses [Protocol Buffers](https://github.com/google/protobuf) for representing the computational graph. However, one can directly map a special JSON file through ProtoBuf schema to obtain a ProtoBuf definition suitable for TensorFlow runtime.
+#### Runtime
+Runtime constructs itermediate representaion of the computational graph from AST. This step includes node type resolution, managing scopes, etc. Intermediate representation graph is then used to produce JSON and ProtoBuf definitions.
 
 ### Moniel IDE
 *Moniel IDE* stands for (Integrated | Interactive) (Development | Design) (Environment | Experience), where user can interactively design model with immediate feedback. For now, this stage is limited to model definition only. However, user should be able to interactively inspect model training and model evaluation – these are partly covered by TensorBoard.
