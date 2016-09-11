@@ -1,7 +1,5 @@
 class ComputationalGraph{
-	graph = new dagreD3.graphlib.Graph({
-		compound:true
-	});
+	graph = null
 
 	defaultEdge = {
         arrowhead: "vee",
@@ -19,6 +17,9 @@ class ComputationalGraph{
 	}
 
 	initialize() {
+		this.graph = new graphlib.Graph({
+			compound:true
+		});
         this.graph.setGraph({});
 		this.scopeStack.initialize();
 
