@@ -4,3 +4,18 @@
 [submodule "lib/ohm"]
 	path = lib/ohm
 	url = https://github.com/cdglabs/ohm.git
+[submodule "lib/color-hash"]
+	path = lib/color-hash
+	url = https://github.com/zenozeng/color-hash.git
+[submodule "lib/graphlib"]
+	path = lib/graphlib
+	url = https://github.com/cpettitt/graphlib.git
+[submodule "lib/dagre"]
+	path = lib/dagre
+	url = https://github.com/cpettitt/dagre.git
+[submodule "lib/dagre-d3"]
+	path = lib/dagre-d3
+	url = https://github.com/cpettitt/dagre-d3.git
+[submodule "lib/lodash"]
+	path = lib/lodash
+	url = https://github.com/lodash/lodash.git
