@@ -1,4 +1,4 @@
 #!/bin/sh
 
-babel scripts --watch --out-file script.js --source-maps inline &
+babel src/scripts --watch --out-file src/bundle.js --source-maps inline &
 http-server -p 9876 .
