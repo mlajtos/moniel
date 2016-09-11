@@ -11,7 +11,7 @@
         In -> MaxPooling(poolSize = 2x2, strides = 2x2) -> Out    
     }
     
-    +Dense_Layer{
+    +DenseLayer{
         In -> Dense(size = 4096) -> ReLU -> Dropout(ratio = 0.5) -> Out    
     }
     
