@@ -19,3 +19,6 @@
 [submodule "lib/lodash"]
 	path = lib/lodash
 	url = https://github.com/lodash/lodash.git
+[submodule "lib/ace-moniel"]
+	path = lib/ace-moniel
+	url = https://github.com/mlajtos/ace-moniel.git
