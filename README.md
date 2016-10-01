@@ -15,7 +15,7 @@ Moniel is an attempt at creating a notation for deep learning models leveraging 
 ----------
 
 ## Quick Introduction
-*These examples are contrived. They are not real-world examples and serve only for introducing the notation.*
+*These examples are contrived. They serve only for introducing the notation.*
 
 Let's start with nothing, i.e. **comments**:
 ```
@@ -48,6 +48,7 @@ Also, there can be many chains:
 ```
 ReLU -> BN
 LRN -> Conv -> MP
+Sigm -> Tanh
 ```
 Nodes can have **identifiers**:
 ```
@@ -69,8 +70,8 @@ However, this can be rewritten without identifiers using **list**:
 ```
 Lists let's you easily define **multi-connection**:
 ```
-// Maximum of 5 random numbers
-[Random,Random,Random,Random,Random] -> Maximum
+// Maximum of 3 random numbers
+[Random,Random,Random] -> Maximum
 ```
 **List-to-list connections** are sometimes really handy:
 ```
@@ -91,19 +92,13 @@ Dropout(ratio = <0.3, 0.5, 0.7>)
 ```
 Defining large graphs without proper structuring is unmanageable. **Scopes** can help:
 ```
-// really bad example of how to use scopes
-
-/layer1{ // slash denotes scope
+/layer{ // slash denotes scope
 	RandomNormal(shape=784x1000) -> weights:Variable
-	weigths -> dp:DotProduct -> act:ReLU
+	weights -> dp:DotProduct -> act:ReLU
 }
 
-/layer2{
-	RandomNormal(shape=1000x10) -> weights:Variable
-	weigths -> dp:DotProduct -> act:ReLU
-} // 'dp', 'weights', and 'act' are not shared because scope is different
-
-layer1/relu1 -> layer2/dp // connect nodes from different scopes
+Tensor -> layer/dp // feed input into the DotProduct of the "layer" scope
+layer/act -> Softmax // feed output of the "layer" scope into another node
 ```
 Scopes are more powerful when they define proper **Input-Output boundary**:
 ```
@@ -137,6 +132,7 @@ Of course, [editor](https://www.youtube.com/watch?v=zVZqHHNQ50c) with proper syn
 ## Similar projects and Inspiration
 - [DNNGraph](https://github.com/ajtulloch/dnngraph) – "a deep neural network model generation DSL in Haskell"
 - [NNVM](https://github.com/dmlc/nnvm) – "Intermediate Computational Graph Representation for Deep Learning Systems"
+- [DeepRosetta](https://github.com/edgarriba/DeepRosetta) – "An universal deep learning models conversor"
 - [TensorBuilder](https://cgarciae.github.io/tensorbuilder/) – "a functional fluent immutable API based on the Builder Pattern"
 - [Keras](https://keras.io/) – "minimalist, highly modular neural networks library"
 - [KeraFlow](https://github.com/ipod825/keraflow) – simplified Keras(?)

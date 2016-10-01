@@ -5,9 +5,7 @@
     biases:Tensor(shape=10x1)
     
     [in,filters] -> conv:Convolution
-    [conv, biases] -> BiasAdd -> ReLU -> out
-    
-    out:Output
+    [conv, biases] -> BiasAdd -> ReLU -> out:Output
 }
 
 /conv2{
@@ -17,9 +15,7 @@
     biases:Tensor(shape=10x1)
     
     [in,filters] -> conv:Convolution
-    [conv, biases] -> BiasAdd -> ReLU -> out
-    
-    out:Output
+    [conv, biases] -> BiasAdd -> ReLU -> out:Output
 }
 
 image:Input -> conv1 -> conv2 -> Out

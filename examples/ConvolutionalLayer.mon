@@ -1,0 +1,11 @@
++ConvolutionalLayer{
+    in:Input
+    
+    filters:Tensor
+    biases:Tensor
+    
+    [in,filters] -> conv:Convolution
+    [conv, biases] -> BiasAdd -> ReLU -> out:Output
+}
+
+image:Input -> conv1:CL -> conv2:CL -> Out
