@@ -17,6 +17,7 @@ class ComputationalGraph{
 	}
 
 	initialize() {
+		this.nodeCounter = {}
 		this.graph = new graphlib.Graph({
 			compound:true
 		});
@@ -50,7 +51,7 @@ class ComputationalGraph{
 			this.nodeCounter[type] = 0;
 		}
 		this.nodeCounter[type] += 1;
-		let id = type + this.nodeCounter[type];
+		let id = "a_" + type + this.nodeCounter[type];
 		return id;
 	}
 
