@@ -1,12 +1,17 @@
 class VisualGraph extends React.Component{
 
     constructor(props) {
-        console.log("constructor");
+        console.log("VisualGraph.constructor");
         super(props);
         this.dagreRenderer = new dagreD3.render();
+        this.graphLayout = new GraphLayout();
+        this.state = {
+            graph: null
+        };
     }
 
     componentDidMount() {
+        console.log("VisualGraph.componentDidMount");
         /*
         this.zoom = d3.behavior.zoom().on("zoom", function() {
             //console.log(d3.event.translate, d3.event.scale);
@@ -18,36 +23,12 @@ class VisualGraph extends React.Component{
         */
     }
 
-    layoutGraph(graph) {
-        var svg = d3.select(this.svg)
-        var group = d3.select(this.svgGroup)
-
-        graph.graph().transition = function(selection) {
-            return selection.transition().duration(250);
-        };
-
-        graph.setGraph({
-            rankdir: 'BT',
-            edgesep: 20,
-            ranksep: 40,
-            nodeSep: 20,
-            marginx: 20,
-            marginy: 20
-        })
-        // dagre.layout(graph);
+    renderGraph(graph) {
+        console.log("VisualGraph.renderGraph");
+        var svg = d3.select(this.svg);
+        var group = d3.select(this.svgGroup);
 
         this.dagreRenderer(d3.select(this.svgGroup), graph);
-
-        var nodes = group.selectAll("g.node");
-
-        nodes.on("click", function(d) {
-            var node = graph.node(d);
-            this.props.onHighlight({
-                startIdx: node._interval.startIdx,
-                endIdx: node._interval.endIdx
-            });
-        }.bind(this));
-
 
         var graphWidth = graph.graph().width;
         var graphHeight = graph.graph().height;
@@ -63,14 +44,25 @@ class VisualGraph extends React.Component{
         d3.select(this.svgGroup).transition().duration(250).attr("transform", "translate(" + translate + ")scale(" + zoomScale + ")");
     }
 
-    render() {
-        console.log(this.props.graph);
+    saveGraph(graph) {
+        console.log("VisualGraph.setState")
+        this.setState({
+            graph: graph
+        });
+    }
 
-        if (this.props.graph) {
-            this.layoutGraph(this.props.graph);
+    componentWillReceiveProps(nextProps) {
+        console.log("VisualGraph.componentWillReceiveProps", nextProps);
+        if (nextProps.graph) {
+            this.graphLayout.layout(nextProps.graph, this.saveGraph.bind(this));
         }
+    }
 
-        console.timeEnd("dataflow");
+    render() {
+        console.log("VisualGraph.render");
+        if (this.state.graph) {
+            this.renderGraph(this.state.graph);
+        }
 
         return <svg id="visualization" ref={(ref) => this.svg = ref}>
             <g id="group" ref={(ref) => this.svgGroup = ref}></g>
