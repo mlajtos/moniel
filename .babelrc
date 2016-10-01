@@ -1,4 +1,7 @@
 {
   "presets": ["react", "latest"],
-  "plugins": ["transform-class-properties", "transform-object-rest-spread", "transform-remove-console"]
+  "plugins": ["transform-class-properties", "transform-object-rest-spread"/*, "transform-remove-console"*/],
+  "ignore": [
+    "src/scripts/GraphLayoutWorker.js"
+  ]
 }
