@@ -30,4 +30,4 @@
     Out
 }
 
-In -> vgg:VGG16 -> Out
+In -> VGG16 -> Out
