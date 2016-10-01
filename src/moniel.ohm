@@ -65,6 +65,6 @@ Moniel{
         += comment
 
     comment
-        = "//" (~"\n" any)* "\n"  -- singleLine
-        | "/*" (~"*/" any)* "*/"  -- multiLine
+        = "//" (~"\n" any)* "\n"?   -- singleLine
+        | "/*" (~"*/" any)* "*/"    -- multiLine
 }
