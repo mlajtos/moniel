@@ -6,7 +6,7 @@ var colorHash = new ColorHash({
 	    for (var i = 0; i < str.length; i++) {
 	        hash = hash * 47 + str.charCodeAt(i) % 32;
 	    }
-	    console.log(hash)
+	    //console.log(hash)
 	    return hash
 	}
 });
