@@ -66,17 +66,6 @@ class Editor extends React.Component{
         if (nextProps.value) {
             this.editor.setValue(nextProps.value, -1);
         }
-
-        if (nextProps.highlightRange) {
-            this.editor.getSession().removeMarker(this.marker);
-            //console.log("highlightRange", nextProps.highlightRange);
-            var Range = require('ace/range').Range;
-            var start = this.editor.session.doc.indexToPosition(nextProps.highlightRange.startIdx);
-            var end = this.editor.session.doc.indexToPosition(nextProps.highlightRange.endIdx);
-            var range = new Range(start.row, start.column, end.row, end.column);
-            //console.log(range);
-            this.marker = this.editor.getSession().addMarker(range, "highlight", "text");
-        }
     }
 
     render() {
