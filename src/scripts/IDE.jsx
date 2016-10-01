@@ -1,24 +1,24 @@
 class IDE extends React.Component{
+	moniel = new Moniel();
+
 	lock = null
 
 	constructor(props) {
 		super(props);
-
-		this.moniel = new Moniel();
 
 		this.state = {
 			"grammar": grammar,
 			"semantics": semantics,
 			"networkDefinition": "",
 			"ast": null,
-			"issues": null,
+			"issues": null
 		};
 		this.updateNetworkDefinition = this.updateNetworkDefinition.bind(this);
 		this.delayedUpdateNetworkDefinition = this.delayedUpdateNetworkDefinition.bind(this);
 	}
 
 	componentDidMount() {
-		this.loadExample("VGG16");
+		this.loadExample("ConvolutionalLayer");
 	}
 
 	delayedUpdateNetworkDefinition(value) {
@@ -27,7 +27,7 @@ class IDE extends React.Component{
 	}
 
 	updateNetworkDefinition(value){
-		console.time("dataflow");
+		console.time("updateNetworkDefinition");
 		var result = this.compileToAST(this.state.grammar, this.state.semantics, value);
 		if (result.ast) {
 			this.moniel.walkAst(result.ast);
@@ -39,19 +39,22 @@ class IDE extends React.Component{
 				issues: this.moniel.getIssues()
 			});
 		} else {
+			console.error(result);
 			this.setState({
 				networkDefinition: value,
 				ast: null,
 				graph: null,
 				issues: [{
-					position: result.position,
+					position: {
+						start: result.position - 1,
+						end: result.position
+					},
 					message: "Expected " + result.expected + ".",
 					type: "error"
 				}]
 			});
 		}
-	}
-
+		console.timeEnd("updateNetworkDefinition");
 	}
 
 	loadExample(id) {
@@ -81,6 +84,7 @@ class IDE extends React.Component{
 	            "ast": ast
 	        }
 	    } else {
+	    	console.error(result);
 	        var expected = result.getExpectedText();
 	        var position = result.getRightmostFailurePosition();
 	        return {
@@ -91,7 +95,7 @@ class IDE extends React.Component{
 	}
 
 	render() {
-		console.log("IDE.render");
+		//console.log("IDE.render");
     	return <div id="container">
     		<Panel title="Definition">
     			<Editor
