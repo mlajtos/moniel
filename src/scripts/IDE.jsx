@@ -11,14 +11,9 @@ class IDE extends React.Component{
 			"networkDefinition": "",
 			"ast": null,
 			"issues": null,
-			"highlightRange": {
-				startIdx: 0,
-				endIdx: 0
-			}
 		};
 		this.updateNetworkDefinition = this.updateNetworkDefinition.bind(this);
 		this.delayedUpdateNetworkDefinition = this.delayedUpdateNetworkDefinition.bind(this);
-		this.onHighlight = this.onHighlight.bind(this);
 		this.lock = null;
 	}
 
@@ -57,10 +52,6 @@ class IDE extends React.Component{
 		}
 	}
 
-	onHighlight(range) {
-		this.setState({
-			highlightRange: range
-		})
 	}
 
 	loadExample(id) {
@@ -115,7 +106,7 @@ class IDE extends React.Component{
     		</Panel>
     		
     		<Panel title="Visualization">
-    			<VisualGraph graph={this.state.graph} onHighlight={this.onHighlight} />
+    			<VisualGraph graph={this.state.graph} />
     		</Panel>
 
     		{/*
