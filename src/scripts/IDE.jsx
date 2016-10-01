@@ -1,4 +1,5 @@
 class IDE extends React.Component{
+	lock = null
 
 	constructor(props) {
 		super(props);
@@ -14,7 +15,6 @@ class IDE extends React.Component{
 		};
 		this.updateNetworkDefinition = this.updateNetworkDefinition.bind(this);
 		this.delayedUpdateNetworkDefinition = this.delayedUpdateNetworkDefinition.bind(this);
-		this.lock = null;
 	}
 
 	componentDidMount() {
@@ -23,7 +23,7 @@ class IDE extends React.Component{
 
 	delayedUpdateNetworkDefinition(value) {
 		if (this.lock) { clearTimeout(this.lock); }
-		this.lock = setTimeout(() => { this.updateNetworkDefinition(value); }, 250);
+		this.lock = setTimeout(() => { this.updateNetworkDefinition(value); }, 100);
 	}
 
 	updateNetworkDefinition(value){
