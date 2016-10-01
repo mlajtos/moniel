@@ -17,6 +17,9 @@ Moniel is an attempt at creating a notation for deep learning models leveraging 
 ## Quick Introduction
 *These examples are contrived. They serve only for introducing the notation.*
 
+Test:
+<div><span style="color:green">Sigmoid</span> <span style="color:red">&rarr;</span> <span style="color:green">MaxPooling</span></span></div>
+
 Let's start with nothing, i.e. **comments**:
 ```
 // This is line comment.
