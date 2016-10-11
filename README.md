@@ -130,6 +130,7 @@ Of course, [editor](https://www.youtube.com/watch?v=zVZqHHNQ50c) with proper syn
 ----------
 
 ## Similar projects and Inspiration
+- [TensorGraph](https://github.com/hycis/TensorGraph) – "TensorGraph is a framework for building any imaginable models based on TensorFlow"
 - [DNNGraph](https://github.com/ajtulloch/dnngraph) – "a deep neural network model generation DSL in Haskell"
 - [NNVM](https://github.com/dmlc/nnvm) – "Intermediate Computational Graph Representation for Deep Learning Systems"
 - [DeepRosetta](https://github.com/edgarriba/DeepRosetta) – "An universal deep learning models conversor"
