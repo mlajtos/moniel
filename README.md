@@ -1,21 +1,16 @@
 # Moniel: *Notation for Deep Learning Models*
 Moniel is human-friendly notation for declarative data flow graphs which can be compiled for TensorFlow runtime.
 
-Definition of VGG16:
+VGG16:
 
 ![VGG16 written in Moniel](docs/images/VGG16.png)
-## Motivation
-### Why?
-Deep Learning is all about learning representations. Deep hierarchical representations that help us solve problems that were thought to be impossible to crack. Ironically, representations of models themselves suck – we describe them in programming languages that were designed for other purpose in another era; effectively burying the beauty of the model under years of legacy ideas.
-### How?
-Deep learning community shifted its thinking about the computations that are at the core of every learning model. We don't execute everything right away, instead we construct a lightweight intermediate representation of all these computations – [a computational graph](https://colah.github.io/posts/2015-08-Backprop/). Coincidentally, illustrations in form of boxes and arrows are used as the best tool to convey an understanding about neural nets. Funny.
-### What?
-Moniel is an attempt at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define our model as a declarative dataflow graph. It is [not a programming language](https://twitter.com/karpathy/status/469958608260579328), just a convenient notation that can be executed.
+
+More [examples](examples).
 
 ----------
 
 ## Quick Introduction
-*These examples are contrived. They serve only for introducing the notation.*
+Moniel is an attempt at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define the model as a declarative dataflow graph. It is *not a programming language*, just a convenient notation that can be executed.
 
 Let's start with nothing, i.e. **comments**:
 ```
@@ -40,11 +35,11 @@ Nodes connect with other nodes with an **arrow**:
 ```
 Sigmoid -> MaxPooling
 ```
-There can be **chains** of any length:
+There can be **chain** of any length:
 ```
 LRN -> Sigm -> BatchNorm -> ReLU -> Tanh -> MP -> Conv -> BN -> ELU
 ```
-Also, there can be many chains:
+Also, there can be **multiple chains**:
 ```
 ReLU -> BN
 LRN -> Conv -> MP
@@ -56,7 +51,7 @@ conv:Convolution
 ```
 Identifiers let's you refer to nodes that are used more than once:
 ```
-// inefficient definition of matrix-matrix multiplication
+// inefficient declaration of matrix-matrix multiplication
 matrix1:Tensor
 matrix2:Tensor
 mm:MatrixMultiplication
@@ -68,7 +63,7 @@ However, this can be rewritten without identifiers using **list**:
 ```
 [Tensor,Tensor] -> MatMul
 ```
-Lists let's you easily define **multi-connection**:
+Lists let's you easily declare **multi-connection**:
 ```
 // Maximum of 3 random numbers
 [Random,Random,Random] -> Maximum
@@ -103,13 +98,13 @@ layer/act -> Softmax // feed output of the "layer" scope into another node
 Scopes are more powerful when they define proper **Input-Output boundary**:
 ```
 /layer1{
-	RandomNormal(shape=784x1000) -> weights:Variable
-	[in:Input,weigths] -> DotProduct -> ReLU -> out:Output
+    RandomNormal(shape=784x1000) -> weigths:Variable
+    [in:Input,weigths] -> DotProduct -> ReLU -> out:Output
 }
 
 /layer2{
-	RandomNormal(shape=1000x10) -> weights:Variable
-	[in:Input,weigths] -> DotProduct -> ReLU -> out:Output
+    RandomNormal(shape=1000x10) -> weigths:Variable
+    [in:Input,weigths] -> DotProduct -> ReLU -> out:Output
 }
 
 layer1 -> layer2 // connect scopes directly

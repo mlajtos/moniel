@@ -18,7 +18,7 @@ class IDE extends React.Component{
 	}
 
 	componentDidMount() {
-		this.loadExample("ConvolutionalLayer");
+		this.loadExample("VGG16");
 	}
 
 	delayedUpdateNetworkDefinition(value) {
@@ -39,7 +39,7 @@ class IDE extends React.Component{
 				issues: this.moniel.getIssues()
 			});
 		} else {
-			console.error(result);
+			// console.error(result);
 			this.setState({
 				networkDefinition: value,
 				ast: null,
@@ -84,7 +84,7 @@ class IDE extends React.Component{
 	            "ast": ast
 	        }
 	    } else {
-	    	console.error(result);
+	    	// console.error(result);
 	        var expected = result.getExpectedText();
 	        var position = result.getRightmostFailurePosition();
 	        return {

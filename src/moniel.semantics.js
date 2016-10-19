@@ -16,7 +16,7 @@ var semantics = grammar.createSemantics().addOperation('eval', {
 	ScopeDefinition: function(_, name, body) {
 		return {
 			type: "ScopeDefinition",
-			name: name.source.contents,
+			name: name.eval(),
 			body: body.eval(),
 			_source: this.source
 		};
@@ -57,9 +57,10 @@ var semantics = grammar.createSemantics().addOperation('eval', {
 	    return list.eval();
 	},
 	BlockDefinitionBody: function(_, list, _) {
+		var definitions = list.eval()[0]; 
 		return {
 			type: "BlockDefinitionBody",
-			definitions: list.eval()[0]
+			definitions: definitions ? definitions : []
 		};
 	},
 	BlockInstanceParameters: function(_, list, _) {
@@ -98,12 +99,23 @@ var semantics = grammar.createSemantics().addOperation('eval', {
 	    return a.source.contents;  
 	},
 	blockType: function(_, _) {
-	    return this.source.contents;
+		return {
+			type: "BlockType",
+			value: this.source.contents,
+			_source: this.source
+		};
 	},
 	blockName: function(_, _) {
 		return {
 	        type: "Identifier",
 	        value: this.source.contents
 	    };
-	}
+	},
+	scopeName: function(_, _) {
+		return {
+	        type: "Identifier",
+	        value: this.source.contents,
+	        _source: this.source
+	    };
+	},
 });

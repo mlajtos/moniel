@@ -83,7 +83,7 @@ body{
 }
 
 .marker_error{
-    border-bottom: 1px dashed red;
+    border-bottom: 1px dotted red;
     position: absolute;
     border-radius: 0;
     z-index: 2;

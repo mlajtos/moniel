@@ -18,7 +18,7 @@ class Moniel{
 
 	addDefaultDefinitions() {
 		// console.info(`Adding default definitions.`);
-		const defaultDefinitions = ["Add", "Input", "Output", "Placeholder", "Variable", "Constant", "Multiply", "Convolution", "Dense", "MaxPooling", "BatchNormalization", "Identity", "RectifiedLinearUnit", "Sigmoid", "ExponentialLinearUnit", "Tanh", "Absolute", "Summation", "Dropout", "MatrixMultiply", "BiasAdd", "Reshape", "Concat", "Flatten", "Tensor", "Softmax", "CrossEntropy"];
+		const defaultDefinitions = ["Add", "Input", "Output", "Placeholder", "Variable", "Constant", "Multiply", "Convolution", "Dense", "MaxPooling", "BatchNormalization", "Identity", "RectifiedLinearUnit", "Sigmoid", "ExponentialLinearUnit", "Tanh", "Absolute", "Summation", "Dropout", "MatrixMultiply", "BiasAdd", "Reshape", "Concat", "Flatten", "Tensor", "Softmax", "CrossEntropy", "ZeroPadding", "RandomNormal", "TruncatedNormalDistribution", "DotProduct"];
 		defaultDefinitions.forEach(definition => this.addDefinition(definition));
 	}
 
@@ -38,7 +38,13 @@ class Moniel{
 
 	handleBlockDefinition(blockDefinition) {
 		// console.info(`Adding "${blockDefinition.name}" to available definitions.`);
-		this.addDefinition(blockDefinition.name);
+		this.graph.enterMetanodeScope(blockDefinition.name);
+		this.walkAst(blockDefinition.body);
+		this.graph.exitMetanodeScope();
+	}
+
+	handleBlockDefinitionBody(definitionBody) {
+		definitionBody.definitions.forEach(definition => this.walkAst(definition));
 	}
 
 	handleUnrecognizedNode(node) {
@@ -63,32 +69,38 @@ class Moniel{
 		var id = undefined;
 		var label = "undeclared";
 		var type = "Unknown";
-		var shape = "rect";
-		var color = "yellow";
+		var shape = "rect"; // should not be here
+		var color = "yellow"; // should not be here
 
 		let possibleTypes = this.getTypeOfInstance(instance);
 
 		if (possibleTypes.length === 0) {
             type = "undefined";
-            label = instance.name;
-            shape = "rect";
+            label = instance.name.value;
+            shape = "rect"; // should not be here
             this.addIssue({
-            	message: `Unrecognized type of block instance "${instance.name}". No possible matches found.`,
-            	position: instance._source.startIdx,
+            	message: `Unrecognized node type "${instance.name.value}". No possible matches found.`,
+            	position: {
+					start:  instance.name._source.startIdx,
+					end:  instance.name._source.endIdx
+				},
             	type: "error"
             });
         } else if (possibleTypes.length === 1) {
 			type = possibleTypes[0];
 			label = type;
-			color = colorHash.hex(label); // this should be handled in VisualGraph
+			color = colorHash.hex(label); // should not be here
 		} else {
 			type = "ambiguous"
-            label = instance.name
-            shape = "diamond";
+            label = instance.name.value
+            shape = "diamond"; // should not be here
 			this.addIssue({
-				message: `Unrecognized type of block instance. Possible matches: ${possibleTypes.join(", ")}.`,
-				position: instance._source.startIdx,
-				type: "warning"
+				message: `Unrecognized node type "${instance.name.value}". Possible matches: ${possibleTypes.join(", ")}.`,
+				position: {
+					start:  instance.name._source.startIdx,
+					end:  instance.name._source.endIdx
+				},
+				type: "error"
 			});
 		}
 
@@ -98,12 +110,21 @@ class Moniel{
 			id = instance.alias.value;
 		}
 
+		// is metanode
+		if (Object.keys(this.graph.metanodes).includes(type)) {
+			this.graph.copy(type, id);
+			return;
+		}
+
 		this.graph.createNode(id, {
+			id: id,
 			label: label,
             class: type,
-            shape: shape,
-            style: "fill: " + color,
-            _source: instance
+            shape: shape, // should not be here
+            style: "fill: " + color, // should not be here
+            _source: instance,
+            width: label.length * 8.5, // should not be here
+            height: 10 // should not be here
         });
 	}
 
@@ -116,8 +137,10 @@ class Moniel{
 	}
 
 	getTypeOfInstance(instance) {
-		// console.info(`Trying to match "${instance.name}" against block definitions.`);
-		return Moniel.nameResolution(instance.name, this.definitions);
+		// console.info(`Trying to match "${instance.name.value}" against block definitions.`);
+		// HACK: There should be only one place to store definitions.
+		var definitions = [...this.definitions, ...Object.keys(this.graph.metanodes)];
+		return Moniel.nameResolution(instance.name.value, definitions);
 	}
 
 	getComputationalGraph() {
@@ -153,6 +176,7 @@ class Moniel{
 		switch (node.type) {
 			case "Network": this.handleNetworkDefinition(node); break;
 			case "BlockDefinition": this.handleBlockDefinition(node); break;
+			case "BlockDefinitionBody": this.handleBlockDefinitionBody(node); break;
 			case "ScopeDefinition": this.handleScopeDefinition(node); break;
 			case "ScopeDefinitionBody": this.handleScopeDefinitionBody(node); break;
 			case "ConnectionDefinition": this.handleConnectionDefinition(node); break;

@@ -1,6 +1,4 @@
 class ComputationalGraph{
-	graph = null
-
 	defaultEdge = {
         arrowhead: "vee",
         lineInterpolate: "basis"
@@ -11,6 +9,14 @@ class ComputationalGraph{
 	previousNodeStack = []
 	scopeStack = new ScopeStack()
 
+	metanodes = {}
+	metanodeStack = []
+
+	get graph() {
+		let lastIndex = this.metanodeStack[this.metanodeStack.length - 1];
+		return this.metanodes[lastIndex];
+	}
+
 	constructor(parent) {
 		this.initialize();
 		this.moniel = parent;
@@ -18,24 +24,24 @@ class ComputationalGraph{
 
 	initialize() {
 		this.nodeCounter = {}
-		this.graph = new graphlib.Graph({
-			compound:true
-		});
-        this.graph.setGraph({});
 		this.scopeStack.initialize();
+
+		this.metanodes = {}
+		this.metanodeStack = []
 
         this.addMain();
 	}
 
 	enterScope(scope) {
-		this.scopeStack.push(scope.name);
+		this.scopeStack.push(scope.name.value);
 		let currentScopeId = this.scopeStack.currentScopeIdentifier();
 
 		this.graph.setNode(currentScopeId, {
-			label: scope.name,
+			label: scope.name.value,
 			clusterLabelPos: "top",
             class: "Scope",
-            _source: scope._source
+            isMetanode: true,
+            _source: scope.name._source
 		});
 
 		let previousScopeId = this.scopeStack.previousScopeIdentifier();
@@ -44,6 +50,22 @@ class ComputationalGraph{
 
 	exitScope() {
 		this.scopeStack.pop();
+	}
+
+	enterMetanodeScope(name) {
+		this.metanodes[name] = new graphlib.Graph({
+			compound: true
+		});
+		this.metanodes[name].setGraph({
+			name: name
+		});
+		this.metanodeStack.push(name);
+
+		return this.metanodes[name];
+	}
+
+	exitMetanodeScope() {
+		return this.metanodeStack.pop();
 	}
 
 	generateInstanceId(type) {
@@ -56,6 +78,7 @@ class ComputationalGraph{
 	}
 
 	addMain() {
+		this.enterMetanodeScope("main");
 		this.scopeStack.push(".");
 		let id = this.scopeStack.currentScopeIdentifier();
 
@@ -107,7 +130,49 @@ class ComputationalGraph{
 		}
 		
 		this.touchNode(nodePath);
+
 		this.scopeStack.pop();
+
+		return nodePath;
+	}
+
+	copy(metanode, identifier) {
+		let scope = this.scopeStack.currentScopeIdentifier();
+		this.scopeStack.push(identifier);
+		let nodePath = this.scopeStack.currentScopeIdentifier();
+		
+		this.graph.setNode(nodePath, {
+			id: identifier,
+			label: identifier,
+			isMetanode: true,
+			clusterLabelPos: "top",
+            class: "Scope"
+		});
+
+		this.graph.setParent(nodePath, scope);
+
+		let targetMetanode = this.metanodes[metanode];
+		targetMetanode.nodes().forEach(nodeId => {
+			let node = targetMetanode.node(nodeId);
+			if (!node) { return }
+			let newNodeId = nodeId.replace(".", nodePath);
+			var newNode = {
+				...node,
+				id: newNodeId
+			}
+			this.graph.setNode(newNodeId, newNode);
+
+			let newParent = targetMetanode.parent(nodeId).replace(".", nodePath);
+			this.graph.setParent(newNodeId, newParent);
+		});
+
+		targetMetanode.edges().forEach(edge => {
+			this.graph.setEdge(edge.v.replace(".", nodePath), edge.w.replace(".", nodePath), targetMetanode.edge(edge));
+		});
+
+		this.scopeStack.pop();
+
+		this.touchNode(nodePath);
 	}
 
 	clearNodeStack() {
@@ -133,49 +198,61 @@ class ComputationalGraph{
 		return this.graph.node(nodePath).class === "Output";
 	}
 
-	isScope(nodePath) {
-		return this.graph.node(nodePath).class === "Scope";	
+	isMetanode(nodePath) {
+		return this.graph.node(nodePath).isMetanode === true;
 	}
 
-	getScopeOutput(scopePath) {
+	getOutputNode(scopePath) {
 		let scope = this.graph.node(scopePath);
 		let outs = this.graph.children(scopePath).filter(node => { return this.isOutput(node) });
 		if (outs.length === 1) {
 			return outs[0];	
 		} else  if (outs.length === 0) {
 			this.moniel.logger.addIssue({
-				message: `Scope "${scope.label}" doesn't have any Output node.`,
+				message: `Scope "${scope.id}" doesn't have any Output node.`,
 				type: "error",
-				position: scope._source.startIdx
+				position: {
+					start: scope._source ? scope._source.startIdx : 0,
+					end: scope._source ? scope._source.endIdx : 0
+				}
 			});
 			return null;
 		} else {
 			this.moniel.logger.addIssue({
-				message: `Scope "${scope.label}" has more than one Output node.`,
+				message: `Scope "${scope.id}" has more than one Output node.`,
 				type: "error",
-				position: scope._source.startIdx
+				position: {
+					start: scope._source ? scope._source.startIdx : 0,
+					end: scope._source ? scope._source.endIdx : 0
+				}
 			});
 			return null;
 		}
 	}
 
-	getScopeInput(scopePath) {
+	getInputNode(scopePath) {
 		let scope = this.graph.node(scopePath);
 		let ins = this.graph.children(scopePath).filter(node => { return this.isInput(node) });
 		if (ins.length === 1) {
 			return ins[0];	
 		} else  if (ins.length === 0) {
 			this.moniel.logger.addIssue({
-				message: `Scope "${scope.label}" doesn't have any Input node.`,
+				message: `Scope "${scope.id}" doesn't have any Input node.`,
 				type: "error",
-				position: scope._source.startIdx
+				position: {
+					start: scope._source ? scope._source.startIdx : 0,
+					end:  scope._source ? scope._source.endIdx : 0
+				}
 			});
 			return null;
 		} else {
 			this.moniel.logger.addIssue({
-				message: `Scope "${scope.label}" has more than one Input node.`,
+				message: `Scope "${scope.id}" has more than one Input node.`,
 				type: "error",
-				position: scope._source.startIdx
+				position: {
+					start: scope._source ? scope._source.startIdx : 0,
+					end:  scope._source ? scope._source.endIdx : 0
+				}
 			});
 			return null;
 		}	
@@ -184,12 +261,12 @@ class ComputationalGraph{
 	setEdge(fromPath, toPath) {
 		// console.info(`Creating edge from "${fromPath}" to "${toPath}".`)
 
-		if (this.isScope(fromPath)) {
-			fromPath = this.getScopeOutput(fromPath);
+		if (this.isMetanode(fromPath)) {
+			fromPath = this.getOutputNode(fromPath);
 		}
 
-		if (this.isScope(toPath)) {
-			toPath = this.getScopeInput(toPath);
+		if (this.isMetanode(toPath)) {
+			toPath = this.getInputNode(toPath);
 		}
 		
 		if (fromPath && toPath) {
