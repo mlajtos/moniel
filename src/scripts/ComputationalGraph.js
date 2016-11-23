@@ -57,7 +57,13 @@ class ComputationalGraph{
 			compound: true
 		});
 		this.metanodes[name].setGraph({
-			name: name
+			name: name,
+	        rankdir: 'BT',
+	        edgesep: 20,
+	        ranksep: 40,
+	        nodeSep: 30,
+	        marginx: 20,
+	        marginy: 20,
 		});
 		this.metanodeStack.push(name);
 
@@ -106,7 +112,9 @@ class ComputationalGraph{
 		if (!this.graph.hasNode(nodePath)) {
 			this.graph.setNode(nodePath, {
 				label: id,
-				class: "undefined"
+				class: "undefined",
+				width: 100,
+				height: 30
 			});
 			this.setParent(nodePath, scope);
 		}
@@ -120,38 +128,34 @@ class ComputationalGraph{
 		let nodePath = this.scopeStack.currentScopeIdentifier();
 		let scope = this.scopeStack.previousScopeIdentifier();
 
-		if (!this.graph.hasNode(nodePath)) {
-			this.graph.setNode(nodePath, node);
-			this.setParent(nodePath, scope);
-		} else {
-			console.warn(`Redifining node "${id}"`);
-			this.graph.setNode(nodePath, node);
-			this.setParent(nodePath, scope);
+		if (this.graph.hasNode(nodePath)) {
+			console.warn(`Redifining node "${id}"`);	
 		}
-		
-		this.touchNode(nodePath);
 
+		this.graph.setNode(nodePath, node);
+		this.setParent(nodePath, scope);
+
+		this.touchNode(nodePath);
 		this.scopeStack.pop();
 
 		return nodePath;
 	}
 
-	copy(metanode, identifier) {
-		let scope = this.scopeStack.currentScopeIdentifier();
+	createMetanode(identifier, metanodeClass, node) {
 		this.scopeStack.push(identifier);
 		let nodePath = this.scopeStack.currentScopeIdentifier();
+		let scope = this.scopeStack.previousScopeIdentifier();
 		
 		this.graph.setNode(nodePath, {
-			id: identifier,
+			...node,
+			id: nodePath,
 			label: identifier,
-			isMetanode: true,
-			clusterLabelPos: "top",
-            class: "Scope"
+			isMetanode: true
 		});
 
 		this.graph.setParent(nodePath, scope);
 
-		let targetMetanode = this.metanodes[metanode];
+		let targetMetanode = this.metanodes[metanodeClass];
 		targetMetanode.nodes().forEach(nodeId => {
 			let node = targetMetanode.node(nodeId);
 			if (!node) { return }

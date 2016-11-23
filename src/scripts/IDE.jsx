@@ -18,7 +18,7 @@ class IDE extends React.Component{
 	}
 
 	componentDidMount() {
-		this.loadExample("VGG16");
+		this.loadExample("ConvolutionalLayer");
 	}
 
 	delayedUpdateNetworkDefinition(value) {
@@ -96,6 +96,7 @@ class IDE extends React.Component{
 
 	render() {
 		//console.log("IDE.render");
+
     	return <div id="container">
     		<Panel title="Definition">
     			<Editor

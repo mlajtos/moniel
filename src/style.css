@@ -105,17 +105,26 @@ svg#visualization{
     flex: 1;
 }
 
+g#graph{
+    transition: transform 0.25s ease-in-out;
+    transform-origin: center;
+}
+
 g.node rect{
     rx: 15;
     ry: 15;
     stroke: white;
     stroke-width: 2px;
+    transition: width 0.25s linear, height 0.25s linear;
+}
+
+g.node{
+    transition: transform 0.25s linear;
 }
 
 g.node:hover rect, g.node:hover polygon{
-    stroke: white !important;
-    stroke-width: 2px !important;
-    opacity: 1 !important;
+    stroke: yellow !important;
+    stroke-width: 3px !important;
     stroke-dasharray: initial !important;
     cursor: pointer;
 }
@@ -158,8 +167,8 @@ g > text{
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
-    font-weight: normal;
     fill: white;
+    dominant-baseline: central;
 }
 
 .edgePath path {
@@ -180,8 +189,13 @@ g > text{
 
 .edgePath path {
     stroke: #fff;
-    fill: #fff;
+    fill: none;
     stroke-width: 1.5px;
+}
+
+path.arrow {
+    stroke: none;
+    fill: white;
 }
 
 g.node.Scope rect, .clusters rect {
@@ -198,4 +212,8 @@ g.node.Scope text, .cluster .label text{
     opacity: 0.5;
     font-weight: normal;
     font-size: small;
+}
+
+tspan.id{
+    font-weight: bold;
 }

@@ -2,7 +2,7 @@ class Moniel{
 	logger = new Logger();
 	graph = new ComputationalGraph(this);
 
-	definitions = [];
+	definitions = {};
 
 	constructor() {
 		this.initialize();
@@ -18,12 +18,15 @@ class Moniel{
 
 	addDefaultDefinitions() {
 		// console.info(`Adding default definitions.`);
-		const defaultDefinitions = ["Add", "Input", "Output", "Placeholder", "Variable", "Constant", "Multiply", "Convolution", "Dense", "MaxPooling", "BatchNormalization", "Identity", "RectifiedLinearUnit", "Sigmoid", "ExponentialLinearUnit", "Tanh", "Absolute", "Summation", "Dropout", "MatrixMultiply", "BiasAdd", "Reshape", "Concat", "Flatten", "Tensor", "Softmax", "CrossEntropy", "ZeroPadding", "RandomNormal", "TruncatedNormalDistribution", "DotProduct"];
+		const defaultDefinitions = ["Add", "Linear", "Input", "Output", "Placeholder", "Variable", "Constant", "Multiply", "Convolution", "Dense", "MaxPooling", "BatchNormalization", "Identity", "RectifiedLinearUnit", "Sigmoid", "ExponentialLinearUnit", "Tanh", "Absolute", "Summation", "Dropout", "MatrixMultiply", "BiasAdd", "Reshape", "Concat", "Flatten", "Tensor", "Softmax", "CrossEntropy", "ZeroPadding", "RandomNormal", "TruncatedNormalDistribution", "DotProduct"];
 		defaultDefinitions.forEach(definition => this.addDefinition(definition));
 	}
 
-	addDefinition(definition) {
-		this.definitions.push(definition);
+	addDefinition(definitionName) {
+		this.definitions[definitionName] = {
+			name: definitionName,
+			color: colorHash.hex(definitionName)
+		};
 	}
 
 	handleScopeDefinition(scope) {
@@ -38,6 +41,7 @@ class Moniel{
 
 	handleBlockDefinition(blockDefinition) {
 		// console.info(`Adding "${blockDefinition.name}" to available definitions.`);
+		this.addDefinition(blockDefinition.name);
 		this.graph.enterMetanodeScope(blockDefinition.name);
 		this.walkAst(blockDefinition.body);
 		this.graph.exitMetanodeScope();
@@ -66,18 +70,23 @@ class Moniel{
 
 	// this is doing too much – break into "not recognized", "success" and "ambiguous"
 	handleBlockInstance(instance) {
-		var id = undefined;
-		var label = "undeclared";
-		var type = "Unknown";
-		var shape = "rect"; // should not be here
-		var color = "yellow"; // should not be here
+		var node = {
+			id: undefined,
+			label: "undeclared",
+			class: "Unknown",
+			color: "yellow",
+			height: 30,
+			width: 100,
 
-		let possibleTypes = this.getTypeOfInstance(instance);
+			_source: instance,
+		};
 
-		if (possibleTypes.length === 0) {
-            type = "undefined";
-            label = instance.name.value;
-            shape = "rect"; // should not be here
+		let definitions = this.matchInstanceNameToDefinitions(instance.name.value)
+		// console.log(`Matched definitions:`, definitions);
+
+		if (definitions.length === 0) {
+            node.class = "undefined";
+            node.label = instance.name.value;
             this.addIssue({
             	message: `Unrecognized node type "${instance.name.value}". No possible matches found.`,
             	position: {
@@ -86,16 +95,18 @@ class Moniel{
 				},
             	type: "error"
             });
-        } else if (possibleTypes.length === 1) {
-			type = possibleTypes[0];
-			label = type;
-			color = colorHash.hex(label); // should not be here
+        } else if (definitions.length === 1) {
+			node.class = definitions[0].name;
+			let definition = definitions[0];
+			if (definition) {
+				node.label = definition.name;
+				node.color = definition.color;
+			}
 		} else {
-			type = "ambiguous"
-            label = instance.name.value
-            shape = "diamond"; // should not be here
+			node.class = "ambiguous"
+            node.label = instance.name.value
 			this.addIssue({
-				message: `Unrecognized node type "${instance.name.value}". Possible matches: ${possibleTypes.join(", ")}.`,
+				message: `Unrecognized node type "${instance.name.value}". Possible matches: ${definitions.map(def => def.name).join(", ")}.`,
 				position: {
 					start:  instance.name._source.startIdx,
 					end:  instance.name._source.endIdx
@@ -105,26 +116,28 @@ class Moniel{
 		}
 
 		if (!instance.alias) {
-			id = this.graph.generateInstanceId(type);
+			node.id = this.graph.generateInstanceId(node.class);
 		} else {
-			id = instance.alias.value;
+			node.id = instance.alias.value;
+			node.userGeneratedId = instance.alias.value;
+			node.height = 50;
 		}
 
 		// is metanode
-		if (Object.keys(this.graph.metanodes).includes(type)) {
-			this.graph.copy(type, id);
+		if (Object.keys(this.graph.metanodes).includes(node.class)) {
+			var color = d3.color(node.color);
+			color.opacity = 0.1;
+			this.graph.createMetanode(node.id, node.class, {
+				...node,
+				style: {"fill": color.toString()}
+			});
 			return;
 		}
 
-		this.graph.createNode(id, {
-			id: id,
-			label: label,
-            class: type,
-            shape: shape, // should not be here
-            style: "fill: " + color, // should not be here
-            _source: instance,
-            width: label.length * 8.5, // should not be here
-            height: 10 // should not be here
+		this.graph.createNode(node.id, {
+			...node,
+            style: {"fill": node.color},
+            width: node.label.length * 10
         });
 	}
 
@@ -136,11 +149,12 @@ class Moniel{
 		this.graph.referenceNode(identifier.value);
 	}
 
-	getTypeOfInstance(instance) {
-		// console.info(`Trying to match "${instance.name.value}" against block definitions.`);
-		// HACK: There should be only one place to store definitions.
-		var definitions = [...this.definitions, ...Object.keys(this.graph.metanodes)];
-		return Moniel.nameResolution(instance.name.value, definitions);
+	matchInstanceNameToDefinitions(query) {
+		var definitions = Object.keys(this.definitions);
+		let definitionKeys = Moniel.nameResolution(query, definitions);
+		//console.log("Found keys", definitionKeys);
+		let matchedDefinitions = definitionKeys.map(key => this.definitions[key]);
+		return matchedDefinitions;
 	}
 
 	getComputationalGraph() {
@@ -156,8 +170,9 @@ class Moniel{
 	}
 
 	static nameResolution(partial, list) {
-	    let partialArray = partial.split(/(?=[A-Z])/);
-	    let listArray = list.map(definition => definition.split(/(?=[A-Z])/));
+		let splitRegex = /(?=[0-9A-Z])/;
+	    let partialArray = partial.split(splitRegex);
+	    let listArray = list.map(definition => definition.split(splitRegex));
 	    var result = listArray.filter(possibleMatch => Moniel.isMultiPrefix(partialArray, possibleMatch));
 	    result = result.map(item => item.join(""));
 	    return result;

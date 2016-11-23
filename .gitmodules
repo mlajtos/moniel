@@ -13,9 +13,6 @@
 [submodule "lib/dagre"]
 	path = lib/dagre
 	url = https://github.com/cpettitt/dagre.git
-[submodule "lib/dagre-d3"]
-	path = lib/dagre-d3
-	url = https://github.com/cpettitt/dagre-d3.git
 [submodule "lib/lodash"]
 	path = lib/lodash
 	url = https://github.com/lodash/lodash.git

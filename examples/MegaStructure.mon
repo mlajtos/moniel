@@ -1,0 +1,32 @@
+
++ConvolutionalLayer{
+    in:Input
+    
+    filters:Tensor
+    biases:Tensor
+    
+    /inner{
+        In -> Add -> Out
+    }
+    
+    [filters,in] -> conv:Convolution
+    [conv, biases] -> BiasAdd -> inner -> ReLU -> out:Output
+}
+
++ConvolutionalLayer3{
+    In -> [CL,CL,CL] -> Out
+}
+
++MaxPoolingLayer{
+    In -> CL -> MP(poolSize = 3x3) -> Out
+}
+
++MegaStructure{
+    image:Input -> MPL -> ReLU -> CL3 -> Concat -> CL3 -> ReLU -> CL3 -> ReLU -> Out
+}
+
++MegaStructure2{
+    In -> [MS,MS] -> Out
+}
+
+In -> MS -> MS2 -> MS -> Out
