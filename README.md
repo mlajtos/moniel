@@ -1,5 +1,5 @@
 # Moniel: *Notation for Computational Graphs*
-Human-friendly declarative dataflow notation for computational graphs. With bells and whistles.
+Human-friendly declarative dataflow notation for computational graphs. [With bells and whistles.](https://www.youtube.com/watch?v=0DC0RMnuwxU)
 
 ![Demo](docs/images/Demo.png)
 
@@ -8,7 +8,7 @@ Some [examples](examples).
 ----------
 
 ## Quick Introduction
-Moniel is one of many attempts at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define the model as a declarative dataflow graph. It is *not a programming language*, just a convenient notation that can be executed.
+Moniel is one of many attempts at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define the model as a declarative dataflow graph. It is *not a programming language*, just a convenient notation. (Which will be executable. [Wanna help?](https://github.com/mlajtos/moniel/issues))
 
 Let's start with nothing, i.e. **comments**:
 ```
@@ -71,7 +71,7 @@ Lists let's you easily declare **multi-connection**:
 // Range of 3 random numbers
 [Rand,Rand,Rand] -> [Max,Min] -> Sub -> Abs
 ```
-Some nodes can take **named attributes** that modify their behavior:
+Nodes can take **named attributes** that modify their behavior:
 ```
 Fill(shape = 10x10x10, value = 1.0)
 ```
@@ -112,9 +112,6 @@ If scopes have identical structure, we can create a **reusable block** and use i
 
 RL(s = 784x1000) -> RL(s = 1000x10)
 ```
-Of course, [editor](https://www.youtube.com/watch?v=0DC0RMnuwxU) with proper syntax highlighting and interactive feedback really helps:
-
-![Syntax highlightning helps](docs/images/ReusableLayer.png)
 
 ----------
 
