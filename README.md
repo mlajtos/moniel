@@ -1,5 +1,5 @@
-# Moniel: *Notation for Deep Learning Models*
-Moniel is human-friendly notation for declarative data flow graphs which can be compiled for TensorFlow runtime.
+# Moniel: *Notation for Computational Graphs*
+Human-friendly declarative dataflow notation for computational graphs. With bells and whistles.
 
 VGG16:
 
@@ -10,7 +10,7 @@ More [examples](examples).
 ----------
 
 ## Quick Introduction
-Moniel is an attempt at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define the model as a declarative dataflow graph. It is *not a programming language*, just a convenient notation that can be executed.
+Moniel is one of many attempts at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define the model as a declarative dataflow graph. It is *not a programming language*, just a convenient notation that can be executed.
 
 Let's start with nothing, i.e. **comments**:
 ```
@@ -81,13 +81,9 @@ Attribute names can also be shortened:
 ```
 Ones(s=10x10x10)
 ```
-**Multi-valued attributes** are useful for hyper-parameter tuning:
-```
-Dropout(ratio = <0.3, 0.5, 0.7>)
-```
 Defining large graphs without proper structuring is unmanageable. **Scopes** can help:
 ```
-/layer{ // slash denotes scope
+/layer{ // slash denotes scope delimiter
 	RandomNormal(shape=784x1000) -> weights:Variable
 	weights -> dp:DotProduct -> act:ReLU
 }
@@ -118,7 +114,7 @@ If scopes have identical structure, we can create a **reusable block** and use i
 
 RL(s = 784x1000) -> RL(s = 1000x10)
 ```
-Of course, [editor](https://www.youtube.com/watch?v=zVZqHHNQ50c) with proper syntax highlighting and interactive feedback really helps:
+Of course, [editor](https://www.youtube.com/watch?v=0DC0RMnuwxU) with proper syntax highlighting and interactive feedback really helps:
 
 ![Syntax highlightning helps](docs/images/ReusableLayer.png)
 
