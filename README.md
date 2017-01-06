@@ -1,11 +1,9 @@
 # Moniel: *Notation for Computational Graphs*
 Human-friendly declarative dataflow notation for computational graphs. With bells and whistles.
 
-VGG16:
+![Demo](docs/images/Demo.png)
 
-![VGG16 written in Moniel](docs/images/VGG16.png)
-
-More [examples](examples).
+Some [examples](examples).
 
 ----------
 
