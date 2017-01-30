@@ -1,5 +1,5 @@
 # Moniel: *Notation for Computational Graphs*
-Human-friendly declarative dataflow notation for computational graphs. [With bells and whistles.](https://www.youtube.com/watch?v=0DC0RMnuwxU)
+Human-friendly declarative dataflow notation for computational graphs. See [video](https://www.youtube.com/watch?v=0DC0RMnuwxU).
 
 ![Demo](docs/images/Demo.png)
 
