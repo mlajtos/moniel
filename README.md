@@ -3,8 +3,6 @@ Human-friendly declarative dataflow notation for computational graphs. See [vide
 
 ![Demo](docs/images/Demo.png)
 
-Some [examples](examples).
-
 ----------
 
 ## Quick Introduction
