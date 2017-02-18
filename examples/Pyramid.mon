@@ -1,0 +1,21 @@
++Block1{
+    Input -> Identity -> Output
+}
+
++Block2{
+    Input -> [Block1,Block1] -> Output
+}
+
++Block3{
+    Input -> [Block2,Block2] -> Output
+}
+
++Block4{
+    Input -> [Block3,Block3] -> Output
+}
+
++Block5{
+    Input -> [Block4,Block4] -> Output
+}
+
+In -> B5 -> B4 -> B3 -> B2 -> B1 -> Out

@@ -16,11 +16,12 @@
 
 	<!-- jQuery (our favorite zombie) -->
 	<script src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script>window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js');</script>
 
 	<!-- React (of course) -->
 	<script src="bower_components/react/react.js"></script>
 	<script src="bower_components/react/react-dom.js"></script>
-	<script src="bower_components/immutable/dist/immutable.min.js"></script>
+	<!--<script src="bower_components/immutable/dist/immutable.min.js"></script>-->
 
 	<!-- lodash + graphlib + dagre + D3 + dagre-d3 (pure awesomness) -->
 	<script src="lib/lodash/dist/lodash.min.js"></script>
@@ -35,7 +36,6 @@
 	<!-- (hello) Moniel -->
 	<script src="src/bundle.js"></script>
 	<link rel="stylesheet" type="text/css" href="src/style.css" />
-	<link rel="icon" href="favicon.png" type="image/x-icon" />
 	<script src="src/moniel.ohm" type="text/ohm-js"></script>
 	<script src="src/moniel.semantics.js"></script>
 	<script src="src/moniel.utils.js"></script>
