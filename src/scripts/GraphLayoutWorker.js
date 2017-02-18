@@ -1,4 +1,4 @@
-importScripts("../../lib/dagre/dist/dagre.js");
+importScripts("../../node_modules/dagre/dist/dagre.js");
 
 addEventListener("message", function(event) {
 	console.time("graph layout");
