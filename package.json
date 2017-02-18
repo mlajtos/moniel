@@ -22,7 +22,7 @@
     "ohm-js": "^0.12.3",
     "react": "^15.4.1",
     "react-dom": "^15.4.2",
-    "ace-moniel": "github:mlajtos/ace-moniel-builds",
+    "ace-moniel-builds": "github:mlajtos/ace-moniel-builds",
     "fira-code": "github:mlajtos/FiraCode"
   },
   "devDependencies": {
