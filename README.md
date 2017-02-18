@@ -5,6 +5,13 @@ Human-friendly declarative dataflow notation for computational graphs. See [vide
 
 ----------
 
+## Setup
+```
+git clone https://github.com/mlajtos/moniel.git
+npm install
+npm start
+```
+
 ## Quick Introduction
 Moniel is one of many attempts at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define the model as a declarative dataflow graph. It is *not a programming language*, just a convenient notation. (Which will be executable. [Wanna help?](https://github.com/mlajtos/moniel/issues))
 
