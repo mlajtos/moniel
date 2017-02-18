@@ -72,9 +72,8 @@ class Moniel{
 	handleBlockInstance(instance) {
 		var node = {
 			id: undefined,
-			label: "undeclared",
 			class: "Unknown",
-			color: "yellow",
+			color: "darkgrey",
 			height: 30,
 			width: 100,
 
@@ -85,8 +84,9 @@ class Moniel{
 		// console.log(`Matched definitions:`, definitions);
 
 		if (definitions.length === 0) {
-            node.class = "undefined";
-            node.label = instance.name.value;
+            node.class = instance.name.value;
+            node.isUndefined = true
+
             this.addIssue({
             	message: `Unrecognized node type "${instance.name.value}". No possible matches found.`,
             	position: {
@@ -96,17 +96,15 @@ class Moniel{
             	type: "error"
             });
         } else if (definitions.length === 1) {
-			node.class = definitions[0].name;
 			let definition = definitions[0];
 			if (definition) {
-				node.label = definition.name;
 				node.color = definition.color;
+				node.class = definition.name;
 			}
 		} else {
-			node.class = "ambiguous"
-            node.label = instance.name.value
+			node.class = instance.name.value;
 			this.addIssue({
-				message: `Unrecognized node type "${instance.name.value}". Possible matches: ${definitions.map(def => def.name).join(", ")}.`,
+				message: `Unrecognized node type "${instance.name.value}". Possible matches: ${definitions.map(def => `"${def.name}"`).join(", ")}.`,
 				position: {
 					start:  instance.name._source.startIdx,
 					end:  instance.name._source.endIdx
@@ -137,7 +135,7 @@ class Moniel{
 		this.graph.createNode(node.id, {
 			...node,
             style: {"fill": node.color},
-            width: node.label.length * 10
+            width: Math.max(Math.max(node.class.length, node.userGeneratedId ? node.userGeneratedId.length : 0), 5) * 12
         });
 	}
 

@@ -1,9 +1,6 @@
 class Panel extends React.Component{
   render() {
-    return <div className="panel">
-    	<div className="header">
-    		{this.props.title}
-    	</div>
+    return <div id={this.props.id} className="panel">
     	{this.props.children}
     </div>;
   }

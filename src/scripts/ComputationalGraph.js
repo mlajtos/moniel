@@ -1,8 +1,5 @@
 class ComputationalGraph{
-	defaultEdge = {
-        arrowhead: "vee",
-        lineInterpolate: "basis"
-    }
+	defaultEdge = {}
 
 	nodeCounter = {}
 	nodeStack = []
@@ -35,16 +32,15 @@ class ComputationalGraph{
 	enterScope(scope) {
 		this.scopeStack.push(scope.name.value);
 		let currentScopeId = this.scopeStack.currentScopeIdentifier();
+		let previousScopeId = this.scopeStack.previousScopeIdentifier();
 
 		this.graph.setNode(currentScopeId, {
-			label: scope.name.value,
-			clusterLabelPos: "top",
-            class: "Scope",
+			userGeneratedId: scope.name.value,
+            class: "Metanode",
             isMetanode: true,
             _source: scope.name._source
 		});
 
-		let previousScopeId = this.scopeStack.previousScopeIdentifier();
 		this.graph.setParent(currentScopeId, previousScopeId);
 	}
 
@@ -89,7 +85,7 @@ class ComputationalGraph{
 		let id = this.scopeStack.currentScopeIdentifier();
 
 		this.graph.setNode(id, {
-			class: "Network"
+			class: ""
 		});
 	}
 
@@ -109,12 +105,16 @@ class ComputationalGraph{
 		let nodePath = this.scopeStack.currentScopeIdentifier();
 		let scope = this.scopeStack.previousScopeIdentifier();
 
+		var node = {
+			userGeneratedId: id,
+			class: "undefined",
+			height: 50
+		}
+
 		if (!this.graph.hasNode(nodePath)) {
 			this.graph.setNode(nodePath, {
-				label: id,
-				class: "undefined",
-				width: 100,
-				height: 30
+				...node,
+				width: Math.max(node.class.length, node.userGeneratedId ? node.userGeneratedId.length : 0) * 10
 			});
 			this.setParent(nodePath, scope);
 		}
@@ -132,7 +132,10 @@ class ComputationalGraph{
 			console.warn(`Redifining node "${id}"`);	
 		}
 
-		this.graph.setNode(nodePath, node);
+		this.graph.setNode(nodePath, {
+			...node,
+			id: nodePath
+		});
 		this.setParent(nodePath, scope);
 
 		this.touchNode(nodePath);
@@ -149,7 +152,6 @@ class ComputationalGraph{
 		this.graph.setNode(nodePath, {
 			...node,
 			id: nodePath,
-			label: identifier,
 			isMetanode: true
 		});
 
@@ -185,7 +187,6 @@ class ComputationalGraph{
 	}
 
 	freezeNodeStack() {
-		// console.log(`Freezing node stack. Content: ${JSON.stringify(this.nodeStack)}`);
 		this.previousNodeStack = [...this.nodeStack];
 		this.nodeStack = [];
 	}

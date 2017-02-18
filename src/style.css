@@ -3,9 +3,6 @@ body{
     margin: 0;
     height: 100vh;
     width: 100vw;
-    background-color: #565656;
-    /* background-color: black; */
-    color: orange;
     font-size: 16px;
     flex-wrap: nowrap;
     justify-content: flex-start;
@@ -23,21 +20,17 @@ body{
     left: 0;
     right: 0;
 }
-.panel{
+div.panel{
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 40%;
-    transition: border-width,border-color ease-out 0.55s;
     display: flex;
     flex-direction: column;
-    border: 1.5px solid #4e4e4e;
-    margin: 10px;
-    border-radius: 10px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    background-color: #2f3129;
-    /*max-height: 600px;*/
-    box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.75);
+    background-color: #272822;
+}
+
+div#definition.panel{
+    border-right: 3px solid #2f3129;
 }
 
 .header {
@@ -47,6 +40,7 @@ body{
     display: flex;
     padding: 0.3em 0.6em;
     -webkit-user-select: none;
+    user-select: none;
     background-color: #272822;
     border-radius: inherit;
     border-bottom-left-radius: 0;
@@ -62,7 +56,7 @@ body{
     padding: 0.5em 1.5em;
     margin: 0.3em;
     white-space: pre-wrap;
-    font-family: "Helvetica Neue";
+    /*font-family: "Helvetica Neue";*/
     text-rendering: optimizeLegibility;
     background-color: hsla(0,60%,47%,1);
     box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.53);
@@ -103,6 +97,12 @@ body{
 
 svg#visualization{
     flex: 1;
+    opacity: 1;
+    transition: opacity 250ms ease-in-out;
+}
+
+svg.faded{
+    opacity: 0.1;
 }
 
 g#graph{
@@ -114,8 +114,9 @@ g.node rect{
     rx: 15;
     ry: 15;
     stroke: white;
-    stroke-width: 2px;
-    transition: width 0.25s linear, height 0.25s linear;
+    stroke-width: 1px;
+    transition: width 0.25s linear, height 0.25s linear, stroke 0.1s ease-in-out, stroke-width 0.1s ease-in-out;
+    fill: transparent;
 }
 
 g.node{
@@ -153,15 +154,6 @@ g.node.ambiguous > .label {
     fill: yellow;
 }
 
-g.node.Network > rect{
-    fill: rgba(255,255,255,0.3);
-    stroke: #fff;
-    stroke-width: 2px;
-    opacity: 0.5;
-    rx: 5;
-    ry: 5;
-}
-
 g > text{
     text-shadow: 0px 0px 3px rgba(0,0,0,0.4);
     cursor: pointer;
@@ -171,11 +163,10 @@ g > text{
     dominant-baseline: central;
 }
 
+/*
 .edgePath path {
-    /*
     stroke-dasharray: 10,3;
     animation: dash 13s linear reverse infinite;
-    */
 }
 
 @keyframes dash {
@@ -186,6 +177,7 @@ g > text{
         stroke-dashoffset: 130;
     }
 }
+*/
 
 .edgePath path {
     stroke: #fff;
@@ -198,20 +190,12 @@ path.arrow {
     fill: white;
 }
 
-g.node.Scope rect, .clusters rect {
+g.node.Scope rect{
     fill: rgba(255,255,255,0.3);
     stroke: #fff;
     stroke-width: 2px;
-    opacity: 0.5;
     rx: 20;
     ry: 20;
-}
-
-g.node.Scope text, .cluster .label text{
-    fill: white;
-    opacity: 0.5;
-    font-weight: normal;
-    font-size: small;
 }
 
 tspan.id{

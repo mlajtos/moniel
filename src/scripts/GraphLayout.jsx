@@ -15,7 +15,7 @@ class GraphLayout{
     }
 
     layout(graph, callback) {
-    	console.log("GraphLayout.layout", graph, callback);
+    	//console.log("GraphLayout.layout", graph, callback);
     	this.callback = callback;
     	this.worker.postMessage({
     		graph: this.encode(graph)

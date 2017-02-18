@@ -66,7 +66,7 @@ class IDE extends React.Component{
 		};
 
 		$.ajax({
-			url: `/examples/${id}.mon`,
+			url: `./examples/${id}.mon`,
 			data: null,
 			success: callback.bind(this),
 			dataType: "text"
@@ -75,7 +75,6 @@ class IDE extends React.Component{
 
 	// into Moniel? or Parser
 	compileToAST(grammar, semantics, source) {
-		console.log("compileToAST");
 	    var result = grammar.match(source);
 
 	    if (result.succeeded()) {
@@ -98,7 +97,7 @@ class IDE extends React.Component{
 		//console.log("IDE.render");
 
     	return <div id="container">
-    		<Panel title="Definition">
+    		<Panel id="definition">
     			<Editor
     				ref={(ref) => this.editor = ref}
     				mode="moniel"
@@ -110,7 +109,7 @@ class IDE extends React.Component{
     			/>
     		</Panel>
     		
-    		<Panel title="Visualization">
+    		<Panel id="visualization">
     			<VisualGraph graph={this.state.graph} />
     		</Panel>
 

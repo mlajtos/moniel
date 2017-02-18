@@ -50,7 +50,7 @@ class Editor extends React.Component{
             enableLiveAutocompletion: false,
             wrap: true,
             autoScrollEditorIntoView: true,
-            fontFamily: "Fira  Code",
+            fontFamily: "Fira Code",
             showLineNumbers: true,
             showGutter: true
         });
