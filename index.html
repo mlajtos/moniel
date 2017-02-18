@@ -7,30 +7,11 @@
 	
 	<title>Moniel</title>
 
-	<!-- Ohm/JS from CDG labs (you rock) -->
-	<script src="lib/ohm/dist/ohm.js"></script>
-
 	<!-- Ace editor (custom mode + few tweaks) -->
 	<script src="lib/ace-moniel/build/src/ace.js"></script>
 	<script src="lib/ace-moniel/build/src/ext-language_tools.js"></script>
 
-	<!-- jQuery (our favorite zombie) -->
-	<script src="bower_components/jquery/dist/jquery.min.js"></script>
-	<script>window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js');</script>
-
-	<!-- React (of course) -->
-	<script src="bower_components/react/react.js"></script>
-	<script src="bower_components/react/react-dom.js"></script>
-	<!--<script src="bower_components/immutable/dist/immutable.min.js"></script>-->
-
-	<!-- lodash + graphlib + dagre + D3 + dagre-d3 (pure awesomness) -->
-	<script src="lib/lodash/dist/lodash.min.js"></script>
-	<script src="lib/graphlib/dist/graphlib.core.js"></script>
-	<script src="lib/dagre/dist/dagre.min.js"></script>
-	<script src="bower_components/d3/d3.js"></script>
-
-	<!-- ColorHash + FiraCode (gorgeous visuals) -->
-	<script src="lib/color-hash/dist/color-hash.js"></script>
+	<!-- FiraCode (gorgeous font) -->
 	<link rel="stylesheet" href="lib/FiraCode/distr/fira_code.css">
 
 	<!-- (hello) Moniel -->
@@ -39,6 +20,27 @@
 	<script src="src/moniel.ohm" type="text/ohm-js"></script>
 	<script src="src/moniel.semantics.js"></script>
 	<script src="src/moniel.utils.js"></script>
+
+	<script>
+		// jQuery (our favorite zombie)
+		window.$ = window.jQuery = require('jQuery')
+
+		// Ohm/JS from HARC (what happened to CDG?)
+		window.ohm = require("ohm-js")
+
+		// React (of course)
+		window.React = require("react")
+		window.ReactDOM = require("react-dom")
+
+		// lodash + graphlib + dagre + D3 + dagre-d3 (pure awesomness)
+		window._ = require("lodash")
+		window.graphlib = require("graphlib")
+		window.dagre = require("dagre")
+		window.d3 = require("d3")
+
+		// for pretty colors
+		window.ColorHash = require("color-hash")
+	</script>
 </head>
 <body>
 

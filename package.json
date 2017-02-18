@@ -13,8 +13,11 @@
     "url": "git+https://github.com/mlajtos/moniel.git"
   },
   "dependencies": {
+    "color-hash": "^1.0.3",
+    "jQuery": "^1.7.4",
     "ohm-js": "^0.12.3",
-    "react": "^15.4.1"
+    "react": "^15.4.1",
+    "react-dom": "^15.4.2"
   },
   "devDependencies": {
     "babel-cli": "^6.0.0",
