@@ -6,10 +6,11 @@ Human-friendly declarative dataflow notation for computational graphs. See [vide
 ----------
 
 ## Setup
-```
-git clone https://github.com/mlajtos/moniel.git
-npm install
-npm start
+```shell
+$ git clone https://github.com/mlajtos/moniel.git
+$ cd moniel
+$ npm install
+$ npm start
 ```
 
 ## Quick Introduction
