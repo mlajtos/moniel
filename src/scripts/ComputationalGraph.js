@@ -92,9 +92,24 @@ class ComputationalGraph{
 	touchNode(nodePath) {
 		if (this.graph.hasNode(nodePath)) {
 			this.nodeStack.push(nodePath);
+			console.log(this.previousNodeStack, nodePath)
+
+			if (this.previousNodeStack.length === 1) {
+				this.setEdge(this.previousNodeStack[0], nodePath)
+			} else {
+				this.setEdge(this.previousNodeStack, nodePath)
+			}
+			
+
+			
+			/*
 			this.previousNodeStack.forEach(fromPath => {
 				this.setEdge(fromPath, nodePath)	
 			});
+			*/
+
+			
+			
 		} else {
 			console.warn(`Trying to touch non-existant node "${nodePath}"`);
 		}
@@ -207,76 +222,102 @@ class ComputationalGraph{
 		return this.graph.node(nodePath).isMetanode === true;
 	}
 
-	getOutputNode(scopePath) {
+	getOutputNodes(scopePath) {
 		let scope = this.graph.node(scopePath);
-		let outs = this.graph.children(scopePath).filter(node => { return this.isOutput(node) });
-		if (outs.length === 1) {
-			return outs[0];	
-		} else  if (outs.length === 0) {
+		let outputNodes = this.graph.children(scopePath).filter(node => { return this.isOutput(node) });
+
+		if (outputNodes.length === 0) {
 			this.moniel.logger.addIssue({
-				message: `Scope "${scope.id}" doesn't have any Output node.`,
+				message: `Metanode "${scope.id}" doesn't have any Output node.`,
 				type: "error",
 				position: {
 					start: scope._source ? scope._source.startIdx : 0,
 					end: scope._source ? scope._source.endIdx : 0
 				}
 			});
-			return null;
-		} else {
-			this.moniel.logger.addIssue({
-				message: `Scope "${scope.id}" has more than one Output node.`,
-				type: "error",
-				position: {
-					start: scope._source ? scope._source.startIdx : 0,
-					end: scope._source ? scope._source.endIdx : 0
-				}
-			});
-			return null;
+			return null;	
 		}
+
+		return outputNodes;
 	}
 
-	getInputNode(scopePath) {
+	getInputNodes(scopePath) {
 		let scope = this.graph.node(scopePath);
-		let ins = this.graph.children(scopePath).filter(node => { return this.isInput(node) });
-		if (ins.length === 1) {
-			return ins[0];	
-		} else  if (ins.length === 0) {
+		let inputNodes = this.graph.children(scopePath).filter(node => { return this.isInput(node)});
+
+		if (inputNodes.length === 0) {
 			this.moniel.logger.addIssue({
-				message: `Scope "${scope.id}" doesn't have any Input node.`,
+				message: `Metanode "${scope.id}" doesn't have any Input nodes.`,
 				type: "error",
 				position: {
 					start: scope._source ? scope._source.startIdx : 0,
 					end:  scope._source ? scope._source.endIdx : 0
 				}
 			});
-			return null;
-		} else {
-			this.moniel.logger.addIssue({
-				message: `Scope "${scope.id}" has more than one Input node.`,
-				type: "error",
-				position: {
-					start: scope._source ? scope._source.startIdx : 0,
-					end:  scope._source ? scope._source.endIdx : 0
-				}
-			});
-			return null;
-		}	
+		}
+
+		return inputNodes;
 	}
 
 	setEdge(fromPath, toPath) {
 		// console.info(`Creating edge from "${fromPath}" to "${toPath}".`)
+		var sourcePaths
 
-		if (this.isMetanode(fromPath)) {
-			fromPath = this.getOutputNode(fromPath);
+		if (typeof fromPath === "string") {
+			if (this.isMetanode(fromPath)) {
+				sourcePaths = this.getOutputNodes(fromPath)
+			} else {
+				sourcePaths = [fromPath]
+			}
+		} else if (Array.isArray(fromPath)) {
+			sourcePaths = fromPath
 		}
 
-		if (this.isMetanode(toPath)) {
-			toPath = this.getInputNode(toPath);
+		var targetPaths
+
+		if (typeof toPath === "string") {
+			if (this.isMetanode(toPath)) {
+				targetPaths = this.getInputNodes(toPath)
+			} else {
+				targetPaths = [toPath]
+			}
+		} else if (Array.isArray(toPath)) {
+			targetPaths = toPath
 		}
-		
-		if (fromPath && toPath) {
-			this.graph.setEdge(fromPath, toPath, {...this.defaultEdge});	
+
+		this.setMultiEdge(sourcePaths, targetPaths)
+	}
+
+	setMultiEdge(sourcePaths, targetPaths) {
+		console.log("setMultiEdge", sourcePaths, targetPaths)
+
+		if (sourcePaths === null || targetPaths === null) {
+			return
 		}
+
+		if (sourcePaths.length === targetPaths.length) {
+			for (var i = 0; i < sourcePaths.length; i++) {
+				if (sourcePaths[i] && targetPaths[i]) {
+					this.graph.setEdge(sourcePaths[i], targetPaths[i], {...this.defaultEdge});	
+				}
+			}
+		} else {
+			if (targetPaths.length === 1) {
+				sourcePaths.forEach(sourcePath => this.graph.setEdge(sourcePath, targetPaths[0], {...this.defaultEdge}))
+			} else if (sourcePaths.length === 1) {
+				targetPaths.forEach(targetPath => this.graph.setEdge(sourcePaths[0], targetPath, {...this.defaultEdge}))
+			} else {
+				this.moniel.logger.addIssue({
+					message: `Number of nodes does not match. [${sourcePaths.length}] -> [${targetPaths.length}]`,
+					type: "error",
+					position: {
+						// start: scope._source ? scope._source.startIdx : 0,
+						// end:  scope._source ? scope._source.endIdx : 0
+					}
+				});
+			}
+		}
+
 	}
 
 	hasNode(nodePath) {
@@ -284,6 +325,7 @@ class ComputationalGraph{
 	}
 
 	getGraph() {
+		// console.log(this.graph)
 		return this.graph;
 	}
 }
