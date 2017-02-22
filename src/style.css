@@ -11,14 +11,19 @@ body{
     flex-wrap: wrap;
     font: 300 16px 'Helvetica Neue', Helvetica;
 }
-#container{
+div.container{
     position: absolute;
     display: flex;
-    flex-direction: row;
     bottom: 0;
     top: 0;
     left: 0;
     right: 0;
+}
+div.container.columns{
+    flex-direction: row;
+}
+div.container.rows{
+    flex-direction: column-reverse;
 }
 div.panel{
     flex-grow: 1;
@@ -29,8 +34,11 @@ div.panel{
     background-color: #272822;
 }
 
-div#definition.panel{
-    border-right: 3px solid #2f3129;
+div.container.rows > div#definition.panel{
+    border-top: 1px solid #636363;
+}
+div.container.columns > div#definition.panel{
+    border-right: 1px solid #636363;
 }
 
 .header {

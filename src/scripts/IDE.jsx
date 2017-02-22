@@ -11,8 +11,22 @@ class IDE extends React.Component{
 			"semantics": semantics,
 			"networkDefinition": "",
 			"ast": null,
-			"issues": null
+			"issues": null,
+			"layout": "columns"
 		};
+
+		let layout = window.localStorage.getItem("layout")
+		if (layout) {
+			if (layout == "columns" || layout == "rows") {
+				this.state.layout = layout
+			} else {
+				this.moniel.logger.addIssue({
+					type: "warning",
+					message: `Value for "layout" can be only "columns" or "rows".`
+				});
+			}
+		}
+
 		this.updateNetworkDefinition = this.updateNetworkDefinition.bind(this);
 		this.delayedUpdateNetworkDefinition = this.delayedUpdateNetworkDefinition.bind(this);
 	}
@@ -57,6 +71,12 @@ class IDE extends React.Component{
 		console.timeEnd("updateNetworkDefinition");
 	}
 
+	toggleLayout() {
+		this.setState({
+			layout: (this.state.layout === "columns") ? "rows" : "columns"
+		})
+	}
+
 	loadExample(id) {
 		var callback = function(value) {
 			this.editor.setValue(value);
@@ -96,7 +116,10 @@ class IDE extends React.Component{
 	render() {
 		//console.log("IDE.render");
 
-    	return <div id="container">
+		let containerLayout = this.state.layout
+		let graphLayout = this.state.layout === "columns" ? "BT" : "LR"
+
+    	return <div id="container" className={`container ${containerLayout}`}>
     		<Panel id="definition">
     			<Editor
     				ref={(ref) => this.editor = ref}
@@ -110,7 +133,7 @@ class IDE extends React.Component{
     		</Panel>
     		
     		<Panel id="visualization">
-    			<VisualGraph graph={this.state.graph} />
+    			<VisualGraph graph={this.state.graph} layout={graphLayout} />
     		</Panel>
 
     		{/*

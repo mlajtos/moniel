@@ -20,6 +20,7 @@ class VisualGraph extends React.Component{
     componentWillReceiveProps(nextProps) {
         // console.log("VisualGraph.componentWillReceiveProps", nextProps);
         if (nextProps.graph) {
+            nextProps.graph._label.rankdir = nextProps.layout;
             this.graphLayout.layout(nextProps.graph, this.saveGraph.bind(this));
         }
     }
@@ -43,7 +44,7 @@ class VisualGraph extends React.Component{
         // console.log(this.state.graph);
 
         if (!this.state.graph) {
-            console.log(this.state.graph)
+            // console.log(this.state.graph)
             return null
         }
 
