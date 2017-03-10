@@ -50,9 +50,31 @@ function createWindow () {
     submenu: [
         { label: "New", accelerator: "CmdOrCtrl+N" },
         { type: "separator" },
-        { label: "Open", accelerator: "CmdOrCtrl+O" },
+        {
+          label: "Open",
+          accelerator: "CmdOrCtrl+O"
+        },
         { type: "separator" },
-        { label: "Save", accelerator: "CmdOrCtrl+S" },
+        { label: "Save",
+          accelerator: "CmdOrCtrl+S",
+          click: function() {
+            const fs = require("fs")
+            const timestamp = Date.now()
+            const folderPath = `./sketches/${timestamp}` 
+            fs.mkdir(folderPath, err => { if (err) throw err })
+            const printOptions = {
+              printBackground: true,
+              landscape: true
+            }
+            mainWindow.webContents.printToPDF(printOptions, (error, data) => {
+              if (error) throw error
+              fs.writeFile(folderPath + '/screen.pdf', data, (error) => { if (error) throw error })
+            })
+            fs.writeFile(folderPath + `/source.mon`, "Hey there! This is work in progress. If you desperately need this, fix it now! Otherwise, wait for someone to do it.", function(err) {
+              if (err) throw errs
+            });
+          }
+        },
         { label: "Save As", accelerator: "Shift+CmdOrCtrl+S" },
         { label: "Save All", accelerator: "Option+CmdOrCtrl+S" },
         { type: "separator" },
