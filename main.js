@@ -62,16 +62,19 @@ function createWindow () {
             const timestamp = Date.now()
             const folderPath = `./sketches/${timestamp}` 
             fs.mkdir(folderPath, err => { if (err) throw err })
+
             const printOptions = {
               printBackground: true,
-              landscape: true
+              landscape: true,
+              marginsType: 1
             }
             mainWindow.webContents.printToPDF(printOptions, (error, data) => {
               if (error) throw error
               fs.writeFile(folderPath + '/screen.pdf', data, (error) => { if (error) throw error })
             })
-            fs.writeFile(folderPath + `/source.mon`, "Hey there! This is work in progress. If you desperately need this, fix it now! Otherwise, wait for someone to do it.", function(err) {
-              if (err) throw errs
+
+            mainWindow.webContents.send('save', {
+              folder: folderPath 
             });
           }
         },

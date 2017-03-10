@@ -1,3 +1,6 @@
+const ipc = require("electron").ipcRenderer
+const fs = require("fs")
+
 class IDE extends React.Component{
 	moniel = new Moniel();
 
@@ -14,6 +17,20 @@ class IDE extends React.Component{
 			"issues": null,
 			"layout": "columns"
 		};
+
+		ipc.on('save', function(event, message) {
+			fs.writeFile(message.folder + "/source.mon", this.state.networkDefinition, function(err) {
+			  if (err) throw errs
+			});
+			fs.writeFile(message.folder + "/source.ast.json", JSON.stringify(this.state.ast, null, 2), function(err) {
+			  if (err) throw errs
+			});
+
+			let saveNotification = new Notification('Sketch saved', {
+            	body: `Sketch was successfully saved in the "sketches" folder.`,
+				silent: true
+            })
+		}.bind(this));
 
 		let layout = window.localStorage.getItem("layout")
 		if (layout) {
@@ -114,8 +131,6 @@ class IDE extends React.Component{
 	}
 
 	render() {
-		//console.log("IDE.render");
-
 		let containerLayout = this.state.layout
 		let graphLayout = this.state.layout === "columns" ? "BT" : "LR"
 
@@ -128,7 +143,6 @@ class IDE extends React.Component{
     				issues={this.state.issues}
     				onChange={this.delayedUpdateNetworkDefinition}
     				defaultValue={this.state.networkDefinition}
-    				highlightRange={this.state.highlightRange}
     			/>
     		</Panel>
     		
