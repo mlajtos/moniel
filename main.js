@@ -105,6 +105,15 @@ function createWindow () {
     label: 'View',
     submenu: [
       {
+        label: "Toggle Layout",
+        click: function() {
+          mainWindow.webContents.send('toggleLayout', null);
+        }
+      },
+      {
+        type: 'separator'
+      },
+      {
         role: 'reload'
       },
       {
