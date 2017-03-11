@@ -6,7 +6,7 @@ Human-friendly declarative dataflow notation for computational graphs. See [vide
 ----------
 
 ## Setup
-```shell
+```
 $ git clone https://github.com/mlajtos/moniel.git
 $ cd moniel
 $ npm install
@@ -85,9 +85,9 @@ Attribute names can also be shortened:
 ```
 Ones(s=10x10x10)
 ```
-Defining large graphs without proper structuring is unmanageable. **Scopes** can help:
+Defining large graphs without proper structuring is unmanageable. **Metanodes** can help:
 ```
-/layer{ // slash denotes scope delimiter
+layer:{
 	RandomNormal(shape=784x1000) -> weights:Variable
 	weights -> dp:DotProduct -> act:ReLU
 }
@@ -95,21 +95,22 @@ Defining large graphs without proper structuring is unmanageable. **Scopes** can
 Tensor -> layer/dp // feed input into the DotProduct of the "layer" scope
 layer/act -> Softmax // feed output of the "layer" scope into another node
 ```
-Scopes are more powerful when they define proper **Input-Output boundary**:
+Metanodes are more powerful when they define proper **Input-Output boundary**:
 ```
-/layer1{
+layer1:{
     RandomNormal(shape=784x1000) -> weigths:Variable
     [in:Input,weigths] -> DotProduct -> ReLU -> out:Output
 }
 
-/layer2{
+layer2:{
     RandomNormal(shape=1000x10) -> weigths:Variable
     [in:Input,weigths] -> DotProduct -> ReLU -> out:Output
 }
 
-layer1 -> layer2 // connect scopes directly
+// connect scopes directly
+layer1 -> layer2
 ```
-If scopes have identical structure, we can create a **reusable block** and use it as a normal node:
+If metanodes have identical structure, we can create a **reusable metanode** and use it as a normal node:
 ```
 +ReusableLayer(shape = 1x1){
 	RandN(shape = shape) -> w:Var
