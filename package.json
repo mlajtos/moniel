@@ -13,17 +13,18 @@
     "url": "git+https://github.com/mlajtos/moniel.git"
   },
   "dependencies": {
+    "ace-moniel-builds": "github:mlajtos/ace-moniel-builds",
     "color-hash": "^1.0.3",
     "d3": "^4.5.0",
     "dagre": "^0.7.4",
+    "electron-devtools-installer": "^2.1.0",
+    "fira-code": "github:mlajtos/FiraCode",
     "graphlib": "^2.1.1",
     "jquery": "^1.7.4",
     "lodash": "^4.17.4",
     "ohm-js": "^0.12.3",
     "react": "^15.4.1",
     "react-dom": "^15.4.2",
-    "ace-moniel-builds": "github:mlajtos/ace-moniel-builds",
-    "fira-code": "github:mlajtos/FiraCode"
   },
   "devDependencies": {
     "babel-cli": "^6.0.0",
