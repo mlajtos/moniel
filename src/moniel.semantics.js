@@ -13,7 +13,7 @@ var semantics = grammar.createSemantics().addOperation('eval', {
 			body: body.eval()
 		};
 	},
-	ScopeDefinition: function(_, name, body) {
+	ScopeDefinition: function(name, _, body) {
 		return {
 			type: "ScopeDefinition",
 			name: name.eval(),
@@ -22,7 +22,7 @@ var semantics = grammar.createSemantics().addOperation('eval', {
 		};
 	},
 	ScopeDefinitionBody: function(_, list, _) {
-		var definitions = list.eval()[0]; 
+		var definitions = list.eval();
 		return {
 			type: "ScopeDefinitionBody",
 			definitions: definitions ? definitions : []

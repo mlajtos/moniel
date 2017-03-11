@@ -29,9 +29,9 @@ Moniel{
         = ("{" Definition* "}")?
 
     ScopeDefinition
-        = "/" scopeName ScopeDefinitionBody
+        = scopeName ":" ScopeDefinitionBody
     ScopeDefinitionBody
-        = ("{" Definition* "}")?
+        = ("{" Definition* "}")
 
     Parameters
         = ListOf<Parameter, ",">

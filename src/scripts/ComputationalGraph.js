@@ -22,6 +22,7 @@ class ComputationalGraph{
 	initialize() {
 		this.nodeCounter = {}
 		this.scopeStack.initialize();
+		this.clearNodeStack()
 
 		this.metanodes = {}
 		this.metanodeStack = []
@@ -36,6 +37,7 @@ class ComputationalGraph{
 
 		this.graph.setNode(currentScopeId, {
 			userGeneratedId: scope.name.value,
+			id: scope.name.value,
             class: "Metanode",
             isMetanode: true,
             _source: scope.name._source
@@ -92,24 +94,12 @@ class ComputationalGraph{
 	touchNode(nodePath) {
 		if (this.graph.hasNode(nodePath)) {
 			this.nodeStack.push(nodePath);
-			console.log(this.previousNodeStack, nodePath)
 
 			if (this.previousNodeStack.length === 1) {
 				this.setEdge(this.previousNodeStack[0], nodePath)
 			} else {
 				this.setEdge(this.previousNodeStack, nodePath)
 			}
-			
-
-			
-			/*
-			this.previousNodeStack.forEach(fromPath => {
-				this.setEdge(fromPath, nodePath)	
-			});
-			*/
-
-			
-			
 		} else {
 			console.warn(`Trying to touch non-existant node "${nodePath}"`);
 		}
@@ -289,7 +279,6 @@ class ComputationalGraph{
 	}
 
 	setMultiEdge(sourcePaths, targetPaths) {
-		console.log("setMultiEdge", sourcePaths, targetPaths)
 
 		if (sourcePaths === null || targetPaths === null) {
 			return
@@ -303,9 +292,9 @@ class ComputationalGraph{
 			}
 		} else {
 			if (targetPaths.length === 1) {
-				sourcePaths.forEach(sourcePath => this.graph.setEdge(sourcePath, targetPaths[0], {...this.defaultEdge}))
+				sourcePaths.forEach(sourcePath => this.setEdge(sourcePath, targetPaths[0]))
 			} else if (sourcePaths.length === 1) {
-				targetPaths.forEach(targetPath => this.graph.setEdge(sourcePaths[0], targetPath, {...this.defaultEdge}))
+				targetPaths.forEach(targetPath => this.setEdge(sourcePaths[0], targetPath,))
 			} else {
 				this.moniel.logger.addIssue({
 					message: `Number of nodes does not match. [${sourcePaths.length}] -> [${targetPaths.length}]`,
