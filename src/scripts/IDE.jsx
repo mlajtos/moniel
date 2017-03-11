@@ -32,6 +32,10 @@ class IDE extends React.Component{
             })
 		}.bind(this));
 
+		ipc.on("toggleLayout", (e, m) => {
+			this.toggleLayout()
+		});
+
 		let layout = window.localStorage.getItem("layout")
 		if (layout) {
 			if (layout == "columns" || layout == "rows") {
