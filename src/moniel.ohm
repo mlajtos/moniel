@@ -2,7 +2,7 @@ Moniel{
     Network
         = Definition*
     Definition
-        = (BlockDefinition | ScopeDefinition | ConnectionDefinition)
+        = (BlockDefinition | ConnectionDefinition)
 
     ConnectionDefinition
         = NonemptyListOf<(BlockList | Block), connectionSymbol>
@@ -11,7 +11,7 @@ Moniel{
         = "[" ListOf<Block, ","> "]"
 
     Block
-        = BlockInstance | blockIdentifier
+        = BlockInstance | InlineBlockDefinition | blockIdentifier
 
     BlockInstance (block)
         = BlockName blockType BlockInstanceParameters
@@ -28,9 +28,9 @@ Moniel{
     BlockDefinitionBody
         = ("{" Definition* "}")?
 
-    ScopeDefinition
-        = scopeName ":" ScopeDefinitionBody
-    ScopeDefinitionBody
+    InlineBlockDefinition
+        = blockName ":" InlineBlockDefinitionBody
+    InlineBlockDefinitionBody
         = ("{" Definition* "}")
 
     Parameters
@@ -43,8 +43,6 @@ Moniel{
     Value
         = parameterName | blockType | float | Shape | integer
 
-    scopeName
-        = lower (alnum | "_")*
     blockType (block name)
         = upper (alnum | "_")*
     blockName

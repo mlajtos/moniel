@@ -13,18 +13,18 @@ var semantics = grammar.createSemantics().addOperation('eval', {
 			body: body.eval()
 		};
 	},
-	ScopeDefinition: function(name, _, body) {
+	InlineBlockDefinition: function(name, _, body) {
 		return {
-			type: "ScopeDefinition",
+			type: "InlineBlockDefinition",
 			name: name.eval(),
 			body: body.eval(),
 			_source: this.source
 		};
 	},
-	ScopeDefinitionBody: function(_, list, _) {
+	InlineBlockDefinitionBody: function(_, list, _) {
 		var definitions = list.eval();
 		return {
-			type: "ScopeDefinitionBody",
+			type: "BlockDefinitionBody",
 			definitions: definitions ? definitions : []
 		};
 	},
@@ -108,14 +108,8 @@ var semantics = grammar.createSemantics().addOperation('eval', {
 	blockName: function(_, _) {
 		return {
 	        type: "Identifier",
-	        value: this.source.contents
-	    };
-	},
-	scopeName: function(_, _) {
-		return {
-	        type: "Identifier",
 	        value: this.source.contents,
-	        _source: this.source
+			_source: this.source
 	    };
-	},
+	}
 });

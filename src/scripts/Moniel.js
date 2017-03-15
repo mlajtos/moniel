@@ -29,14 +29,16 @@ class Moniel{
 		};
 	}
 
-	handleScopeDefinition(scope) {
-		this.graph.enterScope(scope);
+	handleInlineBlockDefinition(scope) {
+		this.graph.enterMetanodeScope(scope.name.value)
 		this.walkAst(scope.body);
-		this.graph.exitScope();
-	}
-
-	handleScopeDefinitionBody(scopeBody) {
-		scopeBody.definitions.forEach(definition => this.walkAst(definition));
+		this.graph.exitMetanodeScope();
+		this.graph.createMetanode(scope.name.value, scope.name.value, {
+			userGeneratedId: scope.name.value,
+			id: scope.name.value,
+			class: "",
+			_source: scope._source
+		});
 	}
 
 	handleBlockDefinition(blockDefinition) {
@@ -51,10 +53,6 @@ class Moniel{
 		definitionBody.definitions.forEach(definition => this.walkAst(definition));
 	}
 
-	handleUnrecognizedNode(node) {
-		console.warn("What to do with this AST node?", node);
-	}
-
 	handleNetworkDefinition(network) {
 		this.initialize();
 		network.definitions.forEach(definition => this.walkAst(definition));
@@ -62,8 +60,10 @@ class Moniel{
 
 	handleConnectionDefinition(connection) {
 		this.graph.clearNodeStack();
+		// console.log(connection.list)
 		connection.list.forEach(item => {
 			this.graph.freezeNodeStack();
+			// console.log(item)
 			this.walkAst(item);
 		});
 	}
@@ -183,6 +183,10 @@ class Moniel{
 	    return (i === name.length); // got to the end?
 	}
 
+	handleUnrecognizedNode(node) {
+		console.warn("What to do with this AST node?", node);
+	}
+
 	walkAst(node) {
 		if (!node) { console.error("No node?!"); return; }
 
@@ -190,8 +194,7 @@ class Moniel{
 			case "Network": this.handleNetworkDefinition(node); break;
 			case "BlockDefinition": this.handleBlockDefinition(node); break;
 			case "BlockDefinitionBody": this.handleBlockDefinitionBody(node); break;
-			case "ScopeDefinition": this.handleScopeDefinition(node); break;
-			case "ScopeDefinitionBody": this.handleScopeDefinitionBody(node); break;
+			case "InlineBlockDefinition": this.handleInlineBlockDefinition(node); break;
 			case "ConnectionDefinition": this.handleConnectionDefinition(node); break;
 			case "BlockInstance": this.handleBlockInstance(node); break;
 			case "BlockList": this.handleBlockList(node); break;

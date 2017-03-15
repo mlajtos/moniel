@@ -2,8 +2,9 @@ class ComputationalGraph{
 	defaultEdge = {}
 
 	nodeCounter = {}
-	nodeStack = []
-	previousNodeStack = []
+	_nodeStack2 = {}
+	_previousNodeStack2 = []
+
 	scopeStack = new ScopeStack()
 
 	metanodes = {}
@@ -12,6 +13,27 @@ class ComputationalGraph{
 	get graph() {
 		let lastIndex = this.metanodeStack[this.metanodeStack.length - 1];
 		return this.metanodes[lastIndex];
+	}
+
+	// 
+	get nodeStack2() {
+		let lastIndex = this.metanodeStack[this.metanodeStack.length - 1];
+		return this._nodeStack2[lastIndex]
+	}
+
+	set nodeStack2(value) {
+		let lastIndex = this.metanodeStack[this.metanodeStack.length - 1];
+		this._nodeStack2[lastIndex] = value
+	}
+
+	get previousNodeStack2() {
+		let lastIndex = this.metanodeStack[this.metanodeStack.length - 1];
+		return this._previousNodeStack2[lastIndex]
+	}
+
+	set previousNodeStack2(value) {
+		let lastIndex = this.metanodeStack[this.metanodeStack.length - 1];
+		this._previousNodeStack2[lastIndex] = value
 	}
 
 	constructor(parent) {
@@ -24,30 +46,14 @@ class ComputationalGraph{
 		this.scopeStack.initialize();
 		this.clearNodeStack()
 
+		this._nodeStack2 = {}
+		this._previousNodeStack2 = {}
+
 		this.metanodes = {}
 		this.metanodeStack = []
 
+
         this.addMain();
-	}
-
-	enterScope(scope) {
-		this.scopeStack.push(scope.name.value);
-		let currentScopeId = this.scopeStack.currentScopeIdentifier();
-		let previousScopeId = this.scopeStack.previousScopeIdentifier();
-
-		this.graph.setNode(currentScopeId, {
-			userGeneratedId: scope.name.value,
-			id: scope.name.value,
-            class: "Metanode",
-            isMetanode: true,
-            _source: scope.name._source
-		});
-
-		this.graph.setParent(currentScopeId, previousScopeId);
-	}
-
-	exitScope() {
-		this.scopeStack.pop();
 	}
 
 	enterMetanodeScope(name) {
@@ -92,13 +98,14 @@ class ComputationalGraph{
 	}
 
 	touchNode(nodePath) {
+		// console.log(`Touching node "${nodePath}".`)
 		if (this.graph.hasNode(nodePath)) {
-			this.nodeStack.push(nodePath);
+			this.nodeStack2.push(nodePath)
 
-			if (this.previousNodeStack.length === 1) {
-				this.setEdge(this.previousNodeStack[0], nodePath)
-			} else {
-				this.setEdge(this.previousNodeStack, nodePath)
+			if (this.previousNodeStack2.length === 1) {
+				this.setEdge(this.previousNodeStack2[0], nodePath)
+			} else if (this.previousNodeStack2.length > 1) {
+				this.setEdge(this.previousNodeStack2, nodePath)
 			}
 		} else {
 			console.warn(`Trying to touch non-existant node "${nodePath}"`);
@@ -187,13 +194,13 @@ class ComputationalGraph{
 	}
 
 	clearNodeStack() {
-		this.previousNodeStack = [];
-		this.nodeStack = [];
+		this.previousNodeStack2 = [];
+		this.nodeStack2 = [];
 	}
 
 	freezeNodeStack() {
-		this.previousNodeStack = [...this.nodeStack];
-		this.nodeStack = [];
+		this.previousNodeStack2 = [...this.nodeStack2];
+		this.nodeStack2 = [];
 	}
 
 	setParent(childPath, parentPath) {
