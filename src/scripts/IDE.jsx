@@ -2,7 +2,8 @@ const ipc = require("electron").ipcRenderer
 const fs = require("fs")
 
 class IDE extends React.Component{
-	moniel = new Moniel();
+	moniel = new Moniel()
+	parser = new Parser()
 
 	lock = null
 
@@ -10,8 +11,8 @@ class IDE extends React.Component{
 		super(props);
 
 		this.state = {
-			"grammar": grammar,
-			"semantics": semantics,
+			"grammar": this.parser.grammar,
+			"semantics": this.parser.semantics,
 			"networkDefinition": "",
 			"ast": null,
 			"issues": null,
@@ -50,10 +51,20 @@ class IDE extends React.Component{
 
 		this.updateNetworkDefinition = this.updateNetworkDefinition.bind(this);
 		this.delayedUpdateNetworkDefinition = this.delayedUpdateNetworkDefinition.bind(this);
+
+		// this.loadExample("ConvolutionalLayer")
+	}
+
+	loadExample(id) {
+		let fileContent = fs.readFileSync(`./examples/${id}.mon`, "utf8")
+		this.editor.setValue(fileContent) // this has to be here, I don't know why
+		this.setState({
+			networkDefinition: fileContent
+		})
 	}
 
 	componentDidMount() {
-		this.loadExample("ConvolutionalLayer");
+		this.loadExample("ConvolutionalLayer")
 	}
 
 	delayedUpdateNetworkDefinition(value) {
@@ -98,20 +109,7 @@ class IDE extends React.Component{
 		})
 	}
 
-	loadExample(id) {
-		var callback = function(value) {
-			this.editor.setValue(value);
-			this.setState({
-				networkDefinition: value
-			});
-		};
 
-		$.ajax({
-			url: `./examples/${id}.mon`,
-			data: null,
-			success: callback.bind(this),
-			dataType: "text"
-		});
 	}
 
 	// into Moniel? or Parser

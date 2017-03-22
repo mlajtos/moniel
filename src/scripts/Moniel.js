@@ -1,6 +1,7 @@
 class Moniel{
-	logger = new Logger();
-	graph = new ComputationalGraph(this);
+	logger = new Logger()
+	graph = new ComputationalGraph(this)
+	colorHash = new ColorHashWrapper()
 
 	definitions = {};
 
@@ -25,7 +26,7 @@ class Moniel{
 	addDefinition(definitionName) {
 		this.definitions[definitionName] = {
 			name: definitionName,
-			color: colorHash.hex(definitionName)
+			color: this.colorHash.hex(definitionName)
 		};
 	}
 

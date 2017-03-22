@@ -52,6 +52,8 @@ class ComputationalGraph{
 		this.metanodes = {}
 		this.metanodeStack = []
 
+		// console.log("Metanodes:", this.metanodes)
+		// console.log("Metanode Stack:", this.metanodeStack)
 
         this.addMain();
 	}
@@ -70,6 +72,7 @@ class ComputationalGraph{
 	        marginy: 20,
 		});
 		this.metanodeStack.push(name);
+		// console.log(this.metanodeStack)
 
 		return this.metanodes[name];
 	}
@@ -216,6 +219,7 @@ class ComputationalGraph{
 	}
 
 	isMetanode(nodePath) {
+		// console.log("isMetanode:", nodePath)
 		return this.graph.node(nodePath).isMetanode === true;
 	}
 
@@ -321,7 +325,7 @@ class ComputationalGraph{
 	}
 
 	getGraph() {
-		// console.log(this.graph)
+		console.log(this.graph)
 		return this.graph;
 	}
 }

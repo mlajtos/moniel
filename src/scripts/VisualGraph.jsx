@@ -1,7 +1,7 @@
 class VisualGraph extends React.Component{
 
     constructor(props) {
-        console.log("VisualGraph.constructor");
+        // console.log("VisualGraph.constructor");
         super(props);
         this.graphLayout = new GraphLayout();
         this.state = {
