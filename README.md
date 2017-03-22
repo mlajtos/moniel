@@ -110,6 +110,10 @@ layer2:{
 // connect scopes directly
 layer1 -> layer2
 ```
+Alternatively, you can use **inline metanodes**:
+```
+In -> layer:{[In,Tensor] -> Conv -> Out} -> Out
+```
 If metanodes have identical structure, we can create a **reusable metanode** and use it as a normal node:
 ```
 +ReusableLayer(shape = 1x1){
