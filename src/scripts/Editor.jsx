@@ -32,7 +32,7 @@ class Editor extends React.Component{
         let m = this.editor.session.getMarkers();
         let c = selection.getCursor();
         let markers = this.markers.map(id => m[id]);
-        let cursorOverMarker = markers.map(marker => marker.range.inside(c.row, c.column)).reduce( (prev, curr) => prev || curr, false);
+        let cursorOverMarker = markers.map(marker => marker.range.contains(c.row, c.column)).reduce( (prev, curr) => prev || curr, false);
 
         if (cursorOverMarker) {
             this.editor.execCommand("goToNextError");
