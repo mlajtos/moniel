@@ -125,4 +125,22 @@ class Parser{
 		this.semantics = this.grammar.createSemantics().addOperation("eval", this.evalOperation)
 	}
 
+	make(source) {
+		var result = this.grammar.match(source)
+
+		if (result.succeeded()) {
+			var ast = this.semantics(result).eval()
+			return {
+				ast
+			}
+		} else {
+			var expected = result.getExpectedText()
+			var position = result.getRightmostFailurePosition()
+			return {
+				expected,
+				position
+			}
+		}
+	}
+
 }

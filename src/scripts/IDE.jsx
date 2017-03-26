@@ -4,6 +4,7 @@ const fs = require("fs")
 class IDE extends React.Component{
 	moniel = new Moniel()
 	parser = new Parser()
+	generator = new PyTorchGenerator()
 
 	lock = null
 
@@ -11,12 +12,14 @@ class IDE extends React.Component{
 		super(props);
 
 		this.state = {
-			"grammar": this.parser.grammar,
-			"semantics": this.parser.semantics,
+			// these are no longer needed here
+			// "grammar": this.parser.grammar,
+			// "semantics": this.parser.semantics,
 			"networkDefinition": "",
 			"ast": null,
 			"issues": null,
-			"layout": "columns"
+			"layout": "columns",
+			"generatedCode": ""
 		};
 
 		ipc.on('save', function(event, message) {
@@ -74,7 +77,8 @@ class IDE extends React.Component{
 
 	updateNetworkDefinition(value){
 		console.time("updateNetworkDefinition");
-		var result = this.compileToAST(this.state.grammar, this.state.semantics, value);
+		var result = this.parser.make(value)
+
 		if (result.ast) {
 			this.moniel.walkAst(result.ast);
 			var graph = this.moniel.getComputationalGraph();
@@ -82,6 +86,7 @@ class IDE extends React.Component{
 				networkDefinition: value,
 				ast: result.ast,
 				graph: graph,
+				generatedCode: this.generator.generateCode(graph),
 				issues: this.moniel.getIssues()
 			});
 		} else {
@@ -109,29 +114,6 @@ class IDE extends React.Component{
 		})
 	}
 
-
-	}
-
-	// into Moniel? or Parser
-	compileToAST(grammar, semantics, source) {
-	    var result = grammar.match(source);
-
-	    if (result.succeeded()) {
-	        var ast = semantics(result).eval();
-	        return {
-	            "ast": ast
-	        }
-	    } else {
-	    	// console.error(result);
-	        var expected = result.getExpectedText();
-	        var position = result.getRightmostFailurePosition();
-	        return {
-	            "expected": expected,
-	            "position": position
-	        }
-	    }
-	}
-
 	render() {
 		let containerLayout = this.state.layout
 		let graphLayout = this.state.layout === "columns" ? "BT" : "LR"
@@ -150,6 +132,14 @@ class IDE extends React.Component{
     		
     		<Panel id="visualization">
     			<VisualGraph graph={this.state.graph} layout={graphLayout} />
+    		</Panel>
+
+			<Panel title="Generated Code">
+    			<Editor
+    				mode="python"
+    				theme="monokai"
+    				value={this.state.generatedCode}
+    			/>
     		</Panel>
 
     		{/*
