@@ -127,6 +127,8 @@ RL(s = 784x1000) -> RL(s = 1000x10)
 ----------
 
 ## Similar projects and Inspiration
+- [PyTorch](http://pytorch.org) – "Tensors and Dynamic neural networks in Python with strong GPU acceleration."
+- [Sonnet](https://github.com/deepmind/sonnet) – "Sonnet is a library built on top of TensorFlow for building complex neural networks."
 - [TensorGraph](https://github.com/hycis/TensorGraph) – "TensorGraph is a framework for building any imaginable models based on TensorFlow"
 - [nngraph](https://github.com/torch/nngraph) – "graphical computation for nn library in Torch"
 - [DNNGraph](https://github.com/ajtulloch/dnngraph) – "a deep neural network model generation DSL in Haskell"
@@ -134,7 +136,6 @@ RL(s = 784x1000) -> RL(s = 1000x10)
 - [DeepRosetta](https://github.com/edgarriba/DeepRosetta) – "An universal deep learning models conversor"
 - [TensorBuilder](https://cgarciae.github.io/tensorbuilder/) – "a functional fluent immutable API based on the Builder Pattern"
 - [Keras](https://keras.io/) – "minimalist, highly modular neural networks library"
-- [KeraFlow](https://github.com/ipod825/keraflow) – simplified Keras(?)
 - [PrettyTensor](https://github.com/google/prettytensor) – "a high level builder API"
 - [TF-Slim](https://github.com/tensorflow/models/blob/master/inception/inception/slim/README.md) – "a lightweight library for defining, training and evaluating models"
 - [TFLearn](http://tflearn.org/) – "modular and transparent deep learning library"
