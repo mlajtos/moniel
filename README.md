@@ -16,8 +16,10 @@ $ npm start
 ## Quick Introduction
 Moniel is one of many attempts at creating a notation for deep learning models leveraging graph thinking. Instead of defining computation as list of formulea, we define the model as a declarative dataflow graph. It is *not a programming language*, just a convenient notation. (Which will be executable. [Wanna help?](https://github.com/mlajtos/moniel/issues))
 
+*Note: Proper syntax highlighting is not available here on GitHub. Use the application for the best experience.*
+
 Let's start with nothing, i.e. **comments**:
-```
+```java
 // This is line comment.
 
 /*
@@ -26,35 +28,35 @@ Let's start with nothing, i.e. **comments**:
 */
 ```
 Node can be created by stating its **type**:
-```
+```java
 Sigmoid
 ```
 You don't have to write full name of a type. Use **acronym** that fits you! These are all equivalent:
-```
+```java
 LocalResponseNormalization // canonical, but too long
 LocRespNorm // weird, but why not?
 LRN // cryptic for beginners, enough for others
 ```
 Nodes connect with other nodes with an **arrow**:
-```
+```java
 Sigmoid -> MaxPooling
 ```
 There can be **chain** of any length:
-```
+```java
 LRN -> Sigm -> BatchNorm -> ReLU -> Tanh -> MP -> Conv -> BN -> ELU
 ```
 Also, there can be **multiple chains**:
-```
+```java
 ReLU -> BN
 LRN -> Conv -> MP
 Sigm -> Tanh
 ```
 Nodes can have **identifiers**:
-```
+```java
 conv:Convolution
 ```
 Identifiers let's you refer to nodes that are used more than once:
-```
+```java
 // inefficient declaration of matrix-matrix multiplication
 matrix1:Tensor
 matrix2:Tensor
@@ -64,39 +66,39 @@ matrix1 -> mm
 matrix2 -> mm
 ```
 However, this can be rewritten without identifiers using **list**:
-```
+```java
 [Tensor,Tensor] -> MatMul
 ```
 Lists let's you easily declare **multi-connection**:
-```
+```java
 // Maximum of 3 random numbers
 [Random,Random,Random] -> Maximum
 ```
 **List-to-list connections** are sometimes really handy:
-```
+```java
 // Range of 3 random numbers
 [Rand,Rand,Rand] -> [Max,Min] -> Sub -> Abs
 ```
 Nodes can take **named attributes** that modify their behavior:
-```
+```java
 Fill(shape = 10x10x10, value = 1.0)
 ```
 Attribute names can also be shortened:
-```
+```java
 Ones(s=10x10x10)
 ```
 Defining large graphs without proper structuring is unmanageable. **Metanodes** can help:
-```
+```java
 layer:{
-	RandomNormal(shape=784x1000) -> weights:Variable
-	weights -> dp:DotProduct -> act:ReLU
+    RandomNormal(shape=784x1000) -> weights:Variable
+    weights -> dp:DotProduct -> act:ReLU
 }
 
-Tensor -> layer/dp // feed input into the DotProduct of the "layer" scope
-layer/act -> Softmax // feed output of the "layer" scope into another node
+Tensor -> layer/dp // feed input into the DotProduct of the "layer" metanode
+layer/act -> Softmax // feed output of the "layer" metanode into another node
 ```
 Metanodes are more powerful when they define proper **Input-Output boundary**:
-```
+```java
 layer1:{
     RandomNormal(shape=784x1000) -> weigths:Variable
     [in:Input,weigths] -> DotProduct -> ReLU -> out:Output
@@ -107,18 +109,18 @@ layer2:{
     [in:Input,weigths] -> DotProduct -> ReLU -> out:Output
 }
 
-// connect scopes directly
+// connect metanodes directly
 layer1 -> layer2
 ```
 Alternatively, you can use **inline metanodes**:
-```
+```java
 In -> layer:{[In,Tensor] -> Conv -> Out} -> Out
 ```
 If metanodes have identical structure, we can create a **reusable metanode** and use it as a normal node:
-```
+```java
 +ReusableLayer(shape = 1x1){
-	RandN(shape = shape) -> w:Var
-	[in:In,w] -> DP -> RLU -> out:Out
+    RandN(shape = shape) -> w:Var
+    [in:In,w] -> DP -> RLU -> out:Out
 }
 
 RL(s = 784x1000) -> RL(s = 1000x10)
