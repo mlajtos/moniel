@@ -90,22 +90,29 @@ class VisualGraph extends React.Component{
             viewBox = viewBox_whole
         }
 
-        return <svg id="visualization">
-            <animate ref={this.mount.bind(this)} attributeName="viewBox" from={viewBox_whole} to={viewBox} begin="0s" dur="0.25s" fill="freeze" repeatCount="1"></animate>
-            <defs>
-                <marker id="vee" viewBox="0 0 10 10" refX="10" refY="5" markerUnits="strokeWidth" markerWidth="10" markerHeight="7.5" orient="auto">
-                    <path d="M 0 0 L 10 5 L 0 10 L 3 5 z" className="arrow"></path>
-                </marker>
-            </defs>
-            <g id="graph">
-                <g id="nodes">
-                    {nodes}
+        return (
+            <svg id="visualization" xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <style>
+                    {
+                        fs.readFileSync("src/style.css", "utf-8", (err) => {console.log(err)})
+                    }
+                </style>
+                <animate ref={this.mount.bind(this)} attributeName="viewBox" from={viewBox_whole} to={viewBox} begin="0s" dur="0.25s" fill="freeze" repeatCount="1"></animate>
+                <defs>
+                    <marker id="vee" viewBox="0 0 10 10" refX="10" refY="5" markerUnits="strokeWidth" markerWidth="10" markerHeight="7.5" orient="auto">
+                        <path d="M 0 0 L 10 5 L 0 10 L 3 5 z" className="arrow"></path>
+                    </marker>
+                </defs>
+                <g id="graph">
+                    <g id="nodes">
+                        {nodes}
+                    </g>
+                    <g id="edges">
+                        {edges}
+                    </g>
                 </g>
-                <g id="edges">
-                    {edges}
-                </g>
-            </g>
-        </svg>;
+            </svg>
+        );
     }
 }
 
@@ -157,7 +164,7 @@ class Node extends React.Component{
     render() {
         let n = this.props.node;
         return (
-            <g className={`node ${n.class}`} onClick={this.handleClick.bind(this)} style={{transform: `translate(${n.x -(n.width/2)}px,${n.y -(n.height/2)}px)`}}>
+            <g className={`node ${n.class}`} onClick={this.handleClick.bind(this)} style={{transform: `translate(${Math.floor(n.x -(n.width/2))}px,${Math.floor(n.y -(n.height/2))}px)`}}>
                 {this.props.children}
             </g>
         );

@@ -29,6 +29,9 @@ class IDE extends React.Component{
 			fs.writeFile(message.folder + "/source.ast.json", JSON.stringify(this.state.ast, null, 2), function(err) {
 			  if (err) throw errs
 			});
+			fs.writeFile(message.folder + "/graph.svg", document.querySelector("svg").outerHTML, function(err) {
+			  if (err) throw errs
+			});
 
 			let saveNotification = new Notification('Sketch saved', {
             	body: `Sketch was successfully saved in the "sketches" folder.`,

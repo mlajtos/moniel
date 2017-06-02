@@ -107,6 +107,8 @@ svg#visualization{
     flex: 1;
     opacity: 1;
     transition: opacity 250ms ease-in-out;
+    font: 300 16px 'Helvetica Neue', Helvetica;
+    background-color: #272822;
 }
 
 svg.faded{
