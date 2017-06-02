@@ -328,4 +328,8 @@ class ComputationalGraph{
 		console.log(this.graph)
 		return this.graph;
 	}
+
+	getMetanodes() {
+		return this.metanodes
+	}
 }

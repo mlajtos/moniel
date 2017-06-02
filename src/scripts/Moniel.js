@@ -1,6 +1,10 @@
+// rename this to something suitable
 class Moniel{
+	// maybe singleton?
 	logger = new Logger()
 	graph = new ComputationalGraph(this)
+
+	// too soon, should be in VisualGraph
 	colorHash = new ColorHashWrapper()
 
 	definitions = {};
@@ -19,7 +23,7 @@ class Moniel{
 
 	addDefaultDefinitions() {
 		// console.info(`Adding default definitions.`);
-		const defaultDefinitions = ["Add", "Linear", "Input", "Output", "Placeholder", "Variable", "Constant", "Multiply", "Convolution", "Dense", "MaxPooling", "BatchNormalization", "Identity", "RectifiedLinearUnit", "Sigmoid", "ExponentialLinearUnit", "Tanh", "Absolute", "Summation", "Dropout", "MatrixMultiply", "BiasAdd", "Reshape", "Concat", "Flatten", "Tensor", "Softmax", "CrossEntropy", "ZeroPadding", "RandomNormal", "TruncatedNormalDistribution", "DotProduct"];
+		const defaultDefinitions = ["Add", "Linear", "Input", "Output", "Placeholder", "Variable", "Constant", "Multiply", "Convolution", "Dense", "MaxPooling", "BatchNormalization", "Deconvolution", "AveragePooling", "AdaptiveAveragePooling", "AdaptiveMaxPooling", "MaxUnpooling", "ParametricRectifiedLinearUnit", "LeakyRectifiedLinearUnit", "RandomizedRectifiedLinearUnit", "LogSigmoid", "Threshold", "HardTanh", "TanhShrink", "HardShrink", "LogSoftMax", "SoftShrink", "SoftMax", "SoftMin", "SoftPlus", "SoftSign", "Identity", "RectifiedLinearUnit", "Sigmoid", "ExponentialLinearUnit", "Tanh", "Absolute", "Summation", "Dropout", "MatrixMultiply", "BiasAdd", "Reshape", "Concat", "Flatten", "Tensor", "Softmax", "CrossEntropy", "ZeroPadding", "RandomNormal", "TruncatedNormalDistribution", "DotProduct"];
 		defaultDefinitions.forEach(definition => this.addDefinition(definition));
 	}
 
@@ -158,6 +162,10 @@ class Moniel{
 
 	getComputationalGraph() {
 		return this.graph.getGraph();
+	}
+
+	getMetanodesDefinitions() {
+		return this.graph.getMetanodes()
 	}
 
 	getIssues() {

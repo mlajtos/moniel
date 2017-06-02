@@ -2,8 +2,8 @@ const ipc = require("electron").ipcRenderer
 const fs = require("fs")
 
 class IDE extends React.Component{
-	moniel = new Moniel()
 	parser = new Parser()
+	moniel = new Moniel()
 	generator = new PyTorchGenerator()
 
 	lock = null
@@ -57,8 +57,6 @@ class IDE extends React.Component{
 
 		this.updateNetworkDefinition = this.updateNetworkDefinition.bind(this);
 		this.delayedUpdateNetworkDefinition = this.delayedUpdateNetworkDefinition.bind(this);
-
-		// this.loadExample("ConvolutionalLayer")
 	}
 
 	loadExample(id) {
@@ -83,13 +81,16 @@ class IDE extends React.Component{
 		var result = this.parser.make(value)
 
 		if (result.ast) {
-			this.moniel.walkAst(result.ast);
-			var graph = this.moniel.getComputationalGraph();
+			this.moniel.walkAst(result.ast)
+			let graph = this.moniel.getComputationalGraph()
+			let definitions = this.moniel.getMetanodesDefinitions()
+			console.log(definitions)
+
 			this.setState({
 				networkDefinition: value,
 				ast: result.ast,
 				graph: graph,
-				generatedCode: this.generator.generateCode(graph),
+				generatedCode: this.generator.generateCode(graph, definitions),
 				issues: this.moniel.getIssues()
 			});
 		} else {
@@ -137,6 +138,7 @@ class IDE extends React.Component{
     			<VisualGraph graph={this.state.graph} layout={graphLayout} />
     		</Panel>
 
+			{/*
 			<Panel title="Generated Code">
     			<Editor
     				mode="python"
@@ -144,6 +146,7 @@ class IDE extends React.Component{
     				value={this.state.generatedCode}
     			/>
     		</Panel>
+			*/}
 
     		{/*
     		<Panel title="AST">
