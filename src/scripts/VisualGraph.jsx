@@ -1,9 +1,7 @@
 class VisualGraph extends React.Component{
-
     constructor(props) {
-        // console.log("VisualGraph.constructor");
         super(props);
-        this.graphLayout = new GraphLayout();
+        this.graphLayout = new GraphLayout(this.saveGraph.bind(this));
         this.state = {
             graph: null,
             previousViewBox: null
@@ -18,11 +16,14 @@ class VisualGraph extends React.Component{
     }
 
     componentWillReceiveProps(nextProps) {
-        // console.log("VisualGraph.componentWillReceiveProps", nextProps);
         if (nextProps.graph) {
             nextProps.graph._label.rankdir = nextProps.layout;
-            this.graphLayout.layout(nextProps.graph, this.saveGraph.bind(this));
+            this.graphLayout.layout(nextProps.graph);
         }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return (this.state !== nextState)
     }
 
     handleClick(node) {
@@ -41,8 +42,6 @@ class VisualGraph extends React.Component{
     }
 
     render() {
-        // console.log(this.state.graph);
-
         if (!this.state.graph) {
             // console.log(this.state.graph)
             return null
@@ -94,12 +93,12 @@ class VisualGraph extends React.Component{
             <svg id="visualization" xmlns="http://www.w3.org/2000/svg" version="1.1">
                 <style>
                     {
-                        fs.readFileSync("src/style.css", "utf-8", (err) => {console.log(err)})
+                        fs.readFileSync("src/bundle.css", "utf-8", (err) => {console.log(err)})
                     }
                 </style>
                 <animate ref={this.mount.bind(this)} attributeName="viewBox" from={viewBox_whole} to={viewBox} begin="0s" dur="0.25s" fill="freeze" repeatCount="1"></animate>
                 <defs>
-                    <marker id="vee" viewBox="0 0 10 10" refX="10" refY="5" markerUnits="strokeWidth" markerWidth="10" markerHeight="7.5" orient="auto">
+                    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerUnits="strokeWidth" markerWidth="10" markerHeight="7.5" orient="auto">
                         <path d="M 0 0 L 10 5 L 0 10 L 3 5 z" className="arrow"></path>
                     </marker>
                 </defs>
@@ -145,7 +144,7 @@ class Edge extends React.Component{
         let e = this.props.edge;
         let l = this.line;
         return (
-            <g className="edgePath" markerEnd="url(#vee)">
+            <g className="edge" markerEnd="url(#arrow)">
                 <path d={l(e.points)}>
                     <animate ref={this.mount} key={Math.random()} restart="always" from={l(this.state.previousPoints)} to={l(e.points)} begin="0s" dur="0.25s" fill="freeze" repeatCount="1" attributeName="d" />
                 </path>
@@ -163,8 +162,11 @@ class Node extends React.Component{
     }
     render() {
         let n = this.props.node;
+        const type = n.isMetanode ? "metanode" : "node"
+
         return (
-            <g className={`node ${n.class}`} onClick={this.handleClick.bind(this)} style={{transform: `translate(${Math.floor(n.x -(n.width/2))}px,${Math.floor(n.y -(n.height/2))}px)`}}>
+            <g className={`${type} ${n.class}`} onClick={this.handleClick.bind(this)} transform={`translate(${Math.floor(n.x -(n.width/2))},${Math.floor(n.y -(n.height/2))})`}>
+                <rect width={n.width} height={n.height} rx="15px" ry="15px" style={n.style} />
                 {this.props.children}
             </g>
         );
@@ -176,7 +178,6 @@ class Metanode extends Node{
         let n = this.props.node;
         return (
             <Node {...this.props}>
-                <rect width={n.width} height={n.height} rx="15px" ry="15px" style={n.style}></rect>
                 <text transform={`translate(10,0)`} textAnchor="start" style={{dominantBaseline: "ideographic"}}>
                     <tspan x="0" className="id">{n.userGeneratedId}</tspan>
                     <tspan x="0" dy="1.2em">{n.class}</tspan>
@@ -194,7 +195,6 @@ class AnonymousNode extends Node{
         let n = this.props.node;
         return (
             <Node {...this.props}>
-                <rect width={n.width} height={n.height} rx="15px" ry="15px" style={n.style}> </rect>
                 <text transform={`translate(${(n.width/2) },${(n.height/2)})`} textAnchor="middle">
                     <tspan>{n.class}</tspan>
                 </text>
@@ -208,7 +208,6 @@ class IdentifiedNode extends Node{
         let n = this.props.node;
         return (
             <Node {...this.props}>
-                <rect width={n.width} height={n.height} rx="15px" ry="15px" style={n.style}></rect>
                 <text transform={`translate(${(n.width/2) },${(n.height/2)})`} textAnchor="middle" style={{dominantBaseline: "ideographic"}}>
                     <tspan x="0" className="id">{n.userGeneratedId}</tspan>
                     <tspan x="0" dy="1.2em">{n.class}</tspan>

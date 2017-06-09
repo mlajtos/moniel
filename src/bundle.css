@@ -1,0 +1,146 @@
+body {
+  display: flex;
+  margin: 0;
+  height: 100vh;
+  width: 100vw;
+  font-size: 16px;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-content: stretch;
+  flex-wrap: wrap;
+  font: 300 16px 'Helvetica Neue', Helvetica; }
+
+div.container {
+  position: absolute;
+  display: flex;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0; }
+  div.container.columns {
+    flex-direction: right; }
+  div.container.rows {
+    flex-direction: column-reverse; }
+  div.container div.panel {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 40%;
+    display: flex;
+    flex-direction: column;
+    background-color: #272822; }
+
+div.container.rows > div#definition.panel {
+  border-top: 1px solid #636363; }
+
+div.container.columns > div#definition.panel {
+  border-right: 1px solid #636363; }
+
+.ace_editor {
+  flex: 1 1 20em; }
+
+.error_widget {
+  border: none;
+  padding: 0.5em 1.5em;
+  margin: 0.3em;
+  white-space: pre-wrap;
+  text-rendering: optimizeLegibility;
+  background-color: #c03030;
+  box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.53);
+  border-radius: 5px;
+  text-shadow: 0px 0px 7px black; }
+
+.error_widget_arrow.ace_error {
+  border-color: #a42929; }
+
+.error_widget.ace_warning {
+  background-color: #c5b21b; }
+
+.error_widget_arrow.ace_warning {
+  border-color: #aa9917; }
+
+.marker_error {
+  border-bottom: 1px dotted red;
+  position: absolute;
+  border-radius: 0;
+  z-index: 2; }
+
+.ace_marker-layer .ace_active-line {
+  position: absolute;
+  z-index: 1; }
+
+.highlight {
+  position: absolute;
+  z-index: 2;
+  background-color: white;
+  opacity: 0.3; }
+
+svg#visualization {
+  flex: 1;
+  opacity: 1;
+  transition: opacity 250ms ease-in-out;
+  font: 300 16px 'Helvetica Neue', Helvetica;
+  background-color: #272822; }
+  svg#visualization.faded {
+    opacity: 0.1; }
+  svg#visualization g#graph {
+    transition: transform 0.25s ease-in-out;
+    transform-origin: center; }
+
+g.node, g.metanode {
+  transition: transform 0.25s linear;
+  animation: fade-in 0.25s linear; }
+  g.node rect, g.metanode rect {
+    rx: 15;
+    ry: 15;
+    stroke: white;
+    stroke-width: 1px;
+    transition: width 0.25s linear, height 0.25s linear, stroke 0.1s ease-in-out, stroke-width 0.1s ease-in-out;
+    fill: transparent; }
+  g.node text, g.metanode text {
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    user-select: none;
+    fill: white;
+    dominant-baseline: central; }
+    g.node text tspan.id, g.metanode text tspan.id {
+      font-weight: bold; }
+  g.node:hover rect, g.metanode:hover rect {
+    stroke: yellow !important;
+    stroke-width: 3px !important;
+    stroke-dasharray: initial !important;
+    cursor: pointer; }
+
+g.node.undefined rect {
+  paint-order: stroke;
+  fill: #afafaf !important;
+  stroke: white;
+  stroke-width: 5px;
+  stroke-dasharray: 5,5;
+  opacity: 0.2; }
+
+@keyframes fade-in {
+  0% {
+    opacity: 0; }
+  50% {
+    opacity: 0.25; }
+  100% {
+    opacity: 1; } }
+
+g.edge {
+  animation: fade-in 0.25s linear; }
+  g.edge path {
+    stroke: #fff;
+    fill: none;
+    stroke-width: 1.5px; }
+
+@keyframes dash {
+  0% {
+    stroke-dashoffset: 0; }
+  100% {
+    stroke-dashoffset: 130; } }
+
+path.arrow {
+  stroke: none;
+  fill: white; }
+
+/*# sourceMappingURL=bundle.css.map */

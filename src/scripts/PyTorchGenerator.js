@@ -50,7 +50,8 @@ class PyTorchGenerator {
 			"KullbackLeiblerDivergenceLoss": "F.kl_div",
 			"Pad": "F.pad",
 			"Variable": "AG.Variable",
-			"RandomNormal": "T.randn"
+			"RandomNormal": "T.randn",
+			"Tensor": "T.Tensor"
 		}
 
 		return translationTable.hasOwnProperty(nodeType) ? translationTable[nodeType] : nodeType

@@ -32,6 +32,12 @@ class IDE extends React.Component{
 			fs.writeFile(message.folder + "/graph.svg", document.querySelector("svg").outerHTML, function(err) {
 			  if (err) throw errs
 			});
+			fs.writeFile(message.folder + "/graph.json", JSON.stringify(dagre.graphlib.json.write(this.state.graph), null, 2), function(err) {
+			  if (err) throw errs
+			});
+			fs.writeFile(message.folder + "/half-assed_joke.py", this.state.generatedCode, function(err) {
+			  if (err) throw errs
+			});
 
 			let saveNotification = new Notification('Sketch saved', {
             	body: `Sketch was successfully saved in the "sketches" folder.`,
@@ -42,6 +48,10 @@ class IDE extends React.Component{
 		ipc.on("toggleLayout", (e, m) => {
 			this.toggleLayout()
 		});
+
+		ipc.on("open", (e, m) => {
+			this.openFile(m.filePath)
+		})
 
 		let layout = window.localStorage.getItem("layout")
 		if (layout) {
@@ -57,6 +67,15 @@ class IDE extends React.Component{
 
 		this.updateNetworkDefinition = this.updateNetworkDefinition.bind(this);
 		this.delayedUpdateNetworkDefinition = this.delayedUpdateNetworkDefinition.bind(this);
+	}
+
+	openFile(filePath) {
+		console.log("openFile", filePath)
+		let fileContent = fs.readFileSync(filePath, "utf8")
+		this.editor.setValue(fileContent) // this has to be here, I don't know why
+		this.setState({
+			networkDefinition: fileContent
+		})
 	}
 
 	loadExample(id) {
@@ -84,7 +103,7 @@ class IDE extends React.Component{
 			this.moniel.walkAst(result.ast)
 			let graph = this.moniel.getComputationalGraph()
 			let definitions = this.moniel.getMetanodesDefinitions()
-			console.log(definitions)
+			//console.log(definitions)
 
 			this.setState({
 				networkDefinition: value,

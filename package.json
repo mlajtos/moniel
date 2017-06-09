@@ -4,9 +4,11 @@
   "version": "0.0.1",
   "main": "main.js",
   "scripts": {
-    "compile": "./node_modules/.bin/babel src/scripts --watch --out-file src/bundle.js --source-maps inline",
-    "start": "./node_modules/.bin/electron .",
-    "build": "./node_modules/.bin/electron-packager . --icon icons/mac/icon.icns --overwrite"
+    "build": "npm run build-js & npm run build-css",
+    "build-js": "./node_modules/.bin/babel src/scripts --watch --out-file src/bundle.js --source-maps inline",
+    "build-css": "./node_modules/.bin/node-sass -w --source-map true src/styles/main.sass src/bundle.css",
+    "build-dist": "./node_modules/.bin/electron-packager . --icon icons/mac/icon.icns --overwrite",
+    "start": "./node_modules/.bin/electron ."
   },
   "repository": {
     "type": "git",
@@ -24,7 +26,8 @@
     "lodash": "^4.17.4",
     "ohm-js": "^0.12.3",
     "react": "^15.4.1",
-    "react-dom": "^15.4.2"
+    "react-dom": "^15.4.2",
+    "string-pixel-width": "^1.0.7"
   },
   "devDependencies": {
     "babel-cli": "^6.0.0",
@@ -35,6 +38,7 @@
     "babel-preset-react": "^6.11.1",
     "electron": "^1.4.10",
     "electron-packager": "^8.3.0",
-    "electron-reload": "^1.0.3"
+    "electron-reload": "^1.0.3",
+    "node-sass": "^4.5.3"
   }
 }

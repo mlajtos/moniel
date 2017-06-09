@@ -1,3 +1,5 @@
+const pixelWidth = require('string-pixel-width')
+
 // rename this to something suitable
 class Moniel{
 	// maybe singleton?
@@ -137,10 +139,12 @@ class Moniel{
 			return;
 		}
 
+		const width = 20 + Math.max(...[node.class, node.userGeneratedId ? node.userGeneratedId : ""].map(string => pixelWidth(string, {size: 16})))
+
 		this.graph.createNode(node.id, {
 			...node,
-            style: {"fill": node.color},
-            width: Math.max(Math.max(node.class.length, node.userGeneratedId ? node.userGeneratedId.length : 0), 5) * 12
+            style: {fill: node.color},
+			width
         });
 	}
 
