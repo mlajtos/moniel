@@ -2,6 +2,7 @@
   "name": "moniel",
   "productName": "Moniel",
   "version": "0.0.1",
+  "license": "MIT",
   "main": "main.js",
   "scripts": {
     "build": "npm run build-js & npm run build-css",
