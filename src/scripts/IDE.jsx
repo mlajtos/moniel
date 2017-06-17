@@ -135,6 +135,9 @@ class IDE extends React.Component{
 		this.setState({
 			layout: (this.state.layout === "columns") ? "rows" : "columns"
 		})
+		setTimeout(() => {
+			window.dispatchEvent(new Event("resize"))
+		}, 100)
 	}
 
 	render() {
