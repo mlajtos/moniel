@@ -1,4 +1,4 @@
-/conv1{
+conv1:{
     in:Input(shape=28x28)
     
     filters:Tensor(shape=10x3x3)
@@ -8,7 +8,7 @@
     [conv, biases] -> BiasAdd -> ReLU -> out:Output
 }
 
-/conv2{
+conv2:{
     in:Input(shape=28x28)
     
     filters:Tensor(shape=10x3x3)
