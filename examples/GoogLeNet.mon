@@ -1,22 +1,16 @@
 +GoogLeNet{
     +Stem{ In -> Conv -> MP -> LRN -> Conv -> Conv -> LRN -> Out }
-    
+    +Classifier{ In -> Dense -> Softmax -> Out }
+    +AuxiliaryClassifier{ In -> AveragePool -> Conv -> Dense -> Dense -> Softmax -> Out }
     +InceptionModule{
         In -> [c11:Conv, c12:Conv, mp1:MP, c21:Conv]
-        [c21:Conv, c22:Conv, c23:Conv, c24:Conv] -> concat:Concat  -> Out
-        // ["c2*"] -> concat //
-        
         c11 -> c22
         c12 -> c23
         mp1 -> c24
+        [c21, c22:Conv, c23:Conv, c24:Conv] -> Concat -> Out
     }
     
-    +AuxiliaryClassifier{
-        In -> AveragePool -> Conv -> Dense -> Dense -> Softmax -> Out
-    }
-    
-    In -> Stem -> MP -> IM -> IM -> MP -> im3:IM -> IM -> IM -> IM -> im7:IM -> MP -> IM -> IM -> MP -> Dense -> Softmax -> Out
-    
+    In -> Stem -> MP -> IM -> IM -> MP -> im3:IM -> IM -> IM -> IM -> im7:IM -> MP -> IM -> IM -> MP -> Classifier -> Out
     im3 -> AC -> Out
     im7 -> AC -> Out
 }
