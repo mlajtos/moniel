@@ -51,9 +51,11 @@ class Moniel{
 	handleBlockDefinition(blockDefinition) {
 		// console.info(`Adding "${blockDefinition.name}" to available definitions.`);
 		this.addDefinition(blockDefinition.name);
-		this.graph.enterMetanodeScope(blockDefinition.name);
-		this.walkAst(blockDefinition.body);
-		this.graph.exitMetanodeScope();
+		if (blockDefinition.body.definitions.length > 0) {
+			this.graph.enterMetanodeScope(blockDefinition.name);
+			this.walkAst(blockDefinition.body);
+			this.graph.exitMetanodeScope();
+		}
 	}
 
 	handleBlockDefinitionBody(definitionBody) {
