@@ -129,6 +129,7 @@ RL(s = 784x1000) -> RL(s = 1000x10)
 ----------
 
 ## Similar projects and Inspiration
+– [Subgraphs](https://subgraphs.com/) – "Subgraphs is a visual IDE for developing computational graphs."
 - [Machine](https://www.youtube.com/watch?v=N9q9qacAKoM) – "Machine is a machine learning IDE."
 - [PyTorch](http://pytorch.org) – "Tensors and Dynamic neural networks in Python with strong GPU acceleration."
 - [Sonnet](https://github.com/deepmind/sonnet) – "Sonnet is a library built on top of TensorFlow for building complex neural networks."
