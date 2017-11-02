@@ -29,7 +29,7 @@ Moniel{
         = ("{" Definition* "}")?
 
     InlineBlockDefinition
-        = blockName ":" InlineBlockDefinitionBody
+        = BlockName InlineBlockDefinitionBody
     InlineBlockDefinitionBody
         = ("{" Definition* "}")
 

@@ -19,10 +19,10 @@ class Parser{
 				body: body.eval()
 			}
 		},
-		InlineBlockDefinition: function(name, _, body) {
+		InlineBlockDefinition: function(name, body) {
 			return {
 				type: "InlineBlockDefinition",
-				name: name.eval(),
+				name: name.eval()[0],
 				body: body.eval(),
 				_source: this.source
 			}

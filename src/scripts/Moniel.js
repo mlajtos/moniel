@@ -1,3 +1,8 @@
+/*
+	This code is inconsistent mess.
+	Metanodes, scopes, blocks, definitions, instances, networks, graphs, classes, identifiers. FUCK
+*/
+
 const pixelWidth = require('string-pixel-width')
 
 // rename this to something suitable
@@ -37,12 +42,14 @@ class Moniel{
 	}
 
 	handleInlineBlockDefinition(scope) {
-		this.graph.enterMetanodeScope(scope.name.value)
+		const identifier = scope.name ? scope.name.value : this.graph.generateInstanceId("metanode")
+
+		this.graph.enterMetanodeScope(identifier)
 		this.walkAst(scope.body);
 		this.graph.exitMetanodeScope();
-		this.graph.createMetanode(scope.name.value, scope.name.value, {
-			userGeneratedId: scope.name.value,
-			id: scope.name.value,
+		this.graph.createMetanode(identifier, identifier, {
+			userGeneratedId: scope.name ? scope.name.value : undefined,
+			id: identifier,
 			class: "",
 			_source: scope._source
 		});
