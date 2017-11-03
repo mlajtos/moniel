@@ -90,7 +90,7 @@ class VisualGraph extends React.Component{
         }
 
         return (
-            <svg id="visualization" xmlns="http://www.w3.org/2000/svg" version="1.1">
+            <svg id="visualization" xmlns="http://www.w3.org/2000/svg" version="1.1" height={g.graph().height} width={g.graph().width}>
                 <style>
                     {
                         fs.readFileSync("src/bundle.css", "utf-8", (err) => {console.log(err)})
