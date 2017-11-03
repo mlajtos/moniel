@@ -1,12 +1,10 @@
 /*
-	This code is inconsistent mess.
-	Metanodes, scopes, blocks, definitions, instances, networks, graphs, classes, identifiers. FUCK
+	This code is a mess.
 */
 
 const pixelWidth = require('string-pixel-width')
 
-// rename this to something suitable
-class Moniel{
+class Interpreter {
 	// maybe singleton?
 	logger = new Logger()
 	graph = new ComputationalGraph(this)
@@ -41,43 +39,47 @@ class Moniel{
 		};
 	}
 
-	handleInlineBlockDefinition(scope) {
-		const identifier = scope.name ? scope.name.value : this.graph.generateInstanceId("metanode")
+	execute(ast) {
+		this.initialize()
+		this.walkAst(ast)
+	}
+
+	handleInlineMetanode(node) {
+		const identifier = node.name ? node.name.value : this.graph.generateInstanceId("metanode")
 
 		this.graph.enterMetanodeScope(identifier)
-		this.walkAst(scope.body);
+		this.walkAst(node.body);
 		this.graph.exitMetanodeScope();
 		this.graph.createMetanode(identifier, identifier, {
-			userGeneratedId: scope.name ? scope.name.value : undefined,
+			userGeneratedId: node.name ? node.name.value : undefined,
 			id: identifier,
 			class: "",
-			_source: scope._source
+			_source: node._source
 		});
 	}
 
-	handleBlockDefinition(blockDefinition) {
-		// console.info(`Adding "${blockDefinition.name}" to available definitions.`);
-		this.addDefinition(blockDefinition.name);
-		if (blockDefinition.body.definitions.length > 0) {
-			this.graph.enterMetanodeScope(blockDefinition.name);
-			this.walkAst(blockDefinition.body);
+	handleNodeDefinition(nodeDefinition) {
+		// console.info(`Adding "${nodeDefinition.name}" to available definitions.`);
+		this.addDefinition(nodeDefinition.name);
+		if (nodeDefinition.body) {
+			this.graph.enterMetanodeScope(nodeDefinition.name);
+			this.walkAst(nodeDefinition.body);
 			this.graph.exitMetanodeScope();
 		}
 	}
 
-	handleBlockDefinitionBody(definitionBody) {
-		definitionBody.definitions.forEach(definition => this.walkAst(definition));
+	handleMetaNode(metanode) {
+		metanode.definitions.forEach(definition => this.walkAst(definition));
 	}
 
-	handleNetworkDefinition(network) {
-		this.initialize();
-		network.definitions.forEach(definition => this.walkAst(definition));
+	handleGraphDefinition(graph) {
+		graph.definitions.forEach(definition => this.walkAst(definition));
 	}
 
-	handleConnectionDefinition(connection) {
+	handleChainDefinition(chain) {
 		this.graph.clearNodeStack();
 		// console.log(connection.list)
-		connection.list.forEach(item => {
+		chain.blocks.forEach(item => {
 			this.graph.freezeNodeStack();
 			// console.log(item)
 			this.walkAst(item);
@@ -85,7 +87,7 @@ class Moniel{
 	}
 
 	// this is doing too much – break into "not recognized", "success" and "ambiguous"
-	handleBlockInstance(instance) {
+	handleNode(instance) {
 		var node = {
 			id: undefined,
 			class: "Unknown",
@@ -157,7 +159,7 @@ class Moniel{
         });
 	}
 
-	handleBlockList(list) {
+	handleList(list) {
 		list.list.forEach(item => this.walkAst(item));
 	}
 
@@ -167,7 +169,7 @@ class Moniel{
 
 	matchInstanceNameToDefinitions(query) {
 		var definitions = Object.keys(this.definitions);
-		let definitionKeys = Moniel.nameResolution(query, definitions);
+		let definitionKeys = Interpreter.nameResolution(query, definitions);
 		//console.log("Found keys", definitionKeys);
 		let matchedDefinitions = definitionKeys.map(key => this.definitions[key]);
 		return matchedDefinitions;
@@ -193,7 +195,7 @@ class Moniel{
 		let splitRegex = /(?=[0-9A-Z])/;
 	    let partialArray = partial.split(splitRegex);
 	    let listArray = list.map(definition => definition.split(splitRegex));
-	    var result = listArray.filter(possibleMatch => Moniel.isMultiPrefix(partialArray, possibleMatch));
+	    var result = listArray.filter(possibleMatch => Interpreter.isMultiPrefix(partialArray, possibleMatch));
 	    result = result.map(item => item.join(""));
 	    return result;
 	}
@@ -212,14 +214,14 @@ class Moniel{
 	walkAst(node) {
 		if (!node) { console.error("No node?!"); return; }
 
-		switch (node.type) {
-			case "Network": this.handleNetworkDefinition(node); break;
-			case "BlockDefinition": this.handleBlockDefinition(node); break;
-			case "BlockDefinitionBody": this.handleBlockDefinitionBody(node); break;
-			case "InlineBlockDefinition": this.handleInlineBlockDefinition(node); break;
-			case "ConnectionDefinition": this.handleConnectionDefinition(node); break;
-			case "BlockInstance": this.handleBlockInstance(node); break;
-			case "BlockList": this.handleBlockList(node); break;
+		switch (node.kind) {
+			case "Graph": this.handleGraphDefinition(node); break;
+			case "NodeDefinition": this.handleNodeDefinition(node); break;
+			case "MetaNode": this.handleMetaNode(node); break;
+			case "InlineMetanode": this.handleInlineMetanode(node); break;
+			case "Chain": this.handleChainDefinition(node); break;
+			case "Node": this.handleNode(node); break;
+			case "List": this.handleList(node); break;
 			case "Identifier": this.handleIdentifier(node); break;
 			default: this.handleUnrecognizedNode(node);
 		}

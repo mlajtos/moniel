@@ -3,7 +3,7 @@ const fs = require("fs")
 
 class IDE extends React.Component{
 	parser = new Parser()
-	moniel = new Moniel()
+	interpreter = new Interpreter()
 	generator = new PyTorchGenerator()
 
 	lock = null
@@ -58,7 +58,7 @@ class IDE extends React.Component{
 			if (layout == "columns" || layout == "rows") {
 				this.state.layout = layout
 			} else {
-				this.moniel.logger.addIssue({
+				this.interpreter.logger.addIssue({
 					type: "warning",
 					message: `Value for "layout" can be only "columns" or "rows".`
 				});
@@ -100,9 +100,9 @@ class IDE extends React.Component{
 		var result = this.parser.make(value)
 
 		if (result.ast) {
-			this.moniel.walkAst(result.ast)
-			let graph = this.moniel.getComputationalGraph()
-			let definitions = this.moniel.getMetanodesDefinitions()
+			this.interpreter.execute(result.ast)
+			let graph = this.interpreter.getComputationalGraph()
+			let definitions = this.interpreter.getMetanodesDefinitions()
 			//console.log(definitions)
 
 			this.setState({
@@ -110,7 +110,7 @@ class IDE extends React.Component{
 				ast: result.ast,
 				graph: graph,
 				generatedCode: this.generator.generateCode(graph, definitions),
-				issues: this.moniel.getIssues()
+				issues: this.interpreter.getIssues()
 			});
 		} else {
 			// console.error(result);

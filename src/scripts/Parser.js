@@ -6,43 +6,41 @@ class Parser{
 	grammar = null
 	
 	evalOperation = {
-		Network: function(definitions) {
+		Graph: (definitions) =>  ({
+			kind: "Graph",
+			definitions: definitions.eval()
+		}),
+		NodeDefinition: function(_, layerName, params, body) {
 			return {
-				type: "Network",
-				definitions: definitions.eval()
-			}
-		},
-		BlockDefinition: function(_, layerName, params, body) {
-			return {
-				type: "BlockDefinition",
+				kind: "NodeDefinition",
 				name: layerName.source.contents,
-				body: body.eval()
+				body: body.eval()[0]
 			}
 		},
-		InlineBlockDefinition: function(name, body) {
+		InlineMetanode: function(name, body) {
 			return {
-				type: "InlineBlockDefinition",
+				kind: "InlineMetanode",
 				name: name.eval()[0],
 				body: body.eval(),
 				_source: this.source
 			}
 		},
-		InlineBlockDefinitionBody: function(_, list, __) {
-			var definitions = list.eval()
+		Metanode: function(_, defs, __) {
+			var definitions = defs.eval()
 			return {
-				type: "BlockDefinitionBody",
-				definitions: definitions ? definitions : []
+				kind: "MetaNode",
+				definitions: definitions.definitions
 			}
 		},
-		ConnectionDefinition: function(list) {
+		Chain: function(list) {
 			return {
-				type: "ConnectionDefinition",
-				list: list.eval()
+				kind: "Chain",
+				blocks: list.eval()
 			}
 		},
-		BlockInstance: function(id, layerName, params) {
+		Node: function(id, layerName, params) {
 			return {
-				type: "BlockInstance",
+				kind: "Node",
 				name: layerName.eval(),
 				alias: id.eval()[0],
 				parameters: params.eval(),
@@ -52,40 +50,27 @@ class Parser{
 		BlockName: function(id, _) {
 			return id.eval()
 		},
-		BlockList: function(_, list, __) {
+		List: function(_, list, __) {
 			return {
-				"type": "BlockList",
-				"list": list.eval()
+				kind: "List",
+				list: list.eval()
 			}
 		},
-		BlockDefinitionParameters: function(_, list, __) {
-			return list.eval()
-		},
-		BlockDefinitionBody: function(_, list, __) {
-			var definitions = list.eval()[0] 
-			return {
-				type: "BlockDefinitionBody",
-				definitions: definitions ? definitions : []
-			}
-		},
-		BlockInstanceParameters: function(_, list, __) {
+		BlockParameters: function(_, list, __) {
 			return list.eval()
 		},
 		Parameter: function(name, _, value) {
 			return {
-				type: "Parameter",
+				kind: "Parameter",
 				name: name.eval(),
 				value: value.eval()
 			}
 		},
 		Value: function(val) {
 			return {
-				type: "Value",
+				kind: "Value",
 				value: val.source.contents
 			}
-		},
-		ValueList: function(_, list, __) {
-			return list.eval()
 		},
 		NonemptyListOf: function(x, _, xs) {
 			return [x.eval()].concat(xs.eval())
@@ -93,9 +78,9 @@ class Parser{
 		EmptyListOf: function() {
 			return []
 		},
-		blockIdentifier: function(_, __, ___) {
+		path: function(list) {
 			return {
-				type: "Identifier",
+				kind: "Identifier",
 				value: this.source.contents,
 				_source: this.source
 			}
@@ -103,16 +88,16 @@ class Parser{
 		parameterName: function(a) {
 			return a.source.contents
 		},
-		blockType: function(_, __) {
+		nodeType: function(_, __) {
 			return {
-				type: "BlockType",
+				kind: "NodeType",
 				value: this.source.contents,
 				_source: this.source
 			}
 		},
-		blockName: function(_, __) {
+		identifier: function(_, __) {
 			return {
-				type: "Identifier",
+				kind: "Identifier",
 				value: this.source.contents,
 				_source: this.source
 			}

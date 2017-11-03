@@ -1,54 +1,49 @@
 Moniel{
-    Network
+    Graph
         = Definition*
     Definition
-        = (BlockDefinition | ConnectionDefinition)
+        = (NodeDefinition | Chain)
 
-    ConnectionDefinition
-        = NonemptyListOf<(BlockList | Block), connectionSymbol>
+    Chain
+        = NonemptyListOf<(List | Block), edge>
 
-    BlockList (block list)
-        = "[" ListOf<Block, ","> "]"
+    List
+        = "[" ListOf<ListItem, ","> "]"
+    ListItem
+        = Block
 
     Block
-        = BlockInstance | InlineBlockDefinition | blockIdentifier
+        = Node | InlineMetanode | path
 
-    BlockInstance (block)
-        = BlockName blockType BlockInstanceParameters
-    BlockInstanceParameters
-        = ("(" Parameters ")")?
+    Node
+        = BlockName nodeType BlockParameters
 
     BlockName
-        = (blockName ":")?
+        = (identifier ":")?
 
-    BlockDefinition
-        = "+" blockType BlockDefinitionParameters BlockDefinitionBody
-    BlockDefinitionParameters
+    InlineMetanode
+        = BlockName Metanode
+    NodeDefinition
+        = "+" nodeType BlockParameters Metanode?
+    BlockParameters
         = ("(" Parameters ")")?
-    BlockDefinitionBody
-        = ("{" Definition* "}")?
+    Metanode
+        = ("{" Graph "}")
 
-    InlineBlockDefinition
-        = BlockName InlineBlockDefinitionBody
-    InlineBlockDefinitionBody
-        = ("{" Definition* "}")
 
     Parameters
         = ListOf<Parameter, ",">
     Parameter (parameter)
-        =  parameterName "=" (ValueList | Value)
-
-    ValueList
-        = "<" ListOf<Value, ";"> ">"
+        =  parameterName "=" Value
     Value
-        = parameterName | blockType | float | Shape | integer
+        = parameterName | nodeType | float | Shape | integer
 
-    blockType (block name)
-        = upper (alnum | "_")*
-    blockName
-        = lower (alnum | "_")*
-    blockIdentifier (identifier)
-        = "./"? lower (alnum | "_" | "/")*
+    nodeType
+        =  &upper (alnum | "_")+
+    identifier
+        =  &lower (alnum | "_")+
+    path (path)
+        = nonemptyListOf<identifier, "/">
     parameterName
         = letter+
     integer
@@ -57,11 +52,10 @@ Moniel{
         = digit* "." digit+
     Shape
         = ListOf<integer, "x">
-    connectionSymbol (->)
+    edge (->)
         = "->"
     space
         += comment
-
     comment
         = "//" (~"\n" any)* "\n"?   -- singleLine
         | "/*" (~"*/" any)* "*/"    -- multiLine
