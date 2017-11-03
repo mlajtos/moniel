@@ -44,7 +44,7 @@ class Interpreter {
 		this.walkAst(ast)
 	}
 
-	handleInlineMetanode(node) {
+	_InlineMetanode(node) {
 		const identifier = node.name ? node.name.value : this.graph.generateInstanceId("metanode")
 
 		this.graph.enterMetanodeScope(identifier)
@@ -58,7 +58,7 @@ class Interpreter {
 		});
 	}
 
-	handleNodeDefinition(nodeDefinition) {
+	_NodeDefinition(nodeDefinition) {
 		// console.info(`Adding "${nodeDefinition.name}" to available definitions.`);
 		this.addDefinition(nodeDefinition.name);
 		if (nodeDefinition.body) {
@@ -68,15 +68,17 @@ class Interpreter {
 		}
 	}
 
-	handleMetaNode(metanode) {
+	_MetaNode(metanode) {
+		console.log(metanode)
 		metanode.definitions.forEach(definition => this.walkAst(definition));
 	}
 
-	handleGraphDefinition(graph) {
+	_Graph(graph) {
+		console.log(graph)
 		graph.definitions.forEach(definition => this.walkAst(definition));
 	}
 
-	handleChainDefinition(chain) {
+	_Chain(chain) {
 		this.graph.clearNodeStack();
 		// console.log(connection.list)
 		chain.blocks.forEach(item => {
@@ -87,7 +89,7 @@ class Interpreter {
 	}
 
 	// this is doing too much – break into "not recognized", "success" and "ambiguous"
-	handleNode(instance) {
+	_Node(instance) {
 		var node = {
 			id: undefined,
 			class: "Unknown",
@@ -159,11 +161,11 @@ class Interpreter {
         });
 	}
 
-	handleList(list) {
+	_List(list) {
 		list.list.forEach(item => this.walkAst(item));
 	}
 
-	handleIdentifier(identifier) {
+	_Identifier(identifier) {
 		this.graph.referenceNode(identifier.value);
 	}
 
@@ -207,23 +209,15 @@ class Interpreter {
 	    return (i === name.length); // got to the end?
 	}
 
-	handleUnrecognizedNode(node) {
-		console.warn("What to do with this AST node?", node);
+	_unrecognized(token) {
+		console.warn("What to do with this AST token?", node);
 	}
 
-	walkAst(node) {
-		if (!node) { console.error("No node?!"); return; }
+	walkAst(token) {
+		if (!token) { console.error("No token?!"); return; }
 
-		switch (node.kind) {
-			case "Graph": this.handleGraphDefinition(node); break;
-			case "NodeDefinition": this.handleNodeDefinition(node); break;
-			case "MetaNode": this.handleMetaNode(node); break;
-			case "InlineMetanode": this.handleInlineMetanode(node); break;
-			case "Chain": this.handleChainDefinition(node); break;
-			case "Node": this.handleNode(node); break;
-			case "List": this.handleList(node); break;
-			case "Identifier": this.handleIdentifier(node); break;
-			default: this.handleUnrecognizedNode(node);
-		}
+		const fnName = "_" + token.kind
+        const fn = this[fnName] || this._unrecognized
+        return fn.call(this, token)
 	}
 }
