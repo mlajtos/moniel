@@ -8,7 +8,7 @@ body
     flex-direction: column
     align-content: stretch
     flex-wrap: wrap
-    font: 300 16px 'Helvetica Neue', Helvetica
+    font: normal 16px 'Helvetica Neue', Helvetica
 
 div.container
     position: absolute
@@ -87,8 +87,12 @@ svg#visualization
     flex: 1
     opacity: 1
     transition: opacity 250ms ease-in-out
-    font: 300 16px 'Helvetica Neue', Helvetica
+    font: normal 16px 'Helvetica Neue', Helvetica
     background-color: #272822
+    text-rendering: geometricPrecision
+    margin: 0 auto
+    // simple print filter
+    // filter: saturate(0%) invert(100%) brightness(130%)
 
     &.faded
         opacity: 0.1
