@@ -5,12 +5,8 @@
     filters:Tensor
     biases:Tensor
     
-    /inner{
-        In -> Add -> Out
-    }
-    
     [filters,in] -> conv:Convolution
-    [conv, biases] -> BiasAdd -> inner -> ReLU -> out:Output
+    [conv, biases] -> BiasAdd -> {In -> Add -> Out} -> ReLU -> out:Output
 }
 
 +ConvolutionalLayer3{
