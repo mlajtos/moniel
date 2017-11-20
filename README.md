@@ -5,6 +5,11 @@ Human-friendly declarative dataflow notation for computational graphs. See [vide
 
 ----------
 
+[![Moniel Logo](icons/png/128x128.png)](release-builds/Moniel.dmg)
+Moniel.dmg (77MB)
+
+----------
+
 ## Setup
 ```
 $ git clone https://github.com/mlajtos/moniel.git
