@@ -7,6 +7,7 @@ class VisualGraph extends React.Component{
             previousViewBox: null
         };
         this.animate = null
+        this.previousViewBox = "0 0 0 0"
     }
 
     saveGraph(graph) {
@@ -47,33 +48,38 @@ class VisualGraph extends React.Component{
             return null
         }
 
-        let g = this.state.graph;
+        const g = this.state.graph;
 
-        let nodes = g.nodes().map(nodeName => {
-            let graph = this;
-            let n = g.node(nodeName);
-            let node = null;
-            let props = {
+        const nodes = g.nodes().map(nodeName => {
+            const graph = this;
+            const n = g.node(nodeName);
+            const props = {
                 key: nodeName,
                 node: n,
                 onClick: graph.handleClick.bind(graph)
             }
 
+            let Type = null
+
             if (n.isMetanode === true) {
-                node = <Metanode {...props} />;
+                if (n.isAnonymous) {
+                    Type = AnonymousMetanode
+                } else {
+                    Type = Metanode
+                }
             } else {
                 if (n.userGeneratedId) {
-                    node = <IdentifiedNode {...props} />;
+                    Type = IdentifiedNode
                 } else {
-                    node = <AnonymousNode {...props} />
+                    Type = AnonymousNode
                 }
             }
 
-            return node;
+            return <Type {...props} />
         });
 
-        let edges = g.edges().map(edgeName => {
-            let e = g.edge(edgeName);
+        const edges = g.edges().map(edgeName => {
+            const e = g.edge(edgeName);
             return <Edge key={`${edgeName.v}->${edgeName.w}`} edge={e}/>
         });
 
@@ -89,6 +95,8 @@ class VisualGraph extends React.Component{
             viewBox = viewBox_whole
         }
 
+        setTimeout(() => { this.previousViewBox = viewBox }, 300)
+
         return (
             <svg id="visualization" xmlns="http://www.w3.org/2000/svg" version="1.1" height={g.graph().height} width={g.graph().width}>
                 <style>
@@ -96,7 +104,9 @@ class VisualGraph extends React.Component{
                         fs.readFileSync("src/bundle.css", "utf-8", (err) => {console.log(err)})
                     }
                 </style>
-                <animate ref={this.mount.bind(this)} attributeName="viewBox" from={viewBox_whole} to={viewBox} begin="0s" dur="0.25s" fill="freeze" repeatCount="1"></animate>
+                <animate ref={this.mount.bind(this)} attributeName="viewBox" from={this.previousViewBox} to={viewBox} begin="0s" dur="0.25s" fill="freeze" repeatCount="1"
+                    calcMode="paced"
+                ></animate>
                 <defs>
                     <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerUnits="strokeWidth" markerWidth="10" markerHeight="7.5" orient="auto">
                         <path d="M 0 0 L 10 5 L 0 10 L 3 5 z" className="arrow"></path>
@@ -187,10 +197,20 @@ class Metanode extends Node{
     }
 }
 
-class AnonymousNode extends Node{
-    constructor(props) {
-        super(props);
+class AnonymousMetanode extends Node {
+    render() {
+        let n = this.props.node;
+        return (
+            <Node {...this.props}>
+                <text transform={`translate(10,0)`} textAnchor="start" style={{dominantBaseline: "ideographic"}}>
+                    <tspan x="0" className="id">{n.userGeneratedId}</tspan>
+                </text>
+            </Node>
+        );
     }
+}
+
+class AnonymousNode extends Node{
     render() {
         let n = this.props.node;
         return (

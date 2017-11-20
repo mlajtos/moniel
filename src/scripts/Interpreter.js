@@ -24,6 +24,7 @@ class Interpreter {
 
 		this.definitions = [];
 		this.addDefaultDefinitions();
+		this.depth = 0
 	}
 
 	addDefaultDefinitions() {
@@ -40,56 +41,100 @@ class Interpreter {
 	}
 
 	execute(ast) {
+		const state = {
+			graph: new ComputationalGraph(this),
+			logger: new Logger()
+		}
 		this.initialize()
-		this.walkAst(ast)
+		this.walkAst(ast, state)
+		console.log("Final State:", state)
 	}
 
-	_InlineMetanode(node) {
-		const identifier = node.name ? node.name.value : this.graph.generateInstanceId("metanode")
+	walkAst(token, state) {
+		if (!token) { console.error("No token?!"); return; }
+		this.depth += 1
+		const pad = Array.from({length: this.depth}).fill(" ").reduce((p, c) => p + c, "")
+		//console.log(pad + token.kind)
 
-		this.graph.enterMetanodeScope(identifier)
-		this.walkAst(node.body);
-		this.graph.exitMetanodeScope();
-		this.graph.createMetanode(identifier, identifier, {
-			userGeneratedId: node.name ? node.name.value : undefined,
-			id: identifier,
-			class: "",
-			_source: node._source
-		});
+		const fnName = "_" + token.kind
+		const fn = this[fnName] || this._unrecognized
+		const returnValue = fn.call(this, token, state)
+		this.depth -= 1
+
+		return returnValue
 	}
 
-	_NodeDefinition(nodeDefinition) {
+	_Graph(graph, state) {
+		graph.definitions.forEach(definition => this.walkAst(definition, state));
+	}
+
+	_NodeDefinition(nodeDefinition, state) {
 		// console.info(`Adding "${nodeDefinition.name}" to available definitions.`);
 		this.addDefinition(nodeDefinition.name);
 		if (nodeDefinition.body) {
-			this.graph.enterMetanodeScope(nodeDefinition.name);
-			this.walkAst(nodeDefinition.body);
-			this.graph.exitMetanodeScope();
+			state.graph.enterMetanodeScope(nodeDefinition.name)
+			this.graph.enterMetanodeScope(nodeDefinition.name)
+			this.walkAst(nodeDefinition.body, state)
+			state.graph.exitMetanodeScope()
+			this.graph.exitMetanodeScope()
+		}
+	}
+	
+	_Chain(chain, state) {
+		state.graph.clearNodeStack()
+		this.graph.clearNodeStack()
+		// console.log(connection.list)
+		chain.blocks.forEach(item => {
+			state.graph.freezeNodeStack()
+			this.graph.freezeNodeStack()
+			// console.log(item)
+			this.walkAst(item, state)
+		})
+	}
+
+	_InlineMetaNode(node, state) {
+		//console.log(node)
+		const identifier = node.alias ? node.alias.value : this.graph.generateInstanceId("metanode")
+
+		state.graph.enterMetanodeScope(identifier)
+		this.graph.enterMetanodeScope(identifier)
+		this.walkAst(node.body, state)
+		state.graph.exitMetanodeScope()
+		this.graph.exitMetanodeScope()
+
+		this.graph.createMetanode(identifier, {
+			userGeneratedId: node.alias ? node.alias.value : undefined,
+			id: identifier,
+			class: identifier,
+			isAnonymous: true,
+			_source: node._source
+		})
+
+		return {
+			id: identifier,
+			class: identifier,
+			userGeneratedId: node.alias ? node.alias.value : undefined,
+			_source: node._source
 		}
 	}
 
-	_MetaNode(metanode) {
-		console.log(metanode)
-		metanode.definitions.forEach(definition => this.walkAst(definition));
+	_MetaNode(metanode, state) {
+		// console.log(metanode)
+		metanode.definitions.forEach(definition => this.walkAst(definition, state))
 	}
 
-	_Graph(graph) {
-		console.log(graph)
-		graph.definitions.forEach(definition => this.walkAst(definition));
-	}
 
-	_Chain(chain) {
-		this.graph.clearNodeStack();
-		// console.log(connection.list)
-		chain.blocks.forEach(item => {
-			this.graph.freezeNodeStack();
-			// console.log(item)
-			this.walkAst(item);
-		});
+	_Node(node, state) {
+		const nodeDefinition = this.walkAst({
+			...node.node,
+			alias: node.alias
+		}, state)
+
+		// console.log(nodeDefinition)
 	}
 
 	// this is doing too much – break into "not recognized", "success" and "ambiguous"
-	_Node(instance) {
+	_LiteralNode(instance, state) {
 		var node = {
 			id: undefined,
 			class: "Unknown",
@@ -100,37 +145,37 @@ class Interpreter {
 			_source: instance,
 		};
 
-		let definitions = this.matchInstanceNameToDefinitions(instance.name.value)
+		let definitions = this.matchInstanceNameToDefinitions(instance.type.value)
 		// console.log(`Matched definitions:`, definitions);
 
 		if (definitions.length === 0) {
-            node.class = instance.name.value;
-            node.isUndefined = true
+			node.class = instance.type.value;
+			node.isUndefined = true
 
-            this.addIssue({
-            	message: `Unrecognized node type "${instance.name.value}". No possible matches found.`,
-            	position: {
-					start:  instance.name._source.startIdx,
-					end:  instance.name._source.endIdx
-				},
-            	type: "error"
-            });
-        } else if (definitions.length === 1) {
-			let definition = definitions[0];
-			if (definition) {
-				node.color = definition.color;
-				node.class = definition.name;
-			}
-		} else {
-			node.class = instance.name.value;
 			this.addIssue({
-				message: `Unrecognized node type "${instance.name.value}". Possible matches: ${definitions.map(def => `"${def.name}"`).join(", ")}.`,
+				message: `Unrecognized node type "${instance.type.value}". No possible matches found.`,
 				position: {
-					start:  instance.name._source.startIdx,
-					end:  instance.name._source.endIdx
+					start:  instance.type._source.startIdx,
+					end:  instance.type._source.endIdx
 				},
 				type: "error"
-			});
+			})
+		} else if (definitions.length === 1) {
+			let definition = definitions[0]
+			if (definition) {
+				node.color = definition.color
+				node.class = definition.name
+			}
+		} else {
+			node.class = instance.type.value
+			this.addIssue({
+				message: `Unrecognized node type "${instance.type.value}". Possible matches: ${definitions.map(def => `"${def.name}"`).join(", ")}.`,
+				position: {
+					start:  instance.type._source.startIdx,
+					end:  instance.type._source.endIdx
+				},
+				type: "error"
+			})
 		}
 
 		if (!instance.alias) {
@@ -143,42 +188,51 @@ class Interpreter {
 
 		// is metanode
 		if (Object.keys(this.graph.metanodes).includes(node.class)) {
-			var color = d3.color(node.color);
-			color.opacity = 0.1;
-			this.graph.createMetanode(node.id, node.class, {
+			let color = d3.color(node.color)
+			color.opacity = 0.1
+			this.graph.createMetanode(node.id, {
 				...node,
 				style: {"fill": color.toString()}
-			});
-			return;
+			})
+			return {
+				...node,
+				style: { "fill": color.toString() }
+			}
 		}
 
 		const width = 20 + Math.max(...[node.class, node.userGeneratedId ? node.userGeneratedId : ""].map(string => pixelWidth(string, {size: 16})))
 
 		this.graph.createNode(node.id, {
 			...node,
-            style: {fill: node.color},
+			style: {fill: node.color},
 			width
-        });
+		})
+
+		return {
+			...node,
+			style: {fill: node.color},
+			width
+		}
 	}
 
-	_List(list) {
-		list.list.forEach(item => this.walkAst(item));
+	_List(list, state) {
+		list.list.forEach(item => this.walkAst(item, state))
 	}
 
 	_Identifier(identifier) {
-		this.graph.referenceNode(identifier.value);
+		this.graph.referenceNode(identifier.value)
 	}
 
 	matchInstanceNameToDefinitions(query) {
-		var definitions = Object.keys(this.definitions);
-		let definitionKeys = Interpreter.nameResolution(query, definitions);
-		//console.log("Found keys", definitionKeys);
-		let matchedDefinitions = definitionKeys.map(key => this.definitions[key]);
-		return matchedDefinitions;
+		var definitions = Object.keys(this.definitions)
+		let definitionKeys = Interpreter.nameResolution(query, definitions)
+		//console.log("Found keys", definitionKeys)
+		let matchedDefinitions = definitionKeys.map(key => this.definitions[key])
+		return matchedDefinitions
 	}
 
 	getComputationalGraph() {
-		return this.graph.getGraph();
+		return this.graph.getGraph()
 	}
 
 	getMetanodesDefinitions() {
@@ -186,38 +240,30 @@ class Interpreter {
 	}
 
 	getIssues() {
-		return this.logger.getIssues();
+		return this.logger.getIssues()
 	}
 
 	addIssue(issue) {
-		this.logger.addIssue(issue);
+		this.logger.addIssue(issue)
 	}
 
 	static nameResolution(partial, list) {
-		let splitRegex = /(?=[0-9A-Z])/;
-	    let partialArray = partial.split(splitRegex);
-	    let listArray = list.map(definition => definition.split(splitRegex));
-	    var result = listArray.filter(possibleMatch => Interpreter.isMultiPrefix(partialArray, possibleMatch));
-	    result = result.map(item => item.join(""));
-	    return result;
+		let splitRegex = /(?=[0-9A-Z])/
+	    let partialArray = partial.split(splitRegex)
+	    let listArray = list.map(definition => definition.split(splitRegex))
+	    var result = listArray.filter(possibleMatch => Interpreter.isMultiPrefix(partialArray, possibleMatch))
+	    result = result.map(item => item.join(""))
+	    return result
 	}
 
 	static isMultiPrefix(name, target) {
-	    if (name.length !== target.length) { return false; }
-	    var i = 0;
-	    while(i < name.length && target[i].startsWith(name[i])) { i += 1; }
-	    return (i === name.length); // got to the end?
+	    if (name.length !== target.length) { return false }
+	    let i = 0
+	    while(i < name.length && target[i].startsWith(name[i])) { i += 1 }
+	    return (i === name.length) // got to the end?
 	}
 
 	_unrecognized(token) {
-		console.warn("What to do with this AST token?", node);
-	}
-
-	walkAst(token) {
-		if (!token) { console.error("No token?!"); return; }
-
-		const fnName = "_" + token.kind
-        const fn = this[fnName] || this._unrecognized
-        return fn.call(this, token)
+		console.warn("What to do with this AST token?", token)
 	}
 }

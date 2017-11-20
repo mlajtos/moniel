@@ -17,15 +17,14 @@ class Parser{
 				body: body.eval()[0]
 			}
 		},
-		InlineMetanode: function(name, body) {
+		InlineMetaNode: function(body) {
 			return {
-				kind: "InlineMetanode",
-				name: name.eval()[0],
+				kind: "InlineMetaNode",
 				body: body.eval(),
 				_source: this.source
 			}
 		},
-		Metanode: function(_, defs, __) {
+		MetaNode: function(_, defs, __) {
 			var definitions = defs.eval()
 			return {
 				kind: "MetaNode",
@@ -38,18 +37,26 @@ class Parser{
 				blocks: list.eval()
 			}
 		},
-		Node: function(id, layerName, params) {
+		Node: function(id, _, node) {
 			return {
 				kind: "Node",
-				name: layerName.eval(),
+				node: node.eval(),
 				alias: id.eval()[0],
-				parameters: params.eval(),
 				_source: this.source
 			}
 		},
+		LiteralNode: function(type, params) {
+			return {
+				kind: "LiteralNode",
+				type: type.eval(),
+				parameters: params.eval()
+			}
+		},
+		/*
 		BlockName: function(id, _) {
 			return id.eval()
 		},
+		*/
 		List: function(_, list, __) {
 			return {
 				kind: "List",

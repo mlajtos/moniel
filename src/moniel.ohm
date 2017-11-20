@@ -1,33 +1,30 @@
 Moniel{
     Graph
-        = Definition*
-    Definition
-        = (NodeDefinition | Chain)
+        = (NodeDefinition | Chain)*
 
     Chain
-        = NonemptyListOf<(List | Block), edge>
+        = NonemptyListOf<(Block), edge>
+
+    Block
+        = List | Node | path
 
     List
         = "[" ListOf<ListItem, ","> "]"
     ListItem
-        = Block
-
-    Block
-        = Node | InlineMetanode | path
+        = Node | path
 
     Node
-        = BlockName nodeType BlockParameters
+        = (identifier ":")? (LiteralNode | InlineMetaNode)
+    LiteralNode
+        = nodeType BlockParameters
+    InlineMetaNode
+        = MetaNode
 
-    BlockName
-        = (identifier ":")?
-
-    InlineMetanode
-        = BlockName Metanode
     NodeDefinition
-        = "+" nodeType BlockParameters Metanode?
+        = "+" nodeType BlockParameters MetaNode?
     BlockParameters
         = ("(" Parameters ")")?
-    Metanode
+    MetaNode
         = ("{" Graph "}")
 
 

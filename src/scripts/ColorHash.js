@@ -5,6 +5,11 @@ class ColorHashWrapper{
         hash: this.magic
     })
 
+    colorHash = new ColorHash({
+        saturation: [0.5, 0.6, 0.7],
+        lightness: [0.45],
+    })
+
     loseLose(str) {
         var hash = 0;
         for (var i = 0; i < str.length; i++) {

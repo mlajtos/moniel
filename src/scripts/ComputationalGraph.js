@@ -136,9 +136,9 @@ class ComputationalGraph{
 	}
 
 	createNode(id, node) {
-		this.scopeStack.push(id);
-		let nodePath = this.scopeStack.currentScopeIdentifier();
-		let scope = this.scopeStack.previousScopeIdentifier();
+		this.scopeStack.push(id)
+		let nodePath = this.scopeStack.currentScopeIdentifier()
+		let scope = this.scopeStack.previousScopeIdentifier()
 
 		if (this.graph.hasNode(nodePath)) {
 			console.warn(`Redefining node "${id}"`);	
@@ -156,10 +156,11 @@ class ComputationalGraph{
 		return nodePath;
 	}
 
-	createMetanode(identifier, metanodeClass, node) {
-		this.scopeStack.push(identifier);
-		let nodePath = this.scopeStack.currentScopeIdentifier();
-		let scope = this.scopeStack.previousScopeIdentifier();
+	createMetanode(identifier, node) {
+		const metanodeClass = node.class
+		this.scopeStack.push(identifier)
+		let nodePath = this.scopeStack.currentScopeIdentifier()
+		let scope = this.scopeStack.previousScopeIdentifier()
 		
 		this.graph.setNode(nodePath, {
 			...node,
@@ -195,37 +196,44 @@ class ComputationalGraph{
 	}
 
 	clearNodeStack() {
-		this.previousNodeStack = [];
-		this.nodeStack = [];
+		this.previousNodeStack = []
+		this.nodeStack = []
 	}
 
 	freezeNodeStack() {
-		this.previousNodeStack = [...this.nodeStack];
-		this.nodeStack = [];
+		this.previousNodeStack = [...this.nodeStack]
+		this.nodeStack = []
 	}
 
 	setParent(childPath, parentPath) {
-		return this.graph.setParent(childPath, parentPath);
+		return this.graph.setParent(childPath, parentPath)
 	}
 
 	isInput(nodePath) {
-		return this.graph.node(nodePath).class === "Input";
+		const isAvailable = (this.graph.inEdges(nodePath).length === 0)
+		const isInput = (this.graph.node(nodePath).class === "Input")
+		const isUndefined = (this.graph.node(nodePath).class === "undefined")
+		return (isInput || (isUndefined && isAvailable))
 	}
 
 	isOutput(nodePath) {
-		return this.graph.node(nodePath).class === "Output";
+		const isAvailable = (this.graph.outEdges(nodePath).length === 0)
+		const isOutput = (this.graph.node(nodePath).class === "Output")
+		const isUndefined = (this.graph.node(nodePath).class === "undefined")
+		return (isOutput || (isUndefined && isAvailable))
 	}
 
 	isMetanode(nodePath) {
 		// console.log("isMetanode:", nodePath)
-		return this.graph.node(nodePath).isMetanode === true;
+		return this.graph.node(nodePath).isMetanode === true
 	}
 
 	getOutputNodes(scopePath) {
-		let scope = this.graph.node(scopePath);
-		let outputNodes = this.graph.children(scopePath).filter(node => { return this.isOutput(node) });
+		let scope = this.graph.node(scopePath)
+		let outputNodes = this.graph.children(scopePath).filter(node => this.isOutput(node))
 
 		if (outputNodes.length === 0) {
+			return null
 			this.moniel.logger.addIssue({
 				message: `Metanode "${scope.id}" doesn't have any Output node.`,
 				type: "error",
@@ -234,17 +242,22 @@ class ComputationalGraph{
 					end: scope._source ? scope._source.endIdx : 0
 				}
 			});
-			return null;	
+			return null
+		} else if (outputNodes.length === 1 && this.graph.node(outputNodes[0]).isMetanode) {
+			return this.getOutputNodes(outputNodes[0])
 		}
 
-		return outputNodes;
+		return outputNodes
 	}
 
 	getInputNodes(scopePath) {
-		let scope = this.graph.node(scopePath);
-		let inputNodes = this.graph.children(scopePath).filter(node => { return this.isInput(node)});
+		console.log(scopePath)
+		let scope = this.graph.node(scopePath)
+		let inputNodes = this.graph.children(scopePath).filter(node => this.isInput(node))
+		console.log(inputNodes)
 
 		if (inputNodes.length === 0) {
+			return null
 			this.moniel.logger.addIssue({
 				message: `Metanode "${scope.id}" doesn't have any Input nodes.`,
 				type: "error",
@@ -252,14 +265,17 @@ class ComputationalGraph{
 					start: scope._source ? scope._source.startIdx : 0,
 					end:  scope._source ? scope._source.endIdx : 0
 				}
-			});
+			})
+			return null
+		} else if (inputNodes.length === 1 && this.graph.node(inputNodes[0]).isMetanode) {
+			return this.getInputNodes(inputNodes[0])
 		}
 
-		return inputNodes;
+		return inputNodes
 	}
 
 	setEdge(fromPath, toPath) {
-		// console.info(`Creating edge from "${fromPath}" to "${toPath}".`)
+		console.info(`Creating edge from "${fromPath}" to "${toPath}".`)
 		var sourcePaths
 
 		if (typeof fromPath === "string") {
