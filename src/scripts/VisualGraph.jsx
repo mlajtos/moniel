@@ -101,7 +101,7 @@ class VisualGraph extends React.Component{
             <svg id="visualization" xmlns="http://www.w3.org/2000/svg" version="1.1" height={g.graph().height} width={g.graph().width}>
                 <style>
                     {
-                        fs.readFileSync("src/bundle.css", "utf-8", (err) => {console.log(err)})
+                        fs.readFileSync(__dirname + "/src/bundle.css", "utf-8", (err) => {console.log(err)})
                     }
                 </style>
                 <animate ref={this.mount.bind(this)} attributeName="viewBox" from={this.previousViewBox} to={viewBox} begin="0s" dur="0.25s" fill="freeze" repeatCount="1"

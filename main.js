@@ -18,18 +18,22 @@ function createWindow () {
     minHeight: 700,
     show: false,
     backgroundColor: '#272822',
-    icon: path.join(__dirname, '/icons/png/256x256.png')
+    icon: path.join(__dirname, '/icons/png/256x256.png'),
+    //titleBarStyle: "hiddenInset"
   });
 
   windows.push(window)
 
   window.loadURL(`file://${__dirname}/index.html`)
+  //window.show()
 
+  /*
   installExtension(REACT_DEVELOPER_TOOLS)
     .then((name) => console.log(`Added Extension:  ${name}`))
     .catch((err) => console.log('An error occurred: ', err));
   // Open the DevTools.
   // window.webContents.openDevTools()
+  */
 
   window.on('closed', function () {
     let index = windows.indexOf(window)
@@ -37,15 +41,19 @@ function createWindow () {
     window = null
   })
 
+  
   window.once('ready-to-show', () => {
      window.show()
   })
 
   window.saveDocument = function() {
-    const fs = require("fs")
+    // const fs = require("fs")
+    const fs = require("fs-extra")
     const timestamp = Date.now()
-    const folderPath = `./sketches/${timestamp}` 
-    fs.mkdir(folderPath, err => { if (err) throw err })
+    const docs = app.getPath("documents")
+    const folderPath = `${docs}/Moniel/sketches/${timestamp}` 
+    fs.ensureDirSync(folderPath)
+    //fs.mkdir(folderPath, err => { if (err) throw err })
 
     const printOptions = {
       printBackground: true,

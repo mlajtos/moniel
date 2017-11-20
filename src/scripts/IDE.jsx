@@ -40,9 +40,15 @@ class IDE extends React.Component{
 			});
 
 			let saveNotification = new Notification('Sketch saved', {
-            	body: `Sketch was successfully saved in the "sketches" folder.`,
-				silent: true
-            })
+				subtitle: "muuu",
+				body: `Click to open saved sketch.`,
+				silent: true,
+			})
+			const {shell} = require('electron')
+			
+			saveNotification.onclick = () => {
+				shell.showItemInFolder(message.folder)
+			}
 		}.bind(this));
 
 		ipc.on("toggleLayout", (e, m) => {
@@ -79,7 +85,7 @@ class IDE extends React.Component{
 	}
 
 	loadExample(id) {
-		let fileContent = fs.readFileSync(`./examples/${id}.mon`, "utf8")
+		let fileContent = fs.readFileSync(`${__dirname}/examples/${id}.mon`, "utf8")
 		this.editor.setValue(fileContent) // this has to be here, I don't know why
 		this.setState({
 			networkDefinition: fileContent

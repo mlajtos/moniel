@@ -112,7 +112,7 @@ class Parser{
 	}
 
 	constructor() {
-		this.contents = fs.readFileSync("src/moniel.ohm", "utf8")
+		this.contents = fs.readFileSync(__dirname + "/src/moniel.ohm", "utf8")
 		this.grammar = ohm.grammar(this.contents)
 		this.semantics = this.grammar.createSemantics().addOperation("eval", this.evalOperation)
 	}
