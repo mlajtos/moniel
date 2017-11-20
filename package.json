@@ -8,7 +8,8 @@
     "build": "npm run build-js & npm run build-css",
     "build-js": "./node_modules/.bin/babel src/scripts --watch --out-file src/bundle.js --source-maps inline",
     "build-css": "./node_modules/.bin/node-sass -w --source-map true src/styles/main.sass src/bundle.css",
-    "build-dist": "./node_modules/.bin/electron-packager . --icon icons/mac/icon.icns --overwrite",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=icons/mac/icon.icns --prune=true --out=release-builds",
+    "create-installer-mac": "electron-installer-dmg ./release-builds/Moniel-darwin-x64/Moniel.app Moniel --out=release-builds --overwrite --icon=icons/mac/icon.icns",
     "start": "./node_modules/.bin/electron ."
   },
   "repository": {
@@ -22,6 +23,7 @@
     "dagre": "^0.7.4",
     "electron-devtools-installer": "^2.1.0",
     "fira-code": "github:mlajtos/FiraCode",
+    "fs-extra": "^4.0.2",
     "graphlib": "^2.1.1",
     "jquery": "^1.7.4",
     "lodash": "^4.17.4",
@@ -38,6 +40,7 @@
     "babel-preset-latest": "^6.14.0",
     "babel-preset-react": "^6.11.1",
     "electron": "^1.7.3",
+    "electron-installer-dmg": "^0.2.1",
     "electron-packager": "^8.3.0",
     "electron-reload": "^1.0.3",
     "node-sass": "^4.5.3"
