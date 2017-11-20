@@ -8,7 +8,7 @@ body {
   flex-direction: column;
   align-content: stretch;
   flex-wrap: wrap;
-  font: 300 16px 'Helvetica Neue', Helvetica; }
+  font: normal 16px 'Helvetica Neue', Helvetica; }
 
 div.container {
   position: absolute;
@@ -18,7 +18,7 @@ div.container {
   left: 0;
   right: 0; }
   div.container.columns {
-    flex-direction: right; }
+    flex-direction: row; }
   div.container.rows {
     flex-direction: column-reverse; }
   div.container div.panel {
@@ -78,8 +78,11 @@ svg#visualization {
   flex: 1;
   opacity: 1;
   transition: opacity 250ms ease-in-out;
-  font: 300 16px 'Helvetica Neue', Helvetica;
-  background-color: #272822; }
+  font: normal 16px 'Helvetica Neue', Helvetica;
+  background-color: #272822;
+  text-rendering: geometricPrecision;
+  margin: 0 auto;
+  max-width: 100%; }
   svg#visualization.faded {
     opacity: 0.1; }
   svg#visualization g#graph {
