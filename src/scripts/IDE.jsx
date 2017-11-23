@@ -40,11 +40,10 @@ class IDE extends React.Component{
 			});
 
 			let saveNotification = new Notification('Sketch saved', {
-				subtitle: "muuu",
 				body: `Click to open saved sketch.`,
 				silent: true,
 			})
-			const {shell} = require('electron')
+			const { shell } = require('electron')
 			
 			saveNotification.onclick = () => {
 				shell.showItemInFolder(message.folder)
