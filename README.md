@@ -7,13 +7,13 @@ Human-friendly declarative dataflow notation for computational graphs. See [vide
 
 ## Pre-built packages
 
-# macOS
+### macOS
 
-[Moniel.dmg (77MB)](https://github.com/mlajtos/moniel/raw/master/release-builds/Moniel.dmg)
+[Moniel.dmg](https://github.com/mlajtos/moniel/raw/master/release-builds/Moniel.dmg) (77MB)
 
 ----------
 
-## Setup
+## Setup for other platforms
 ```
 $ git clone https://github.com/mlajtos/moniel.git
 $ cd moniel
