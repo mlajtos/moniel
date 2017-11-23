@@ -27,7 +27,8 @@ div.container {
     flex-basis: 40%;
     display: flex;
     flex-direction: column;
-    background-color: #272822; }
+    background-color: #272822;
+    overflow: hidden; }
 
 div.container.rows > div#definition.panel {
   border-top: 1px solid #636363; }
@@ -85,9 +86,6 @@ svg#visualization {
   max-width: 100%; }
   svg#visualization.faded {
     opacity: 0.1; }
-  svg#visualization g#graph {
-    transition: transform 0.25s ease-in-out;
-    transform-origin: center; }
 
 g.node, g.metanode {
   transition: transform 0.25s linear;
