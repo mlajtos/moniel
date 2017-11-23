@@ -20,6 +20,7 @@
     "ace-moniel-builds": "github:mlajtos/ace-moniel-builds",
     "color-hash": "^1.0.3",
     "d3": "^4.5.0",
+    "d3-zoom": "^1.7.1",
     "dagre": "^0.7.4",
     "electron-devtools-installer": "^2.1.0",
     "fira-code": "github:mlajtos/FiraCode",
