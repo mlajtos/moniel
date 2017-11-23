@@ -1,25 +1,28 @@
+const zoom = require("d3-zoom")
+
 class VisualGraph extends React.Component{
     constructor(props) {
-        super(props);
+        super(props)
+
         this.graphLayout = new GraphLayout(this.saveGraph.bind(this));
         this.state = {
-            graph: null,
-            previousViewBox: null
-        };
-        this.animate = null
-        this.previousViewBox = "0 0 0 0"
+            graph: null
+        }
+
+        this.svg = null
+        this.group = null
+
+        this.currentZoom = null
     }
 
     saveGraph(graph) {
-        this.setState({
-            graph: graph
-        });
+        this.setState({ graph })
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.graph) {
-            nextProps.graph._label.rankdir = nextProps.layout;
-            this.graphLayout.layout(nextProps.graph);
+            nextProps.graph._label.rankdir = nextProps.layout
+            this.graphLayout.layout(nextProps.graph)
         }
     }
 
@@ -28,19 +31,51 @@ class VisualGraph extends React.Component{
     }
 
     handleClick(node) {
-        console.log("Clicked", node);
-        this.setState({
-            selectedNode: node.id
-        })
-        this.animate.beginElement()
+        const selectedNode = node.id
+        this.setState({ selectedNode })
+
+        const { width, height } = this.state.graph.graph()
+
+        const idealSize = (width, height, maxWidth, maxHeight) => {
+            const widthRatio = width / maxWidth
+            const heightRatio = height / maxHeight
+            const idealSize = (widthRatio < heightRatio ? width : height)
+            // console.log(`[${width}, ${height}], [${maxWidth}, ${maxHeight}], ${widthRatio}, ${heightRatio}, ideal = ${idealSize}`)
+            return idealSize
+        }
+
+        if (this.currentZoom === null) {
+            this.currentZoom = [ width / 2, height / 2, idealSize(width, height, width, height)]
+        }
+        const target = [node.x, node.y, idealSize(node.width, node.height, width, height)]
+
+        this.transition(this.currentZoom, target, node)
+
+        this.currentZoom = target
     }
 
-    mount(domNode) {
-        if (domNode) {
-            this.animate = domNode
+    transition(start, end, node) {
+        const { width, height } = this.state.graph.graph()
+
+        const center = {
+            x: width / 2,
+            y: height / 2
         }
-        this.animate.beginElement()
-    }
+        const i = d3.interpolateZoom(start, end)
+
+        const transform = ([x, y, size]) => {
+            const scale = width / size
+            const translateX = center.x - x * scale
+            const translateY = center.y - y * scale
+            return `translate(${translateX},${translateY})scale(${scale})`
+        }
+
+        d3.select(this.group)
+            .attr("transform", transform(start))
+          .transition()
+            .duration(i.duration)
+            .attrTween("transform", () => ( (t) => transform(i(t)) ))
+      }
 
     render() {
         if (!this.state.graph) {
@@ -48,71 +83,39 @@ class VisualGraph extends React.Component{
             return null
         }
 
-        const g = this.state.graph;
+        const g = this.state.graph
 
         const nodes = g.nodes().map(nodeName => {
-            const graph = this;
-            const n = g.node(nodeName);
+            const n = g.node(nodeName)
             const props = {
                 key: nodeName,
                 node: n,
-                onClick: graph.handleClick.bind(graph)
+                onClick: this.handleClick.bind(this)
             }
 
-            let Type = null
-
-            if (n.isMetanode === true) {
-                if (n.isAnonymous) {
-                    Type = AnonymousMetanode
-                } else {
-                    Type = Metanode
-                }
-            } else {
-                if (n.userGeneratedId) {
-                    Type = IdentifiedNode
-                } else {
-                    Type = AnonymousNode
-                }
-            }
+            const Type = nodeDispatch(n)
 
             return <Type {...props} />
-        });
+        })
 
         const edges = g.edges().map(edgeName => {
             const e = g.edge(edgeName);
             return <Edge key={`${edgeName.v}->${edgeName.w}`} edge={e}/>
-        });
+        })
 
-        var viewBox_whole = `0 0 ${g.graph().width} ${g.graph().height}`;
-        var transformView = `translate(0px,0px)` + `scale(${g.graph().width / g.graph().width},${g.graph().height / g.graph().height})`;
-        
-        let selectedNode = this.state.selectedNode;
-        var viewBox
-        if (selectedNode) {
-            let n = g.node(selectedNode);
-            viewBox = `${n.x - n.width / 2} ${n.y - n.height / 2} ${n.width} ${n.height}`
-        } else {
-            viewBox = viewBox_whole
-        }
-
-        setTimeout(() => { this.previousViewBox = viewBox }, 300)
+        const { width, height } = g.graph()
 
         return (
-            <svg id="visualization" xmlns="http://www.w3.org/2000/svg" version="1.1" height={g.graph().height} width={g.graph().width}>
+            <svg ref={ el => { this.svg = el } } id="visualization" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox={`0 0 ${width} ${height}`}>
                 <style>
                     {
                         fs.readFileSync(__dirname + "/src/bundle.css", "utf-8", (err) => {console.log(err)})
                     }
                 </style>
-                <animate ref={this.mount.bind(this)} attributeName="viewBox" from={this.previousViewBox} to={viewBox} begin="0s" dur="0.25s" fill="freeze" repeatCount="1"
-                    calcMode="paced"
-                ></animate>
                 <defs>
-                    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerUnits="strokeWidth" markerWidth="10" markerHeight="7.5" orient="auto">
-                        <path d="M 0 0 L 10 5 L 0 10 L 3 5 z" className="arrow"></path>
-                    </marker>
+                    <Arrow />
                 </defs>
-                <g id="graph">
+                <g id="graph" ref={el => { this.group = el }}>
                     <g id="nodes">
                         {nodes}
                     </g>
@@ -124,6 +127,12 @@ class VisualGraph extends React.Component{
         );
     }
 }
+
+const Arrow = () => (
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerUnits="strokeWidth" markerWidth="10" markerHeight="7.5" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 L 3 5 z" className="arrow" />
+    </marker>
+)
 
 class Edge extends React.Component{
     line = d3.line()
@@ -163,19 +172,38 @@ class Edge extends React.Component{
     }
 }
 
-class Node extends React.Component{
-    constructor(props) {
-        super(props);
+const nodeDispatch = (n) => {
+    let Type = null
+    if (n.isMetanode === true) {
+        if (n.isAnonymous) {
+            Type = AnonymousMetanode
+        } else {
+            Type = Metanode
+        }
+    } else {
+        if (n.userGeneratedId) {
+            Type = IdentifiedNode
+        } else {
+            Type = AnonymousNode
+        }
     }
-    handleClick() {
-        this.props.onClick(this.props.node);
-    }
+    return Type
+}
+
+class Node extends React.Component {
     render() {
-        let n = this.props.node;
+        const n = this.props.node
         const type = n.isMetanode ? "metanode" : "node"
 
+        const translateX = Math.floor(n.x -(n.width / 2))
+        const translateY = Math.floor(n.y -(n.height / 2))
+
         return (
-            <g className={`${type} ${n.class}`} onClick={this.handleClick.bind(this)} transform={`translate(${Math.floor(n.x -(n.width/2))},${Math.floor(n.y -(n.height/2))})`}>
+            <g
+                className={`${type} ${n.class}`}
+                onClick={this.props.onClick.bind(this, this.props.node)}
+                transform={`translate(${translateX},${translateY})`}
+            >
                 <rect width={n.width} height={n.height} rx="15px" ry="15px" style={n.style} />
                 {this.props.children}
             </g>
@@ -183,9 +211,9 @@ class Node extends React.Component{
     }
 }
 
-class Metanode extends Node{
+class Metanode extends Node {
     render() {
-        let n = this.props.node;
+        const n = this.props.node
         return (
             <Node {...this.props}>
                 <text transform={`translate(10,0)`} textAnchor="start" style={{dominantBaseline: "ideographic"}}>
@@ -193,39 +221,39 @@ class Metanode extends Node{
                     <tspan x="0" dy="1.2em">{n.class}</tspan>
                 </text>
             </Node>
-        );
+        )
     }
 }
 
 class AnonymousMetanode extends Node {
     render() {
-        let n = this.props.node;
+        const n = this.props.node
         return (
             <Node {...this.props}>
                 <text transform={`translate(10,0)`} textAnchor="start" style={{dominantBaseline: "ideographic"}}>
                     <tspan x="0" className="id">{n.userGeneratedId}</tspan>
                 </text>
             </Node>
-        );
+        )
     }
 }
 
-class AnonymousNode extends Node{
+class AnonymousNode extends Node {
     render() {
-        let n = this.props.node;
+        const n = this.props.node
         return (
             <Node {...this.props}>
                 <text transform={`translate(${(n.width/2) },${(n.height/2)})`} textAnchor="middle">
                     <tspan>{n.class}</tspan>
                 </text>
             </Node>
-        );
+        )
     }
 }
 
-class IdentifiedNode extends Node{
+class IdentifiedNode extends Node {
     render() {
-        let n = this.props.node;
+        const n = this.props.node
         return (
             <Node {...this.props}>
                 <text transform={`translate(${(n.width/2) },${(n.height/2)})`} textAnchor="middle" style={{dominantBaseline: "ideographic"}}>
@@ -233,6 +261,6 @@ class IdentifiedNode extends Node{
                     <tspan x="0" dy="1.2em">{n.class}</tspan>
                 </text>
             </Node>
-        );
+        )
     }
 }
