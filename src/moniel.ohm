@@ -3,7 +3,7 @@ Moniel{
         = (NodeDefinition | Chain)*
 
     Chain
-        = NonemptyListOf<(Block), edge>
+        = NonemptyListOf<Block, edge>
 
     Block
         = List | Node | path
