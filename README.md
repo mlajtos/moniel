@@ -141,9 +141,10 @@ RL(s = 784x1000) -> RL(s = 1000x10)
 ----------
 
 ## Similar projects and Inspiration
+– [Lobe](https://lobe.ai/) ([video](https://www.youtube.com/watch?v=IN69suHxS8w)) – "Build, train, and ship custom deep learning models using a simple visual interface."
 - [Serrano](https://github.com/pcpLiu/Serrano) – "A graph computation framework with Accelerate and Metal support."
 - [Subgraphs](https://subgraphs.com/) – "Subgraphs is a visual IDE for developing computational graphs."
-- [Machine](https://www.youtube.com/watch?v=N9q9qacAKoM) – "Machine is a machine learning IDE."
+- 💀[Machine](https://www.youtube.com/watch?v=N9q9qacAKoM) – "Machine is a machine learning IDE."
 - [PyTorch](http://pytorch.org) – "Tensors and Dynamic neural networks in Python with strong GPU acceleration."
 - [Sonnet](https://github.com/deepmind/sonnet) – "Sonnet is a library built on top of TensorFlow for building complex neural networks."
 - [TensorGraph](https://github.com/hycis/TensorGraph) – "TensorGraph is a framework for building any imaginable models based on TensorFlow"
