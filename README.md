@@ -1,3 +1,9 @@
+# ⚠️ Notice
+
+[L1: Tensor Studio](https://github.com/mlajtos/L1) - a more practical continuation of the ideas presented in Moniel.
+
+---
+
 # Moniel: *Notation for Computational Graphs*
 Human-friendly declarative dataflow notation for computational graphs. See [video](https://www.youtube.com/watch?v=0DC0RMnuwxU).
 
