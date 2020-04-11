@@ -147,6 +147,8 @@ RL(s = 784x1000) -> RL(s = 1000x10)
 ----------
 
 ## Similar projects and Inspiration
+
+ - [Piotr Migdał: Simple Diagrams of Convoluted Neural Networks](https://medium.com/inbrowserai/simple-diagrams-of-convoluted-neural-networks-39c097d2925b) - great summary on visualizing ML architectures
 - [Lobe](https://lobe.ai/) ([video](https://www.youtube.com/watch?v=IN69suHxS8w)) – "Build, train, and ship custom deep learning models using a simple visual interface."
 - [Serrano](https://github.com/pcpLiu/Serrano) – "A graph computation framework with Accelerate and Metal support."
 - [Subgraphs](https://subgraphs.com/) – "Subgraphs is a visual IDE for developing computational graphs."
