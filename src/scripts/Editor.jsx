@@ -65,7 +65,7 @@ class Editor extends React.Component{
         this.editor.selection.on("changeCursor", this.onCursorPositionChanged.bind(this));
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.issues) {
             var annotations = nextProps.issues.map(issue => {
                 let position = this.editor.session.doc.indexToPosition(issue.position.start);

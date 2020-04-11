@@ -91,8 +91,8 @@ g.node, g.metanode {
   transition: transform 0.25s linear;
   animation: fade-in 0.25s linear; }
   g.node rect, g.metanode rect {
-    rx: 15;
-    ry: 15;
+    rx: 12;
+    ry: 12;
     stroke: white;
     stroke-width: 1px;
     transition: width 0.25s linear, height 0.25s linear, stroke 0.1s ease-in-out, stroke-width 0.1s ease-in-out;

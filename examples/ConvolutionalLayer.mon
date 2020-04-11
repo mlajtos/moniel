@@ -1,11 +1,11 @@
 +ConvolutionalLayer{
     in:Input
     
-    filters:Tensor
-    biases:Tensor
+    filters:Tensor(size = 28x28x10, sparse = true)
+    biases:Tensor(size = 28x28x1)
     
-    [in,filters] -> conv:Convolution
-    [conv, biases] -> BiasAdd -> ReLU -> out:Output
+    [in,filters] -> conv:Convolution(strideSize = 2x2)
+    [conv, biases] -> BiasAdd(silent = true) -> ReLU -> out:Output
 }
 
 image:Input -> conv1:CL -> conv2:CL -> Out

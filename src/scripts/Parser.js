@@ -63,13 +63,14 @@ class Parser{
 				list: list.eval()
 			}
 		},
-		BlockParameters: function(_, list, __) {
-			return list.eval()
+		BlockParameters: function(_, params, __) {
+			const p = params.eval();
+			return p[0] ? p[0] : p
 		},
 		Parameter: function(name, _, value) {
 			return {
 				kind: "Parameter",
-				name: name.eval(),
+				name: name.source.contents,
 				value: value.eval()
 			}
 		},
