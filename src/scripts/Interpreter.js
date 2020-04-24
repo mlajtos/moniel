@@ -135,12 +135,22 @@ class Interpreter {
 
 	// this is doing too much – break into "not recognized", "success" and "ambiguous"
 	_LiteralNode(instance, state) {
-		var node = {
+
+		const heights = {
+			id: 19,
+			class: 18,
+			parameterRow: 15,
+			parameterTablePadding: 2*3,
+			headerPadding: 5
+		};
+		
+		const node = {
 			id: undefined,
 			class: "Unknown",
 			color: "darkgrey",
-			height: 30,
+			height: 2 * heights.headerPadding + heights.class,
 			width: 100,
+			parameters: instance.parameters.map(p => [p.name, p.value.value]),
 
 			_source: instance,
 		};
@@ -183,7 +193,11 @@ class Interpreter {
 		} else {
 			node.id = instance.alias.value;
 			node.userGeneratedId = instance.alias.value;
-			node.height = 50;
+			node.height += heights.id;
+		}
+
+		if (node.parameters.length > 0) {
+			node.height += heights.parameterTablePadding + (node.parameters.length * heights.parameterRow);
 		}
 
 		// is metanode
@@ -200,7 +214,13 @@ class Interpreter {
 			}
 		}
 
-		const width = 20 + Math.max(...[node.class, node.userGeneratedId ? node.userGeneratedId : ""].map(string => pixelWidth(string, {size: 16})))
+		const left = Math.max(...node.parameters.map(([key, value]) => pixelWidth(key, { size:14 })));
+		const right = Math.max(...node.parameters.map(([key, value]) => pixelWidth(value, { size:14 })));
+		const widthParams = left + right;
+
+		const widthTitle = Math.max(...[node.class, node.userGeneratedId ? node.userGeneratedId : ""].map(string => pixelWidth(string, {size: 16})))
+
+		const width = 20 + Math.max(widthParams, widthTitle);
 
 		this.graph.createNode(node.id, {
 			...node,
